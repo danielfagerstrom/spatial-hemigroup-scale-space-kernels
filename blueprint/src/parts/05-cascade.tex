@@ -1,0 +1,359 @@
+% !TEX root = ../print.tex
+% Draft \S5 --- The cascade: additivity and infinite divisibility
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S5 (lines 199-279).
+%
+% Four nodes. lem:additivity ports verbatim. thm:increments-levy is the causal
+% thm:increments-bernstein with the weight 1 - e^{-x} replaced by 1 wedge x^2 and the
+% compactification replaced by a truncation inequality, which is the one new idea; it is
+% written out, so the classical null-array convergence theorem (Sato Thm. 8.7) is NOT a
+% ledger entry.
+%
+% CHANGED (skeleton 2026-09-08): cor:monotonicity's exceptional set is now E = union of the
+% N_{p,q}, not of the N_{p,q} MINUS {0}. With the set-difference, 0 lies outside E while
+% G(.,0) = 0 identically, so the conclusion "G(.,omega) is strictly increasing for every omega
+% outside E" was FALSE at omega = 0. The proof below already had it right ("for omega not in
+% E union {0}"), which is how the discrepancy surfaced; E is still a countable union of
+% subgroups. Found by writing the Lean statement (Skeleton.monotonicity_strict).
+% CHANGED (review 2026-09-09, R29): the annotation now records that the lattice clause is read
+% through lem:lattice-zero rather than restated, so that a reader of the \lean tag does not
+% look for a declaration that does not exist. Statement unchanged.
+%
+% cor:monotonicity is the HONEST port of the causal cor:strict-monotonicity: on the line
+% strict monotonicity of the accumulated exponent holds only off a countable set of
+% frequencies, and the causal sentence that closes its \S5 is false here before covariance.
+% cor:smoothed-transmittance is the replacement coordinate the gauge argument runs on, and
+% it is new.
+
+\chapter{The cascade: additivity and infinite divisibility}
+\label{ch:cascade}
+
+Composition of operators is convolution of measures, so the exponent of
+Chapter~\ref{ch:representation} is additive over adjacent intervals of the scale axis. Set
+\[
+  G(t,\omega) := g_{0,t}(\omega),
+\]
+the density accumulated from scale $0$ to scale $t$. No covariance is used anywhere in this
+chapter: everything below holds for every family satisfying (A1)--(A7), including the lattice
+family of \ref{rem:lattice-family}.
+
+% draft: Lemma 5.1'
+% twin: hcs lem:additivity (Hemigroup.CascadeCore.additivity) --- verbatim.
+\begin{lemma}[additivity]\label{lem:additivity}
+\uses{lem:convolution-representation,lem:nonvanishing}
+\lean{SpatialLine.additivity}\leanok
+\notes{hemigroup-cascade}
+Under (A1)--(A7), $\mu_{r,t} = \mu_{s,t} * \mu_{r,s}$ for $r \le s \le t$, hence
+\[
+  g_{r,t}(\omega) = g_{r,s}(\omega) + g_{s,t}(\omega), \qquad g_{t,t} = 0 .
+\]
+Consequently $g_{s,t}(\omega) = G(t,\omega) - G(s,\omega)$, where $G(0,\cdot) = 0$;
+$G(\cdot,\omega)$ is nondecreasing and continuous for each $\omega$; and $G(t,\cdot)$ is even
+and continuous with $G(t,0) = 0$.
+\statusT\quad\emph{(\textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean core.
+The ten conjuncts of \texttt{SpatialLine.additivity} are the ten clauses above, in order, with
+$G(t,\omega)$ written inline as the exponent of $\mu_{0,t}$ rather than given a name of its
+own. Two of the three inputs the proof names are supplied to the Lean statement rather than
+cited: the representation is the hypothesis that the operators are convolution by a family of
+probability measures, and what the proof uses from \ref{lem:convolution-representation} beyond
+that is its \emph{uniqueness} clause, which is a statement about measures with no axiom in it
+and is proved separately. The positivity of $\hat\mu$ is cited across chapters: the Lean proof
+applies \ref{lem:nonvanishing}'s own declaration, \texttt{SpatialLine.nonvanishing}.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(A6) gives $\Phis{s}{t}\Phis{r}{s} = \Phis{r}{t}$, which by
+\ref{lem:convolution-representation} reads $\mu_{s,t} * (\mu_{r,s} * f) = \mu_{r,t} * f$ for
+every $f \in \Lone$, so $\mu_{r,t} = \mu_{s,t} * \mu_{r,s}$ by the uniqueness clause there.
+Fourier transforms turn convolution into multiplication and hence $-\log$ into addition, which
+is legitimate because $\hat\mu > 0$ (\ref{lem:nonvanishing}); and $\Phis{t}{t} = \mathrm{Id}$
+gives $\mu_{t,t} = \delta_0$ and $g_{t,t} = 0$. The remaining clauses are
+\ref{lem:nonvanishing}, together with $g_{s,t} \ge 0$ for the monotonicity of
+$G(\cdot,\omega)$.
+\end{proof}
+
+In the semigroup case the next step is trivial, $\mu_t = \mu_{t/n}^{*n}$ exhibiting every
+kernel as a convolution power. In the hemigroup case there is no such power, and what replaces
+it is a null-array limit. The causal argument made this elementary by weighting the partition
+measures with $1 - e^{-x}$ and compactifying the half-line, the killing term that the
+compactification admits being excluded afterwards. On the line the weight becomes
+$1 \wedge x^2$, which vanishes at the origin at the rate that turns piled-up mass into the
+Gaussian coefficient; but the test function $(1 - \cos\omega x)/(1 \wedge x^2)$ oscillates at
+infinity and does not extend to a compactification, so escape of mass must be ruled out
+\emph{before} the limit. The tool is a truncation inequality, and its input is the same fact
+the causal proof used afterwards: continuity of $g_{s,t}$ at $\omega = 0$ with
+$g_{s,t}(0) = 0$.
+
+% draft: Theorem 5.2'
+% twin: hcs thm:increments-bernstein (Hemigroup.CascadeCore.exponent_hasLevyRep), ledger A3
+% there; here the same clause of the toolbox (prop:fourier-toolbox(3)) supplies existence and
+% uniqueness, and the extraction of the representation is ours.
+% CHANGED (proof of record 2026-09-09): the proof below now follows the machine-checked route,
+% per CLAUDE.md's convention. Two constants change and nothing else: the null-array comparison
+% is written with u^2 in place of the sharp u^2/2 (it follows from e^v >= 1 + v alone, and the
+% factor multiplies a quantity going to zero), and the truncation inequality with 2/(3 pi^2) in
+% place of 2/15, derived by integrating 1 - cos v >= (2/pi^2) v^2 over [0,u] rather than from
+% the alternating-series bound sin u <= u - u^3/6 + u^5/120, which Mathlib does not carry. The
+% truncation lower bound is now displayed as eq:sinc-lower and the mass and tightness constants
+% follow it (3 pi^2 / 2 and the threshold 1/eta in place of 15/2 and 2/eta). The sharp
+% constants survive as a closing remark, marked as not machine-checked. Statement unchanged.
+\begin{theorem}[increments are symmetric \Levy{} exponents]\label{thm:increments-levy}
+\uses{lem:additivity,lem:nonvanishing,prop:fourier-toolbox,lem:profile-integrability,prop:fourier-uniqueness}
+\lean{SpatialLine.increments_levy, SpatialLine.increments_levy_id_measure,
+SpatialLine.increments_levy_infinitely_divisible}\leanok
+\notes{hemigroup-cascade}
+Under (A1)--(A7), $g_{s,t} \in \LEs$ for every $s \le t$: there are a Gaussian coefficient
+$a(s,t) \ge 0$ and a measure $\nu_{s,t}$ on $(0,\infty)$ with
+$\int_{(0,\infty)}(1 \wedge x^2)\,\nu_{s,t}(dx) < \infty$ and
+\begin{equation}\label{eq:increment-levy}
+  g_{s,t}(\omega) \;=\; a(s,t)\,\omega^2
+   + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\nu_{s,t}(dx),
+\end{equation}
+the pair being unique by \ref{prop:fourier-toolbox}(3). In particular every kernel
+$\mu_{s,t}$ is infinitely divisible.
+\statusT\quad\emph{(The representation is extracted directly, and the closure clause
+\ref{prop:fourier-toolbox}(4) is never spent, exactly as in the causal proof. What
+\ref{prop:fourier-toolbox}(3) supplies is uniqueness of the pair and, for the last sentence,
+the converse direction; the null-array limit itself, including the truncation inequality that
+excludes escape of mass, is ours. Prokhorov's theorem, or Helly selection, is held
+\textbf{[T]}. \textbf{Machine-checked}, in two declarations, and the split is where the trust
+boundary falls. The representation itself, \texttt{SpatialLine.increments\_levy}, has
+\texttt{\#print axioms} reducing to \emph{Lean core}: the null-array estimate, the truncation
+inequality and the extraction of the limiting pair are all proved, and no interface is spent.
+The closing sentence, \texttt{SpatialLine.increments\_levy\_infinitely\_divisible}, spends the
+two clauses the last paragraph cites --- the converse half of \ref{prop:fourier-toolbox}(3),
+ledger A3, and \ref{prop:fourier-toolbox}(1), ledger A1 --- and nothing else. It is stated
+twice, at the transform and at the law. The transform form is the one every consumer uses; the
+law form, \texttt{SpatialLine.increments\_levy\_id\_measure}, is the sentence printed here, that
+$\mu_{s,t}$ \emph{is} the $n$-fold convolution, and it takes the printed proof's last step ---
+\ref{prop:fourier-uniqueness}, to pass from the transform back to the measure. That step is
+\textbf{[T]} and machine-checked, so spending it costs nothing at the trust boundary: the law
+form prints exactly the two ledger names the transform form prints. What it needed beyond them
+is the convolution power itself, which the library used does not define; it is four lines of
+recursion, with $\delta_0$ at the exponent $0$. The proof below is the checked route: its two
+constants, $u^2$ and $\frac{2}{3\pi^2}$, are those of the verified inequalities
+\texttt{SpatialLine.sub\_one\_sub\_exp\_neg\_le} and \texttt{SpatialLine.one\_sub\_sinc\_ge}
+rather than the sharp $u^2/2$ and $\frac{2}{15}$, which are recorded as a remark at the end of
+the second step and are not machine-checked. Two steps are written differently in the Lean and
+not here, both being formalisation conveniences and not mathematics. The removable singularity
+of $k_\omega$ is filled in there by the closed form
+$k_\omega(x) = \tfrac{\omega^2}{2}\,\mathrm{sinc}(\omega x/2)^2\,(1 \vee x^2)$, equal to it and
+needing no case distinction. And the compactness step produces a \emph{cluster point} of
+$(\varrho_n)$ rather than a convergent subsequence, because the space of finite measures on
+$\RR$ carries no metrizability instance in the library used; nothing is lost, since every
+observable the proof reads off the limit converges along the full sequence and a convergent
+sequence has one cluster value.)}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Fix $s < t$ and the uniform partition $s_i = s + \tfrac in(t-s)$, $i = 0,\dots,n$; write
+$\mu_i := \mu_{s_i,s_{i+1}}$ and $g_i := g_{s_i,s_{i+1}}$, so that
+$g_{s,t} = \sum_{i<n} g_i$ for every $n$, by \ref{lem:additivity}.
+
+\emph{The null array.} Fix $\omega$. $G(\cdot,\omega)$ is uniformly continuous on $[s,t]$, so
+$m_n := \max_i g_i(\omega) \to 0$. For $u \ge 0$ we have $0 \le u - (1 - e^{-u}) \le u^2$: the
+left inequality is $e^v \ge 1 + v$ at $v = -u$, and the right one is the same inequality at
+$v = u$ followed by $e^{-u} \le (1+u)^{-1} \le 1 - u + u^2$. Hence
+\[
+  \Bigl|\,g_{s,t}(\omega) - \sum_i \bigl(1 - e^{-g_i(\omega)}\bigr)\Bigr|
+  \ \le\ \sum_i g_i(\omega)^2
+  \ \le\ m_n\,g_{s,t}(\omega) \ \to\ 0 .
+\]
+On the other hand, with $\Pi_n := \sum_i \mu_i$, a symmetric finite measure of mass $n$,
+\[
+  \sum_i \bigl(1 - e^{-g_i(\omega)}\bigr) = \sum_i \bigl(1 - \hat\mu_i(\omega)\bigr)
+  = \int_\RR \bigl(1 - \cos\omega x\bigr)\,\Pi_n(dx)
+  = \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\widetilde\Pi_n(dx),
+\]
+where $\widetilde\Pi_n$ is the image of $\Pi_n$ under $x \mapsto |x|$, the integrand being
+even; the origin carries no weight, since $1 - \cos 0 = 0$, so $\widetilde\Pi_n$ may be taken
+on $(0,\infty)$.
+
+\emph{Two bounds, uniform in $n$.} Both come from one inequality. For $\eta > 0$, Tonelli and
+the identity $\eta^{-1}\int_0^\eta (1 - \cos\omega x)\,d\omega = 1 - \frac{\sin\eta x}{\eta x}$
+give
+\begin{equation}\label{eq:truncation}
+  \int_{(0,\infty)} \Bigl(1 - \frac{\sin\eta x}{\eta x}\Bigr)\,\widetilde\Pi_n(dx)
+  \;=\; \frac1\eta\int_0^\eta \sum_i\bigl(1 - \hat\mu_i(\omega)\bigr)\,d\omega
+  \;\le\; \frac1\eta\int_0^\eta g_{s,t}(\omega)\,d\omega \;=:\; \bar g(\eta),
+\end{equation}
+using $1 - e^{-u} \le u$ and \ref{lem:additivity}. The function $1 - \frac{\sin u}{u}$ is
+nonnegative and satisfies
+\begin{equation}\label{eq:sinc-lower}
+  1 - \frac{\sin u}{u} \ \ge\ \frac{2}{3\pi^2}\,\bigl(1 \wedge u^2\bigr)
+  \qquad (u \in \RR),
+\end{equation}
+with the convention $\frac{\sin 0}{0} = 1$. Both sides being even, take $u > 0$. For
+$0 < u \le \pi$, integrate the elementary bound $1 - \cos v \ge \frac{2}{\pi^2}v^2$, valid for
+$|v| \le \pi$, over $[0,u]$ against the identity $u - \sin u = \int_0^u (1 - \cos v)\,dv$; this
+gives $u - \sin u \ge \frac{2}{3\pi^2}u^3$, that is
+$1 - \frac{\sin u}{u} \ge \frac{2}{3\pi^2}u^2 \ge \frac{2}{3\pi^2}(1 \wedge u^2)$. For
+$u > \pi$ the crude bound $\frac{\sin u}{u} \le \frac1u < \frac1\pi$ leaves
+$1 - \frac{\sin u}{u} > 1 - \frac1\pi > \frac23 > \frac{2}{3\pi^2} \ge
+\frac{2}{3\pi^2}(1 \wedge u^2)$. \emph{Mass:} with $\eta = 1$, \ref{eq:truncation} and
+\ref{eq:sinc-lower} bound the weighted measures
+$\varrho_n := (1 \wedge x^2)\,\widetilde\Pi_n$ on $(0,\infty)$ by
+$\varrho_n((0,\infty)) \le \tfrac{3\pi^2}{2}\,\bar g(1)$. \emph{Tightness:} for $x \ge 1/\eta$
+the argument $u = \eta x$ has $1 \wedge u^2 = 1$, so \ref{eq:truncation} and
+\ref{eq:sinc-lower} give
+$\tfrac{2}{3\pi^2}\,\widetilde\Pi_n([1/\eta,\infty)) \le \bar g(\eta)$, and
+$\bar g(\eta) \to 0$ as $\eta \downarrow 0$ because $g_{s,t}$ is continuous with
+$g_{s,t}(0) = 0$ (\ref{lem:nonvanishing}); since $\varrho_n \le \widetilde\Pi_n$ on
+$[1,\infty)$, the tails of $\varrho_n$ are small uniformly in $n$. This is the truncation
+inequality of characteristic-function theory, proved here in the few lines it takes; it is
+where continuity at $\omega = 0$ does quantitative work.
+
+Sharper constants are available and are not used: Taylor's theorem gives
+$u - (1 - e^{-u}) \le u^2/2$ and, through $\sin u \le u - u^3/6 + u^5/120$,
+$1 - \frac{\sin u}{u} \ge \frac{2}{15}(1 \wedge u^2)$. Neither is worth its derivative
+argument here --- the first constant multiplies a quantity that is going to zero, the second
+one that has only to be finite --- and neither is machine-checked.
+
+\emph{The limit.} A family of finite measures on $[0,\infty)$ of uniformly bounded mass and
+uniformly small tails has a weakly convergent subsequence: pass first to a subsequence along
+which the total masses converge; if their limit is $0$ the measures converge weakly to the
+zero measure, and otherwise Prokhorov's theorem applies to the normalised measures, which are
+tight. Let $\varrho_{n_k} \to \varrho$, a finite measure on $[0,\infty)$, the subsequence
+chosen once and independently of $\omega$. The function
+\[
+  k_\omega(x) := \frac{1 - \cos\omega x}{1 \wedge x^2}, \qquad k_\omega(0) := \tfrac12\omega^2,
+\]
+is continuous on $[0,\infty)$ --- the singularity is removable, since
+$1 - \cos u = \tfrac12u^2 + O(u^4)$ --- and bounded by $\max(\tfrac12\omega^2, 2)$, so
+$\int k_\omega\,d\varrho_{n_k} \to \int k_\omega\,d\varrho$, while
+$\int k_\omega\,d\varrho_n = \int (1-\cos\omega x)\,\widetilde\Pi_n(dx) \to g_{s,t}(\omega)$ by
+the first step. Reading $\varrho$ in two pieces, the atom at $0$ and the rest,
+\[
+  g_{s,t}(\omega) = \tfrac12\varrho(\{0\})\,\omega^2
+   + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\frac{\varrho(dx)}{1 \wedge x^2},
+\]
+which is \ref{eq:increment-levy} with $a(s,t) := \tfrac12\varrho(\{0\})$ and
+$\nu_{s,t}(dx) := (1 \wedge x^2)^{-1}\varrho(dx)$ on $(0,\infty)$, for which
+$\int (1 \wedge x^2)\,\nu_{s,t} = \varrho((0,\infty)) < \infty$. The atom at $0$ is the Gaussian
+coefficient, as in the causal theory it was the drift; there is no atom at infinity to exclude,
+because tightness has already forbidden it, and correspondingly no killing term. The case
+$s = t$ is $g_{t,t} = 0$, with the pair $(0,0)$.
+
+\emph{Infinite divisibility.} For each $n$, $g_{s,t}/n$ is of the form
+\ref{eq:levy-khintchine} with pair $(a/n, \nu/n)$, so by the converse half of
+\ref{prop:fourier-toolbox}(3) and by \ref{prop:fourier-toolbox}(1), $e^{-g_{s,t}/n}$ is the
+transform of a symmetric probability measure, whose $n$-fold convolution has transform
+$e^{-g_{s,t}} = \hat\mu_{s,t}$ and hence is $\mu_{s,t}$ by \ref{prop:fourier-uniqueness}.
+\end{proof}
+
+% draft: Corollary 5.3'
+% twin: hcs cor:strict-monotonicity (Hemigroup.CascadeCore.strict_monotonicity) --- the
+% honest port: the causal statement holds at EVERY value of the transform variable, this one
+% only off a countable exceptional set, and the difference is exactly the lattice laws.
+\begin{corollary}[monotonicity, and where it is strict]\label{cor:monotonicity}
+\uses{lem:additivity,lem:lattice-zero,lem:convolution-representation,lem:nonvanishing}
+\lean{SpatialLine.monotonicity_zero_set, SpatialLine.monotonicity_strict}\leanok
+Assume in addition (ND). For $s < t$ the zero set
+$N_{s,t} := \{\omega : g_{s,t}(\omega) = 0\}$ is a closed proper subgroup of $\RR$, hence
+$\{0\}$ or a lattice $c\ZZ$ with $c > 0$, and it is a lattice exactly when $\mu_{s,t}$ is a
+lattice law. Consequently $G(\cdot,\omega)$ is strictly increasing on $[0,\infty)$ for every
+$\omega$ outside the countable set $E := \bigcup N_{p,q}$, the union over rational
+$0 \le p < q$.
+\statusT\quad\emph{(This is as much as the line gives before covariance. The causal sentence
+that the accumulated exponent is injective in scale at every value of the transform variable
+--- and that this is what makes the relabelling of (A8) rigid --- is false here, and the
+exceptional frequencies are exactly those at which some increment is a lattice law. It becomes
+true again after the classification, \ref{prop:strict-positivity}(2), and the gauge argument of
+Chapter~\ref{ch:covariance} is arranged not to need it in the meantime. One clause is read
+rather than restated in the formalisation: that $N_{s,t}$ is a lattice exactly when
+$\mu_{s,t}$ is a lattice law is \ref{lem:lattice-zero}'s own equivalence applied to
+$\mu_{s,t}$, so \texttt{SpatialLine.monotonicity\_zero\_set} names that application instead of
+duplicating the statement. \textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean
+core. The exceptional set the formal proof exhibits is the union over ordered pairs of
+rationals, and the statement asks of $E$ only what the conclusion uses --- that it is countable
+and contains every $N_{p,q}$ --- since the indexing of the union is a proof device and not part
+of the mathematics.)}
+\end{corollary}
+
+\begin{proof}
+\leanok
+$N_{s,t} = N(\mu_{s,t})$ in the notation of \ref{lem:lattice-zero}, a closed subgroup, proper
+because $\mu_{s,t} \ne \delta_0$ by (ND) and the uniqueness clause of
+\ref{lem:convolution-representation}. If $[p,q] \subseteq [s,t]$ then
+$g_{s,t} = g_{s,p} + g_{p,q} + g_{q,t}$ with all three terms nonnegative
+(\ref{lem:additivity}, \ref{lem:nonvanishing}), so $N_{s,t} \subseteq N_{p,q}$; every interval
+$[s,t]$ with $s < t$ contains one with rational endpoints, so every $N_{s,t}$ is contained in
+some $N_{p,q}$ with $p < q$ rational, and $E$ is a countable union of lattices, hence
+countable, and it contains $0$, every $N_{p,q}$ being a subgroup. For $\omega \notin E$ and
+$s < t$ we get $g_{s,t}(\omega) > 0$, and
+$G(t,\omega) - G(s,\omega) = g_{s,t}(\omega)$ is \ref{lem:additivity}.
+\end{proof}
+
+% CHANGED (2026-09-11, draft sync, R81): "E = 2 pi Z \ {0}" was the exceptional set of the
+% pre-2026-09-08 corollary, which removed the origin; since the skeleton change recorded at the
+% head of this file E is the plain union of the N_{p,q}, which contains 0, and for this family
+% every N_{s,t} (s < t) is 2 pi Z, so E = 2 pi Z. The remark's point survives unchanged -- E
+% contains nonzero frequencies -- and the title says that now that "not empty" is automatic.
+% Found by the draft-sync editor of group A; the draft carried the same stale form.
+\begin{remark}[the exceptional set is not $\{0\}$]\label{rem:lattice-family}
+For the symmetric compound Poisson family on $\ZZ$ with
+$\hat\mu_{s,t}(\omega) = e^{-(t-s)(1-\cos\omega)}$ (a hemigroup, indeed a semigroup, of unit
+steps), every axiom except (A8) holds, every kernel is a lattice law,
+$E = 2\pi\ZZ$, and $G(\cdot,2\pi n) \equiv 0$ for every integer $n$. Covariance
+fails because $\Dil{\lambda}\mu_{s,t}$ has exponent $(t-s)(1-\cos\lambda\omega)$, which is of
+the form $c\,(1-\cos\omega)$ only for $\lambda = 1$. So the exclusion of lattice kernels is a
+consequence of covariance rather than a property of the function class. That
+is \ref{lem:no-lattice}.
+\end{remark}
+
+The rigidity argument of Chapter~\ref{ch:covariance} is therefore run on a coordinate that is
+injective in scale with no exceptions and needs no covariance to be so.
+
+% draft: Corollary 5.4'
+% NEW: no causal counterpart. The causal gauge argument read the action off the accumulated
+% exponent at one fixed value of the transform variable, which cor:monotonicity does not
+% licence here.
+% CHANGED (article mirror 2026-09-14, R157; the annotation only, no statement or proof): the
+% probabilistic reading was wrong in its second form. Theta(t) = E e^{-X_t^2/2} is NOT the
+% probability that X_t is "beaten by an independent standard normal deadline" -- for a standard
+% normal N, P(N > x) is not e^{-x^2/2} -- but the probability that X_t^2/2 falls short of an
+% independent standard EXPONENTIAL threshold, since P(E > u) = e^{-u}. The first form, the
+% transmittance averaged over a Gaussian spectrum, is right and is kept, read at the kernel from
+% the origin rather than at "the medium to depth t". Found at the paper's register pass.
+\begin{corollary}[the smoothed transmittance]\label{cor:smoothed-transmittance}
+\uses{lem:nonvanishing,lem:additivity,lem:convolution-representation}
+\lean{SpatialLine.smoothed_transmittance, SpatialLine.smoothed_transmittance_strictAnti}\leanok
+Assume (A1)--(A7) and let $\rho$ be the standard Gaussian density. Put
+\[
+  \Theta(t) := \int_\RR \hat\mu_{0,t}(\omega)\,\rho(\omega)\,d\omega
+   \;=\; \int_\RR e^{-x^2/2}\,\mu_{0,t}(dx) \ \in\ (0,1].
+\]
+Then $\Theta$ is continuous on $[0,\infty)$, $\Theta(0) = 1$, and $\Theta$ is nonincreasing;
+under (ND) it is strictly decreasing.
+\statusT\quad\emph{(One number attached to each scale, strictly monotone in it, obtained
+without covariance. Probabilistically $\Theta(t) = \mathbb{E}\,e^{-X_t^2/2}$ with
+$X_t := X_{0,t}$: the transmittance of the kernel from the origin averaged over a Gaussian
+spectrum of probe wavenumbers, or equally the probability that $X_t^2/2$ falls short of an
+independent standard exponential threshold. It is what \ref{lem:action-rigidity}(3) inverts.
+\textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean core, in six conjuncts: the
+Fubini identity, the two bounds, continuity, the value at $0$, and the antitone clause, with
+the strict clause a second declaration. One over-citation surfaced in the formalisation and is
+corrected in the proof below: the positivity of $\Theta$ is not \ref{lem:nonvanishing} but the
+positivity of the integrand $e^{-x^2/2}$, which holds at every point of the line, so the
+positivity of $\hat\mu$ is spent only on the two monotonicity clauses.)}
+\end{corollary}
+
+\begin{proof}
+\leanok
+The two expressions agree by Fubini, since $\int e^{-i\omega x}\rho(\omega)\,d\omega =
+e^{-x^2/2}$ exactly for $\rho(\omega) = (2\pi)^{-1/2}e^{-\omega^2/2}$. Continuity in $t$ is
+dominated convergence, with the bound $|\hat\mu| \le 1$ and the continuity of
+$\hat\mu_{0,t}(\omega)$ in $t$ (\ref{lem:nonvanishing}); positivity is that $e^{-x^2/2} > 0$ at
+every $x$ and $\mu_{0,t}$ is a probability measure, and
+$\Theta(0) = 1$ is $\mu_{0,0} = \delta_0$. For $s < t$, $\hat\mu_{0,t} =
+\hat\mu_{s,t}\,\hat\mu_{0,s}$ (\ref{lem:additivity}) with $0 < \hat\mu_{s,t} \le 1$, so
+\[
+  \Theta(t) - \Theta(s)
+  = \int_\RR \bigl(\hat\mu_{s,t} - 1\bigr)\,\hat\mu_{0,s}\,\rho\,d\omega \ \le\ 0 ;
+\]
+under (ND) the continuous integrand is negative on the open set $\{\hat\mu_{s,t} < 1\}$, which
+is nonempty because $\mu_{s,t} \ne \delta_0$ (\ref{lem:convolution-representation}), while
+$\hat\mu_{0,s}\,\rho > 0$, so the inequality is strict.
+\end{proof}

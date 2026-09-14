@@ -1,0 +1,313 @@
+% §5 The cascade --- blueprint chapter 5 (blueprint/src/parts/05-cascade.tex), statements and
+% proofs of record verbatim. Drafted 2026-09-11.
+%
+% Contents and departures from the blueprint chapter:
+%   - all four statement nodes transcribed (lem:additivity, thm:increments-levy,
+%     cor:monotonicity, cor:smoothed-transmittance) under their markers; all [T] and \leanok,
+%     and the theorem's proof is the machine-checked route with its two constants (the sharp
+%     ones survive inside the proof as a remark marked not machine-checked, as in the blueprint);
+%   - the lead paragraph adds the draft's "three things" sentence; the paragraph before the
+%     theorem is rewritten in half-line-versus-line terms, and the comparisons with the causal
+%     article that the blueprint spreads over its annotations are collected in this section's
+%     one relation-to-the-causal-theory remark, rem:causal-relation-cascade, after
+%     cor:monotonicity (the proof of thm:increments-levy keeps its one verbatim clause);
+%   - rem:lattice-family is copied; the probabilistic reading of Theta in
+%     cor:smoothed-transmittance's annotation is kept as prose after the corollary.
+% Forward references: lem:no-lattice, lem:action-rigidity, sec:covariance (§6),
+% prop:strict-positivity (§7).
+
+\section{The cascade: additivity and infinite divisibility}\label{sec:cascade}
+
+With the representation in hand, the cascade axiom (A6) becomes a statement about kernels:
+composition of operators is convolution of measures, so the exponent of
+\S\ref{sec:representation} is additive over adjacent intervals of the scale axis. The optical
+densities of stacked stages add (Remark~\ref{rem:modulation-transfer}). Set
+\[
+  G(t,\omega) := g_{0,t}(\omega),
+\]
+the density accumulated from scale $0$ to scale $t$. The exponent of any increment is a
+difference of its values, so $G(\cdot,\omega)$ is nondecreasing; every increment has the
+symmetric \Levy--Khintchine form \ref{eq:levy-khintchine}, which is the hemigroup form of
+infinite divisibility; and, under nondegeneracy, $G(\cdot,\omega)$ is strictly increasing
+for all but countably many $\omega$. The
+coordinate that \S\ref{sec:covariance} uses on the scale axis is therefore not
+$G(\cdot,\omega_0)$ but a smoothed transmittance, Corollary~\ref{cor:smoothed-transmittance},
+which is strictly monotone with no exceptions. No covariance is used anywhere in this
+section: everything below holds for every family satisfying (A1)--(A7), with (ND) added only
+where a statement says so, including the lattice family of Remark~\ref{rem:lattice-family}.
+
+% shared with blueprint lem:additivity
+\begin{lemma}[additivity]\label{lem:additivity}
+Under (A1)--(A7), $\mu_{r,t} = \mu_{s,t} * \mu_{r,s}$ for $r \le s \le t$, hence
+\[
+  g_{r,t}(\omega) = g_{r,s}(\omega) + g_{s,t}(\omega), \qquad g_{t,t} = 0 .
+\]
+Consequently $g_{s,t}(\omega) = G(t,\omega) - G(s,\omega)$, where $G(0,\cdot) = 0$;
+$G(\cdot,\omega)$ is nondecreasing and continuous for each $\omega$; and $G(t,\cdot)$ is even
+and continuous with $G(t,0) = 0$.
+\end{lemma}
+
+\begin{proof}
+(A6) gives $\Phis{s}{t}\Phis{r}{s} = \Phis{r}{t}$, which by
+Lemma~\ref{lem:convolution-representation} reads $\mu_{s,t} * (\mu_{r,s} * f) = \mu_{r,t} * f$ for
+every $f \in \Lone$, so $\mu_{r,t} = \mu_{s,t} * \mu_{r,s}$ by the uniqueness clause there.
+Fourier transforms turn convolution into multiplication and hence $-\log$ into addition, which
+is legitimate because $\hat\mu > 0$ (Lemma~\ref{lem:nonvanishing}); and $\Phis{t}{t} = \mathrm{Id}$
+gives $\mu_{t,t} = \delta_0$ and $g_{t,t} = 0$. The remaining clauses are
+Lemma~\ref{lem:nonvanishing}, together with $g_{s,t} \ge 0$ for the monotonicity of
+$G(\cdot,\omega)$.
+\end{proof}
+
+In the semigroup case the next step is trivial, $\mu_t = \mu_{t/n}^{*n}$ exhibiting every
+kernel as a convolution power. In the hemigroup case there is no such power, and what replaces
+it is a null-array limit. The idea is the following. Split the increment from $s$ to $t$
+into $n$ consecutive stages. By additivity the exponent $g_{s,t}$ is the sum of the $n$
+small exponents, and by continuity every one of them is close to zero once $n$ is large.
+For a small exponent $g_i$ the kernel $\mu_i$ is close to a point mass at the origin, and
+$g_i(\omega) \approx 1 - \hat\mu_i(\omega) = \int (1 - \cos\omega x)\,\mu_i(dx)$. Summing
+over the stages, $g_{s,t}(\omega)$ is the limit of $\int (1 - \cos\omega x)\,\Pi_n(dx)$,
+where $\Pi_n$ is the sum of the $n$ kernels. If the measures $\Pi_n$ converged to a measure
+$\nu$, the limit would be of the form \ref{eq:levy-khintchine}. They do not: $\Pi_n$ has
+total mass $n$, and that mass piles up at the origin. The remedy is to move the factor
+$1 \wedge x^2$ from the integrand to the measure, writing
+$\int (1 - \cos\omega x)\,\Pi_n(dx) = \int \frac{1 - \cos\omega x}{1 \wedge x^2}\,\varrho_n(dx)$
+with $\varrho_n(dx) := (1 \wedge x^2)\,\Pi_n(dx)$. The new integrand is bounded, and near the
+origin it tends to $\omega^2/2$, so the mass that piles up there produces the Gaussian term
+$a\,\omega^2$ rather than a divergence. The measures $\varrho_n$ have bounded mass, and a
+limit of them along a subsequence gives the pair $(a,\nu)$.
+
+One obstacle remains. The new integrand oscillates as $x \to \infty$ instead of converging,
+so it does not extend continuously to $x = \infty$, and mass of $\varrho_n$ escaping to
+infinity would be lost from the limit rather than accounted for. So it has to be shown,
+before the limit is taken, that no mass escapes: the family $\varrho_n$ is tight. The tool
+is a truncation inequality, and its only input is that $g_{s,t}$ is continuous at
+$\omega = 0$ with $g_{s,t}(0) = 0$.
+
+% shared with blueprint thm:increments-levy
+\begin{theorem}[increments are symmetric \Levy{} exponents]\label{thm:increments-levy}
+Under (A1)--(A7), $g_{s,t} \in \LEs$ for every $s \le t$: there are a Gaussian coefficient
+$a(s,t) \ge 0$ and a measure $\nu_{s,t}$ on $(0,\infty)$ with
+$\int_{(0,\infty)}(1 \wedge x^2)\,\nu_{s,t}(dx) < \infty$ and
+\begin{equation}\label{eq:increment-levy}
+  g_{s,t}(\omega) \;=\; a(s,t)\,\omega^2
+   + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\nu_{s,t}(dx),
+\end{equation}
+the pair being unique by Proposition~\ref{prop:fourier-toolbox}(3). In particular every kernel
+$\mu_{s,t}$ is infinitely divisible.
+\end{theorem}
+
+The representation is extracted directly, and the closure clause
+Proposition~\ref{prop:fourier-toolbox}(4) is never used. What
+Proposition~\ref{prop:fourier-toolbox}(3) supplies is uniqueness of the pair and, for the
+last sentence, the converse direction. The null-array limit itself, including the
+truncation inequality that excludes escape of mass, is proved below, and Prokhorov's theorem
+is the one classical fact it stands on. It is a theorem of the library, on Lean core, and not a
+cited interface. The proof is the machine-checked route: its two
+constants, $u^2$ and $\frac{2}{3\pi^2}$, are those of the verified inequalities rather
+than the sharp $u^2/2$ and $\frac{2}{15}$, which are recorded at the end of the second step
+and are not machine-checked. In the Lean development the representation itself rests on
+Lean core alone, and only the closing sentence uses two clauses of the toolbox,
+Proposition~\ref{prop:fourier-toolbox}(1) and the converse half of (3).
+
+\begin{proof}
+Fix $s < t$ and the uniform partition $s_i = s + \tfrac in(t-s)$, $i = 0,\dots,n$; write
+$\mu_i := \mu_{s_i,s_{i+1}}$ and $g_i := g_{s_i,s_{i+1}}$, so that
+$g_{s,t} = \sum_{i<n} g_i$ for every $n$, by Lemma~\ref{lem:additivity}.
+
+\emph{The null array.} Fix $\omega$. $G(\cdot,\omega)$ is uniformly continuous on $[s,t]$, so
+$m_n := \max_i g_i(\omega) \to 0$. For $u \ge 0$ we have $0 \le u - (1 - e^{-u}) \le u^2$: the
+left inequality is $e^v \ge 1 + v$ at $v = -u$, and the right one is the same inequality at
+$v = u$ followed by $e^{-u} \le (1+u)^{-1} \le 1 - u + u^2$. Hence
+\[
+  \Bigl|\,g_{s,t}(\omega) - \sum_i \bigl(1 - e^{-g_i(\omega)}\bigr)\Bigr|
+  \ \le\ \sum_i g_i(\omega)^2
+  \ \le\ m_n\,g_{s,t}(\omega) \ \to\ 0 .
+\]
+On the other hand, with $\Pi_n := \sum_i \mu_i$, a symmetric finite measure of mass $n$,
+\[
+  \sum_i \bigl(1 - e^{-g_i(\omega)}\bigr) = \sum_i \bigl(1 - \hat\mu_i(\omega)\bigr)
+  = \int_\RR \bigl(1 - \cos\omega x\bigr)\,\Pi_n(dx)
+  = \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\widetilde\Pi_n(dx),
+\]
+where $\widetilde\Pi_n$ is the image of $\Pi_n$ under $x \mapsto |x|$, the integrand being
+even; the origin carries no weight, since $1 - \cos 0 = 0$, so $\widetilde\Pi_n$ may be taken
+on $(0,\infty)$.
+
+\emph{Two bounds, uniform in $n$.} Both come from one inequality. For $\eta > 0$, Tonelli and
+the identity $\eta^{-1}\int_0^\eta (1 - \cos\omega x)\,d\omega = 1 - \frac{\sin\eta x}{\eta x}$
+give
+\begin{equation}\label{eq:truncation}
+  \int_{(0,\infty)} \Bigl(1 - \frac{\sin\eta x}{\eta x}\Bigr)\,\widetilde\Pi_n(dx)
+  \;=\; \frac1\eta\int_0^\eta \sum_i\bigl(1 - \hat\mu_i(\omega)\bigr)\,d\omega
+  \;\le\; \frac1\eta\int_0^\eta g_{s,t}(\omega)\,d\omega \;=:\; \bar g(\eta),
+\end{equation}
+using $1 - e^{-u} \le u$ and Lemma~\ref{lem:additivity}. The function $1 - \frac{\sin u}{u}$ is
+nonnegative and satisfies
+\begin{equation}\label{eq:sinc-lower}
+  1 - \frac{\sin u}{u} \ \ge\ \frac{2}{3\pi^2}\,\bigl(1 \wedge u^2\bigr)
+  \qquad (u \in \RR),
+\end{equation}
+with the convention $\frac{\sin 0}{0} = 1$. Both sides being even, take $u > 0$. For
+$0 < u \le \pi$, integrate the elementary bound $1 - \cos v \ge \frac{2}{\pi^2}v^2$, valid for
+$|v| \le \pi$, over $[0,u]$ against the identity $u - \sin u = \int_0^u (1 - \cos v)\,dv$; this
+gives $u - \sin u \ge \frac{2}{3\pi^2}u^3$, that is
+$1 - \frac{\sin u}{u} \ge \frac{2}{3\pi^2}u^2 \ge \frac{2}{3\pi^2}(1 \wedge u^2)$. For
+$u > \pi$ the crude bound $\frac{\sin u}{u} \le \frac1u < \frac1\pi$ leaves
+$1 - \frac{\sin u}{u} > 1 - \frac1\pi > \frac23 > \frac{2}{3\pi^2} \ge
+\frac{2}{3\pi^2}(1 \wedge u^2)$. \emph{Mass:} with $\eta = 1$, \ref{eq:truncation} and
+\ref{eq:sinc-lower} bound the weighted measures
+$\varrho_n := (1 \wedge x^2)\,\widetilde\Pi_n$ on $(0,\infty)$ by
+$\varrho_n((0,\infty)) \le \tfrac{3\pi^2}{2}\,\bar g(1)$. \emph{Tightness:} for $x \ge 1/\eta$
+the argument $u = \eta x$ has $1 \wedge u^2 = 1$, so \ref{eq:truncation} and
+\ref{eq:sinc-lower} give
+$\tfrac{2}{3\pi^2}\,\widetilde\Pi_n([1/\eta,\infty)) \le \bar g(\eta)$, and
+$\bar g(\eta) \to 0$ as $\eta \downarrow 0$ because $g_{s,t}$ is continuous with
+$g_{s,t}(0) = 0$ (Lemma~\ref{lem:nonvanishing}); since $\varrho_n \le \widetilde\Pi_n$ on
+$[1,\infty)$, the tails of $\varrho_n$ are small uniformly in $n$. This is the truncation
+inequality of characteristic-function theory, proved here in the few lines it takes; it is
+where continuity at $\omega = 0$ does quantitative work.
+
+Sharper constants are available and are not used: Taylor's theorem gives
+$u - (1 - e^{-u}) \le u^2/2$ and, through $\sin u \le u - u^3/6 + u^5/120$,
+$1 - \frac{\sin u}{u} \ge \frac{2}{15}(1 \wedge u^2)$. Neither is worth its derivative
+argument here --- the first constant multiplies a quantity that is going to zero, the second
+one that has only to be finite --- and neither is machine-checked.
+
+\emph{The limit.} A family of finite measures on $[0,\infty)$ of uniformly bounded mass and
+uniformly small tails has a weakly convergent subsequence: pass first to a subsequence along
+which the total masses converge; if their limit is $0$ the measures converge weakly to the
+zero measure, and otherwise Prokhorov's theorem applies to the normalised measures, which
+are tight. Let $\varrho_{n_k} \to \varrho$, a finite measure on $[0,\infty)$, the subsequence
+chosen once and independently of $\omega$. The function
+\[
+  k_\omega(x) := \frac{1 - \cos\omega x}{1 \wedge x^2}, \qquad k_\omega(0) := \tfrac12\omega^2,
+\]
+is continuous on $[0,\infty)$ --- the singularity is removable, since
+$1 - \cos u = \tfrac12u^2 + O(u^4)$ --- and bounded by $\max(\tfrac12\omega^2, 2)$, so
+$\int k_\omega\,d\varrho_{n_k} \to \int k_\omega\,d\varrho$, while
+$\int k_\omega\,d\varrho_n = \int (1-\cos\omega x)\,\widetilde\Pi_n(dx) \to g_{s,t}(\omega)$ by
+the first step. Reading $\varrho$ in two pieces, the atom at $0$ and the rest,
+\[
+  g_{s,t}(\omega) = \tfrac12\varrho(\{0\})\,\omega^2
+   + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\frac{\varrho(dx)}{1 \wedge x^2},
+\]
+which is \ref{eq:increment-levy} with $a(s,t) := \tfrac12\varrho(\{0\})$ and
+$\nu_{s,t}(dx) := (1 \wedge x^2)^{-1}\varrho(dx)$ on $(0,\infty)$, for which
+$\int (1 \wedge x^2)\,\nu_{s,t} = \varrho((0,\infty)) < \infty$. The atom at $0$ is the Gaussian
+coefficient, as in the causal theory it was the drift; there is no atom at infinity to exclude,
+because tightness has already forbidden it, and correspondingly no killing term. The case
+$s = t$ is $g_{t,t} = 0$, with the pair $(0,0)$.
+
+\emph{Infinite divisibility.} For each $n$, $g_{s,t}/n$ is of the form
+\ref{eq:levy-khintchine} with pair $(a/n, \nu/n)$, so by the converse half of
+Proposition~\ref{prop:fourier-toolbox}(3) and by Proposition~\ref{prop:fourier-toolbox}(1),
+$e^{-g_{s,t}/n}$ is the transform of a symmetric probability measure, whose $n$-fold
+convolution has transform $e^{-g_{s,t}} = \hat\mu_{s,t}$ and hence is $\mu_{s,t}$ by
+Proposition~\ref{prop:fourier-uniqueness}.
+\end{proof}
+
+Note the order of dependence. Infinite divisibility implies a zero-free transform, so
+Lemma~\ref{lem:nonvanishing} is now also a corollary of the theorem. But the theorem's proof
+used the lemma to define the exponents it manipulates, and the order cannot be reversed.
+
+% shared with blueprint cor:monotonicity
+\begin{corollary}[monotonicity, and where it is strict]\label{cor:monotonicity}
+Assume in addition (ND). For $s < t$ the zero set
+$N_{s,t} := \{\omega : g_{s,t}(\omega) = 0\}$ is a closed proper subgroup of $\RR$, hence
+$\{0\}$ or a lattice $c\ZZ$ with $c > 0$, and it is a lattice exactly when $\mu_{s,t}$ is a
+lattice law. Consequently $G(\cdot,\omega)$ is strictly increasing on $[0,\infty)$ for every
+$\omega$ outside the countable set $E := \bigcup N_{p,q}$, the union over rational
+$0 \le p < q$.
+\end{corollary}
+
+\begin{proof}
+$N_{s,t} = N(\mu_{s,t})$ in the notation of Lemma~\ref{lem:lattice-zero}, a closed subgroup,
+proper because $\mu_{s,t} \ne \delta_0$ by (ND) and the uniqueness clause of
+Lemma~\ref{lem:convolution-representation}. If $[p,q] \subseteq [s,t]$ then
+$g_{s,t} = g_{s,p} + g_{p,q} + g_{q,t}$ with all three terms nonnegative
+(Lemmas~\ref{lem:additivity} and~\ref{lem:nonvanishing}), so $N_{s,t} \subseteq N_{p,q}$;
+every interval $[s,t]$ with $s < t$ contains one with rational endpoints, so every $N_{s,t}$
+is contained in some $N_{p,q}$ with $p < q$ rational, and $E$ is a countable union of
+lattices, hence countable, and it contains $0$, every $N_{p,q}$ being a subgroup. For
+$\omega \notin E$ and $s < t$ we get $g_{s,t}(\omega) > 0$, and
+$G(t,\omega) - G(s,\omega) = g_{s,t}(\omega)$ is Lemma~\ref{lem:additivity}.
+\end{proof}
+
+This is as much as the line gives before covariance: the exceptional frequencies are exactly
+those at which some increment is a lattice law, and strict monotonicity at every frequency
+becomes true again only after the classification, Proposition~\ref{prop:strict-positivity}(2).
+The exceptional set can be larger than $\{0\}$.
+
+% blueprint rem:lattice-family, copied
+\begin{remark}[the exceptional set is not $\{0\}$]\label{rem:lattice-family}
+For the symmetric compound Poisson family on $\ZZ$ with
+$\hat\mu_{s,t}(\omega) = e^{-(t-s)(1-\cos\omega)}$ (a hemigroup, indeed a semigroup, of unit
+steps), every axiom except (A8) holds, every kernel is a lattice law,
+$E = 2\pi\ZZ$, and $G(\cdot,2\pi n) \equiv 0$ for every integer $n$. Covariance
+fails because $\Dil{\lambda}\mu_{s,t}$ has exponent $(t-s)(1-\cos\lambda\omega)$, which is of
+the form $c\,(1-\cos\omega)$ only for $\lambda = 1$. So the exclusion of lattice kernels is a
+consequence of covariance rather than a property of the function class. That is
+Lemma~\ref{lem:no-lattice}.
+\end{remark}
+
+\begin{remark}[relation to the causal theory]\label{rem:causal-relation-cascade}
+The first two statements of this section port from the causal article
+\sscite{fagerstrom2026hemigroup}, the additivity lemma verbatim and the increments theorem
+with the weight $1 - e^{-x}$ replaced by $1 \wedge x^2$ and the compactification of the
+half-line replaced by the truncation inequality \ref{eq:truncation}, which is the one new
+idea. The atom at the origin that was the drift there is the Gaussian coefficient here, and
+the atom at infinity that had to be excluded there cannot form here, because tightness has been
+established first. The third statement does not port verbatim.
+The causal corollary says that the accumulated exponent is injective in scale at every
+value of the transform variable, and that this is what makes the relabelling of the scale
+axis rigid. On the line that sentence is false before covariance,
+Remark~\ref{rem:lattice-family} being the counterexample, and
+Corollary~\ref{cor:monotonicity} states what survives. The rigidity argument of
+\S\ref{sec:covariance} is therefore run on a different coordinate, the smoothed
+transmittance below, which has no causal counterpart because none was needed.
+\end{remark}
+
+The coordinate is one number attached to each scale, strictly monotone in it, and obtained
+without covariance. It is the transform of the kernel averaged against a window on the
+frequency axis. Any strictly positive integrable window would serve: the average is
+strictly monotone because a nondegenerate increment cannot have transform $1$ on a set of
+positive measure, whereas a single frequency can fall in the zero set of a lattice
+increment. The Gaussian is chosen because it is its own transform and because its dilates
+are dominated by one Gaussian, which is what the continuity estimate of
+\S\ref{sec:covariance} uses.
+
+% shared with blueprint cor:smoothed-transmittance
+\begin{corollary}[the smoothed transmittance]\label{cor:smoothed-transmittance}
+Assume (A1)--(A7) and let $\rho$ be the standard Gaussian density. Put
+\[
+  \Theta(t) := \int_\RR \hat\mu_{0,t}(\omega)\,\rho(\omega)\,d\omega
+   \;=\; \int_\RR e^{-x^2/2}\,\mu_{0,t}(dx) \ \in\ (0,1].
+\]
+Then $\Theta$ is continuous on $[0,\infty)$, $\Theta(0) = 1$, and $\Theta$ is nonincreasing;
+under (ND) it is strictly decreasing.
+\end{corollary}
+
+\begin{proof}
+The two expressions agree by Fubini, since $\int e^{-i\omega x}\rho(\omega)\,d\omega =
+e^{-x^2/2}$ exactly for $\rho(\omega) = (2\pi)^{-1/2}e^{-\omega^2/2}$. Continuity in $t$ is
+dominated convergence, with the bound $|\hat\mu| \le 1$ and the continuity of
+$\hat\mu_{0,t}(\omega)$ in $t$ (Lemma~\ref{lem:nonvanishing}); positivity is that
+$e^{-x^2/2} > 0$ at every $x$ and $\mu_{0,t}$ is a probability measure, and
+$\Theta(0) = 1$ is $\mu_{0,0} = \delta_0$. For $s < t$, $\hat\mu_{0,t} =
+\hat\mu_{s,t}\,\hat\mu_{0,s}$ (Lemma~\ref{lem:additivity}) with $0 < \hat\mu_{s,t} \le 1$, so
+\[
+  \Theta(t) - \Theta(s)
+  = \int_\RR \bigl(\hat\mu_{s,t} - 1\bigr)\,\hat\mu_{0,s}\,\rho\,d\omega \ \le\ 0 ;
+\]
+under (ND) the continuous integrand is negative on the open set $\{\hat\mu_{s,t} < 1\}$, which
+is nonempty because $\mu_{s,t} \ne \delta_0$ (Lemma~\ref{lem:convolution-representation}),
+while $\hat\mu_{0,s}\,\rho > 0$, so the inequality is strict.
+\end{proof}
+
+Probabilistically $\Theta(t) = \Ex\,e^{-X_t^2/2}$ with $X_t := X_{0,t}$: the transmittance of
+the kernel from the origin averaged over a Gaussian spectrum of probe wavenumbers, or equally the
+probability that $X_t^2/2$ falls short of an independent standard exponential threshold.
+It is what Lemma~\ref{lem:action-rigidity}(3) inverts.
+Note that the positivity of $\Theta$ is not Lemma~\ref{lem:nonvanishing} but the positivity
+of the integrand $e^{-x^2/2}$. The positivity of $\hat\mu$ is used only on the two
+monotonicity clauses.

@@ -1,0 +1,879 @@
+% !TEX root = ../print.tex
+% Draft \S7 --- Self-decomposability and the characterization theorem
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S7 (lines 365-478).
+%
+% DRAFT NUMBERING (reported, not corrected here): the draft carries TWO statements numbered
+% 7.6' -- "Lemma 7.6' (the admissible exponents form a convex cone)" and "Remark 7.6' (the
+% scale evolution)" -- and states Lemma 7.6' before Proposition 7.5'. The nodes below use
+% labels, so nothing here depends on the collision; the draft should renumber.
+% (Checked at the draft sync, 2026-09-11: the draft had already renumbered -- the scale-evolution
+% remark is "Remark 7.7'" -- so the paragraph above records a past state of the draft; the
+% ordering note, Lemma 7.6' before Proposition 7.5', is still true.)
+%
+% lem:selfdecomposable-exponents is the analytic heart. Its (1) => (3) leg is proved
+% DIRECTLY, from the dilation identity, the uniqueness of the pair, and a convex-tail
+% argument in the log-displacement coordinate; that is why the classical one-dimensional
+% self-decomposability theorem (prop:sd-exponents, ledger A7) is cited for orientation and
+% not consumed. The causal article takes the opposite route and carries the corresponding
+% classical statement in its trust base (its ledger A18), so this is a place where the
+% spatial development is NARROWER than its twin.
+%
+% prop:strict-positivity and prop:kernel-regularity are the draft's Proposition 7.5' SPLIT:
+% clauses (1) and (2) are elementary and stay [T]; clause (3), absolute continuity, and the
+% unimodality claim the draft makes in the paragraph after it are classical and become one
+% [A] node. The split keeps two elementary facts out of the trust base.
+
+\chapter{Self-decomposability and the characterization theorem}
+\label{ch:characterization}
+
+By \ref{lem:additivity} the exponent of a kernel is a difference of accumulated exponents,
+and by \ref{prop:canonical-gauge} the accumulated exponent is a dilate of one function. So
+every kernel is read off $F$ by stretching its argument and subtracting,
+\[
+  g_{s,t}(\omega) = F(\tilde t\,\omega) - F(\tilde s\,\omega),
+  \qquad \tilde s = \chi(s) \le \tilde t = \chi(t),
+\]
+and since $\chi$ is onto, $(\tilde s,\tilde t)$ ranges over all pairs $0 \le \tilde s \le
+\tilde t$. \ref{thm:increments-levy} requires each of these differences to be a symmetric \Levy{}
+exponent. That is a condition on $F$ alone --- not that $F \in \LEs$, which it is, but that
+every stretched difference is --- and it is the condition this chapter solves. Canonical-gauge
+scales are written $s \le t$, plain, when no other family is in play, so that $a$ is free for
+the Gaussian coefficient.
+
+The condition has a probabilistic name. Let $X_1$ be the random displacement whose law is the
+kernel at canonical scale $1$, so that $\mathbb{E}\cos(\omega X_1) = e^{-F(\omega)}$; in the
+canonical gauge the kernel at scale $t$ is the law of $tX_1$. That $F(\omega) - F(c\omega)$ is
+a \Levy{} exponent for $c \in (0,1)$ says that there is a random variable $R_c$, independent of
+$X_1$, with $X_1 \seq cX_1 + R_c$. That is self-decomposability
+(\ref{def:self-decomposable}): covariance turns a shrinking of the scale axis into a shrinking
+of the displacement, and the cascade requires what remains to be a measurement in its own
+right.
+
+% draft: Lemma 7.1'
+% twin: hcs lem:selfdecomposable-exponents (ledger A18 there, for the analysis direction).
+% Deliberately NOT a reuse: the analysis direction is proved here, so this article's trust
+% base does not contain the corresponding classical statement.
+% CHANGED (proof of record 2026-09-09): the (3) => (1) paragraph's finiteness step is
+% rewritten to the machine-checked route. It said the (1 wedge u^2)-integral of k(u/t) is
+% finite "because F(t.) is in LEs and lem:profile-integrability applies", which assumes what
+% is to be shown -- knowing F(t.) is in LEs is knowing the dilated measure satisfies the \Levy{}
+% condition. The Lean proof instead runs the SAME substitution u = tx on that integral and
+% compares truncations, 1 wedge t^2x^2 <= max(1,t^2)(1 wedge x^2)
+% (SpatialLine.min_one_sq_mul_le); the printed proof now does the same. The closing sentence
+% also no longer appeals to prop:fourier-toolbox(3): LEs is named by its representation in
+% this article, and the increment is exhibited in that form, so the direction spends nothing.
+% Statement unchanged.
+% CHANGED (proof of record 2026-09-09, wave 3): the "measure varpi" paragraph is rewritten to
+% the machine-checked route (SpatialLine.sd_exponents_profile_measure), and lem:cin-rays joins
+% the \uses list. It said "with k right-continuous, nonincreasing and k(infinity) = 0, the set
+% function varpi := -dk is a positive measure with k(x) = varpi((x,infinity))", which assumes a
+% right-continuous representative the previous paragraph does not produce -- a profile that is
+% only nonincreasing has none this development can name. The checked route builds the measure
+% FIRST, as the quantile transform lem:cin-rays(2) already attaches to any nonincreasing profile
+% vanishing at infinity, and reads the right-continuous modification off its tails; the tail
+% identity is then an identity at every point, not almost everywhere. The two Tonelli identities
+% are replaced by layer-cake INEQUALITIES with continuous weights, u^2/(1+u^2) and
+% log(1+u^2)/2 in place of (u wedge 1)^2/2 and log_+ u: the blueprint's weights have
+% discontinuous densities (2t.1_{t<1} and t^{-1}1_{t>1}) and both conditions are finiteness
+% assertions, so nothing is lost and two indicator functions are not carried. Statement
+% unchanged. This also closes finding F6, which had priced the paragraph as downstream of an
+% unwritten Stieltjes construction: no Stieltjes function is needed, and the construction it
+% does need was written in chapter 8 in wave 2.
+% CHANGED (proof of record 2026-09-09, wave 3): the convex-tail paragraph of "(1) implies (3)"
+% is rewritten to the machine-checked route (SpatialLine.exists_antitone_density). It said that
+% M(theta) = nu~((theta,infinity)) is convex because its increments over intervals of fixed
+% length are nonincreasing, and took k~ = -M', the right derivative. Everything after the word
+% "convex" is in Mathlib; the word itself is not. What the shift property gives is
+% M(theta) + M(theta + 2delta) >= 2 M(theta + delta), MIDPOINT convexity, and Mathlib has no
+% "midpoint convex plus continuous implies convex" (convexOn_of_slope_mono_adjacent wants the
+% adjacent-slope inequality at arbitrary triples); supplying it is the classical dyadic
+% induction plus a continuity passage, and the continuity of M is itself an argument -- an atom
+% of mass alpha forces uncountably many atoms of mass alpha to its left. The checked route
+% defines k~ as the supremum of the dyadic difference quotients 2^n nu~((theta, theta+2^-n]),
+% which is nonincreasing BY CONSTRUCTION and is a supremum of a nondecreasing sequence, and
+% recovers nu~ from it by monotone convergence and one Tonelli. No convexity, no right
+% derivative, no modification, and the function produced is the nonincreasing one the statement
+% asks for rather than a representative of it. The rest of the direction -- the transport
+% between nu and its image under log -- is not yet machine-checked; see the skeleton's
+% annotation. Statement unchanged.
+% CHANGED (proof of record 2026-09-09, wave 3): the "(3) implies (2)" paragraph is rewritten to
+% the machine-checked route (SpatialLine.sd_exponents_three_implies_two,
+% SpatialLine.sd_exponents_symbol). Three additions, no deletion.
+%   (i) Cin's own calculus, which chapter 8 did not build and the printed proof assumed: the
+%     integrand (1 - cos v)/v is continuous AT THE ORIGIN too, its value there being 0 and
+%     |(1-cos v)/v| <= |v|/2, so Cin is C^1 on all of R and the chain rule gives
+%     d/domega Cin(omega u) = (1 - cos omega u)/omega. Without that step the differentiation is
+%     not justified at all.
+%   (ii) the dominating constant is named -- (4/omega_0 + 2 omega_0) on (omega_0/2, 2 omega_0)
+%     -- rather than left as "C on a compact subinterval", and the integrability of 1 wedge u^2
+%     is credited to the varpi paragraph above, which proves it for every measure with the
+%     tail property rather than only for the constructed one.
+%   (iii) "F is C^1" is separated from "F is differentiable": continuity of F' is a SECOND
+%     dominated-convergence argument, and the printed proof asserted the conclusion without it.
+%     The extension of eq:symbol to omega <= 0 (evenness, and the factor omega at the origin)
+%     is stated, since the Lean identity is at every real frequency.
+%   The closing sentence now says that the direction makes no appeal to prop:fourier-toolbox --
+%   LEs is named by its representation here -- which is the same observation the (3) => (1)
+%   paragraph records, and the parenthesis on the causal route gains the counterexample that
+%   makes "not available" a fact rather than a caution: k(x) = (log x)^{-2} at infinity is
+%   admissible and has int_1^infty k(x) dx = infty.
+% Statement unchanged.
+% CHANGED (proof of record 2026-09-10): the "(2) implies (3)" paragraph is rewritten to the
+% machine-checked route (SpatialLine.sd_exponents_two_implies_three). The printed route
+% established the representation F(omega) = (1/2)a_B omega^2 + int Cin(omega u) varpi(du)
+% first and then said "the integrability conditions hold because F is finite and the pair is
+% unique". Formalizing showed the order has to be the other way round: the profile data cannot
+% be assembled before both integrability conditions are in hand, so the representation cannot
+% be the step that supplies them. The checked route therefore (a) gets the first condition from
+% the \Levy{} condition on varpi alone, by the same layer cake the varpi paragraph uses, read
+% backwards; (b) gets the second from int Cin d varpi <= int_0^1 F' <= F(1), an INEQUALITY,
+% which is all that is needed and which makes the improper endpoint a monotone limit rather
+% than an improper integral; and (c) identifies F with the profile exponent by their
+% derivatives rather than by re-deriving the representation, so eq:cin-superposition is never
+% re-run in this direction. Statement unchanged.
+\begin{lemma}[symmetric self-decomposable exponents]\label{lem:selfdecomposable-exponents}
+\uses{prop:fourier-toolbox,lem:profile-integrability,lem:cin-rays}
+\lean{SpatialLine.sd_exponents_three_implies_one, SpatialLine.sd_exponents_one_implies_three,
+SpatialLine.sd_exponents_three_implies_two, SpatialLine.sd_exponents_two_implies_three,
+SpatialLine.sd_exponents_profile_measure, SpatialLine.sd_exponents_symbol}\leanok
+\notes{self-decomposability}
+For $F \in \LEs$ with pair $(a,\nu)$ the following are equivalent.
+\begin{enumerate}
+\item $F(t\,\cdot) - F(s\,\cdot) \in \LEs$ for all $0 < s \le t$.
+\item $F$ is continuously differentiable on $(0,\infty)$ and the symbol
+$B(\omega) := \omega F'(\omega)$ lies in $\LEs$.
+\item $F$ has the representation \ref{eq:sd-profile}: $\nu(dx) = k(x)\,x^{-1}dx$ with
+$k : (0,\infty) \to [0,\infty)$ nonincreasing, $\int_0^1 x\,k(x)\,dx < \infty$ and
+$\int_1^\infty k(x)\,x^{-1}dx < \infty$.
+\end{enumerate}
+In (3) the profile $k$ may be taken right-continuous with $k(\infty) = 0$, and then
+$\varpi := -dk$ is a positive measure on $(0,\infty)$ with $k(x) = \varpi((x,\infty))$,
+$\int (1 \wedge u^2)\,\varpi(du) < \infty$ and $\int \log_+ u\,\varpi(du) < \infty$; in (2) the
+pair of $B$ is $(2a,\varpi)$.
+\statusT\quad\emph{(The three conditions are not equally deep, and the asymmetry organizes
+what follows. (3) implies (1) is elementary --- a change of variables in the representation,
+using no property of the positive definite class --- and it is all the constructive direction
+of \ref{thm:main-characterization} consumes. (1) implies (3) spends the uniqueness clause of
+\ref{prop:fourier-toolbox}(3) once, and then an argument about monotone measures that is
+elementary but genuine; it is the analysis direction of the main theorem. (2) is here a
+consequence rather than a stepping stone, because the line offers no a priori
+differentiability: what the superposition \ref{eq:cin-superposition} buys instead is that
+every admissible exponent is $C^1$ off the origin with a symbol that is again a \Levy{}
+exponent. \textbf{Machine-checked} (2026-09-10) at all six declarations. The whole node spends
+\ref{prop:fourier-toolbox}(3)'s uniqueness clause and nothing else: once in (1) implies (3), to
+read the dilation identity backwards, and once in (2) implies (3), to match the pair of $F$
+with the pair the profile produces. The other four declarations, including the two elementary
+directions and the construction of $\varpi$, rest on Lean core.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\emph{(3) implies (1): the dilation identity.} Write
+$F(c\omega) = ac^2\omega^2 + \int_0^\infty (1 - \cos c\omega x)\,k(x)\,\frac{dx}{x}$ for
+$c > 0$ and substitute $u = cx$. The measure $dx/x$ is invariant under dilations, so
+\[
+  F(c\omega) = a c^2\,\omega^2
+   + \int_0^\infty \bigl(1 - \cos\omega u\bigr)\,k(u/c)\,\frac{du}{u} :
+\]
+dilating the argument by $c$ dilates the profile and rescales the Gaussian coefficient, and
+does nothing else. Subtracting the identity at $c = s$ from the one at $c = t$,
+\begin{equation}\label{eq:dilation-difference}
+  F(t\omega) - F(s\omega) = a(t^2 - s^2)\,\omega^2
+   + \int_0^\infty \bigl(1 - \cos\omega u\bigr)\,\bigl(k(u/t) - k(u/s)\bigr)\,\frac{du}{u},
+\end{equation}
+which is of the form \ref{eq:levy-khintchine}: the Gaussian coefficient $a(t^2-s^2)$ is
+nonnegative since $s \le t$, and the density is nonnegative since $u/t \le u/s$ and $k$ is
+nonincreasing. For the \Levy{} condition, the density is dominated by $k(u/t)$, so it is enough to
+bound the $(1 \wedge u^2)$-integral of $k(u/t)\,u^{-1}du$; and the same substitution $u = tx$
+turns that integral into $\int_0^\infty (1 \wedge t^2x^2)\,k(x)\,x^{-1}dx$, at most
+$\max(1,t^2)\int_0^\infty (1 \wedge x^2)\,k(x)\,x^{-1}dx$, which is finite by
+\ref{lem:profile-integrability}; the comparison $1 \wedge t^2x^2 \le \max(1,t^2)(1 \wedge x^2)$
+holds in each of the two regimes of the truncation separately. So the difference is itself of
+the form \ref{eq:levy-khintchine}, hence in $\LEs$; the class being named by its
+representation, this direction makes no appeal to \ref{prop:fourier-toolbox}.
+
+% CHANGED (2026-09-11, post-sync follow-up, R109): the paragraph heading still said "and the
+% convex tail", which the wave-3 proof-of-record rewrite (the block above) removed from the
+% argument: the density is the supremum of dyadic difference quotients and no convexity is used.
+% Heading only; no statement or proof changed.
+\emph{(1) implies (3): the dilation identity read backwards, and the monotone density.} Fix
+$c \in (0,1)$. By hypothesis $F(\omega) - F(c\omega) = a'\omega^2 + \int (1-\cos\omega
+x)\,\nu'(dx)$ for some $a' \ge 0$ and some \Levy{} measure $\nu' \ge 0$. On the other hand, with
+$\Dil{c}\nu$ the image of $\nu$ under $x \mapsto cx$, the first display of this proof reads
+$F(c\omega) = ac^2\omega^2 + \int (1-\cos\omega x)\,(\Dil{c}\nu)(dx)$. Hence
+\[
+  a'\omega^2 + \int \bigl(1 - \cos\omega x\bigr)\,(\nu' + \Dil{c}\nu)(dx)
+  \;=\; a\,\omega^2 + \int \bigl(1 - \cos\omega x\bigr)\,\nu(dx)
+  \qquad \text{for every } \omega,
+\]
+an identity between two representations of the form \ref{eq:levy-khintchine} with
+\emph{positive} data; so by the uniqueness clause of \ref{prop:fourier-toolbox}(3),
+$a' = a(1-c^2)$ and $\nu' + \Dil{c}\nu = \nu$. Thus
+\begin{equation}\label{eq:dilation-decrease}
+  \Dil{c}\nu \ \le\ \nu \qquad \text{for every } c \in (0,1).
+\end{equation}
+Pass to the log-displacement coordinate $\theta = \log x$: let $\tilde\nu$ be the image of
+$\nu$ under $\log$, a measure on $\RR$ with
+$\tilde\nu((\theta,\infty)) = \nu((e^\theta,\infty)) < \infty$ for every $\theta$, finiteness
+coming from $\int (1 \wedge x^2)\,\nu < \infty$. Dilation by $c$ becomes translation by
+$\log c < 0$, so \ref{eq:dilation-decrease} reads $\tilde\nu(A + h) \le \tilde\nu(A)$ for every
+Borel $A$ and every $h > 0$: the measure decreases under every right shift. Put
+\[
+  \tilde k(\theta) \;:=\; \sup_{n \ge 0}\ 2^n\,\tilde\nu\bigl((\theta,\ \theta + 2^{-n}]\bigr).
+\]
+Each term is nonincreasing in $\theta$, by the shift property; and the sequence is nondecreasing
+in $n$, because splitting $(\theta, \theta+2\delta]$ at its midpoint and applying the shift
+property to the right half gives
+$\tilde\nu((\theta,\theta+2\delta]) \le 2\,\tilde\nu((\theta,\theta+\delta])$. So $\tilde k$ is
+nonincreasing, and it is a supremum of a nondecreasing sequence. Fix $a < b$. By monotone
+convergence and then Tonelli,
+\[
+  \int_a^b \tilde k \;=\; \sup_n\ 2^n\!\int_a^b \tilde\nu\bigl((\theta,\theta+\varepsilon_n]\bigr)
+    d\theta
+  \;=\; \sup_n\ 2^n\!\int \bigl|(a,b] \cap [x - \varepsilon_n,\, x)\bigr|\ \tilde\nu(dx),
+  \qquad \varepsilon_n = 2^{-n},
+\]
+and the inner length is $\varepsilon_n$ for $x \in (a+\varepsilon_n, b]$, at most
+$\varepsilon_n$ always, and $0$ outside $(a, b+\varepsilon_n]$. So the $n$-th term lies between
+$\tilde\nu((a+\varepsilon_n, b])$ and $\tilde\nu((a, b+\varepsilon_n])$, and both converge to
+$\tilde\nu((a,b])$ --- the first by continuity of a measure from below, the second by continuity
+from above, which is where the finiteness of the rays is used. Hence
+$\tilde\nu((a,b]) = \int_a^b \tilde k$ for every $a < b$, so $\tilde\nu(d\theta) =
+\tilde k(\theta)\,d\theta$. The supremum defining $\tilde k$ is extended-valued at first, and
+that identity is what makes it finite: a nonincreasing function taking the value $+\infty$ at
+one point takes it at every point to the left, so some $\int_a^b \tilde k$ would be infinite,
+whereas every $\tilde\nu((a,b])$ is finite. Returning to $x$, $\nu(dx) = k(x)\,x^{-1}dx$ with
+$k(x) := \tilde k(\log x)$ nonincreasing; and $k(\infty) = 0$, since $\tilde k$ is nonincreasing
+and nonnegative with $\int_\theta^\infty \tilde k = \tilde\nu((\theta,\infty)) < \infty$. The two
+integrability
+conditions are $\int (1 \wedge x^2)\,\nu(dx) < \infty$ read through
+\ref{lem:profile-integrability}.
+
+\emph{The measure $\varpi$, and the right-continuous profile.} A profile that is merely
+nonincreasing has no right-continuous representative to hand, so the measure is built first and
+the modification read off it. Take for $\varpi$ the measure \ref{lem:cin-rays}(2) attaches to
+$k$: the image of Lebesgue measure on $(0,\infty)$ under the generalized inverse
+$y \mapsto \sup\{u > 0 : k(u) > y\}$, whose tails satisfy $\varpi((x,\infty)) = k(x)$ at every
+continuity point of $k$, hence at almost every $x > 0$. Every positive tail is then finite,
+since a point of that identity below $x$ bounds $\varpi((x,\infty))$ by a value of $k$; so
+$k^{\ast}(x) := \varpi((x,\infty))$ is a finite nonincreasing function on $(0,\infty)$, equal to
+$k$ almost everywhere and therefore inducing the same \Levy{} measure, right-continuous because
+$(x,\infty)$ is the increasing union of the $(x + 1/n,\infty)$, and vanishing at infinity
+because $k$ does. This is the modification the statement asserts, and its tail identity holds at
+\emph{every} positive point rather than almost everywhere.
+
+For the two integrability conditions, the layer cake formula against $\varpi$ turns
+$\int G(u)\,\varpi(du)$, for $G(u) = \int_0^u g(t)\,dt$ with $g \ge 0$ continuous, into
+$\int_0^\infty k^{\ast}(t)\,g(t)\,dt$. Take $g(t) = 2t(1+t^2)^{-2}$, so that
+$G(u) = u^2/(1+u^2) \ge \tfrac12 (1 \wedge u^2)$, and note $g(t) \le 2t$ and
+$g(t) \le 2t^{-1}$; then
+$\int (1 \wedge u^2)\,\varpi(du) \le 4\int_0^1 t\,k(t)\,dt + 4\int_1^\infty k(t)\,t^{-1}dt$.
+Take $g(t) = t(1+t^2)^{-1}$, so that $G(u) = \tfrac12\log(1+u^2) \ge \log_+ u$, with the same
+two bounds on $g$; then $\int \log_+ u\,\varpi(du)$ is bounded by the same two integrals. So
+both conditions on $\varpi$ follow from $\int_0^1 x\,k(x)\,dx < \infty$ and
+$\int_1^\infty k(x)\,x^{-1}dx < \infty$.
+
+\emph{(3) implies (2): the $\Cin$ superposition.} Tonelli over $\{0 < x < u\}$ turns
+\ref{eq:sd-profile} into
+\begin{equation}\label{eq:cin-superposition}
+  F(\omega) = a\,\omega^2 + \int_{(0,\infty)} \Cin(\omega u)\,\varpi(du),
+  \qquad \Cin(z) := \int_0^{z}\frac{1 - \cos v}{v}\,dv,
+\end{equation}
+since $\int_0^u (1-\cos\omega x)\,x^{-1}dx = \Cin(\omega u)$; the measure $\varpi$ is the one
+supplied above, and only its almost-everywhere tail identity is used. The integrand
+$v \mapsto (1-\cos v)/v$ of $\Cin$ is continuous at the origin as well, its value there being
+$0$ and $|(1-\cos v)/v| \le |v|/2$; so $\Cin$ is continuously differentiable on all of $\RR$
+with $\Cin'(v) = (1-\cos v)/v$, and
+$\partial_\omega \Cin(\omega u) = u\,\Cin'(\omega u) = (1 - \cos\omega u)/\omega$. For $\omega$
+in the interval $(\omega_0/2, 2\omega_0)$ this is bounded by
+$(4\omega_0^{-1} + 2\omega_0)(1 \wedge u^2)$ --- it is at most $2/\omega$ and at most
+$\omega u^2/2$, which are the two regimes of the truncation --- and $1 \wedge u^2$ is
+$\varpi$-integrable, as the previous paragraph shows for every such $\varpi$. So
+differentiation under the integral sign applies at every $\omega > 0$, and
+\begin{equation}\label{eq:symbol}
+  B(\omega) = \omega F'(\omega)
+   = 2a\,\omega^2 + \int_{(0,\infty)} \bigl(1 - \cos\omega u\bigr)\,\varpi(du),
+\end{equation}
+which is of the form \ref{eq:levy-khintchine} with pair $(2a,\varpi)$, hence in $\LEs$ --- the
+class being named by its representation, so exhibiting the pair is the conclusion and no appeal
+to \ref{prop:fourier-toolbox} is made. That $F$ is $C^1$ on $(0,\infty)$ and not merely
+differentiable is a second dominated-convergence argument: $1 - \cos\omega v$ is bounded by
+$(2 + (|\omega_0|+1)^2)(1 \wedge v^2)$ for $\omega$ within $1$ of $\omega_0$, so
+$\omega \mapsto \int (1 - \cos\omega v)\,\varpi(dv)$ is continuous on $\RR$ and $F' $ is
+continuous where $\omega \ne 0$. Both sides of \ref{eq:symbol} are stated at every real
+$\omega$: the identity extends to $\omega < 0$ because $F$ is even, hence $F'$ odd, and holds
+at $\omega = 0$ because the factor $\omega$ annihilates whatever value the derivative is
+assigned there. (The half-line route, differentiating under the integral in the profile form and
+applying Tonelli, is not available here: $\omega\sin(\omega x)$ is not of one sign, and
+$\int u\,\varpi(du)$ may diverge, as it does for the stable profiles of index below $1$. The
+$\Cin$ form has a positive integrand and needs no such integral. Nor is the profile form saved
+by the two admissibility conditions: $k(x) = (\log x)^{-2}$ at infinity satisfies
+$\int_1^\infty k(x)x^{-1}dx < \infty$ while $\int_1^\infty k(x)\,dx$ diverges, and that
+integral is what dominating $|\sin(\omega x)|k(x)$ would need.)
+
+\emph{(2) implies (3).} Let $B = \omega F'$ have pair $(a_B,\varpi)$ and put
+$k(x) := \varpi((x,\infty))$, which is nonnegative and nonincreasing on $(0,\infty)$ and finite
+at every positive $x$, since $\int (1 \wedge u^2)\,\varpi(du) < \infty$ bounds
+$\varpi((x,\infty))$ by $(1 \wedge x^2)^{-1}$ times that integral. The claim is that $F$ is
+\ref{eq:sd-profile} at the data $(\tfrac12 a_B, k)$, and the two integrability conditions on
+$k$ come from two different places --- which is the order the proof has to be read in, because
+the data is not admissible until both are in hand.
+
+The first is the \Levy{} condition on $\varpi$ alone. The layer cake formula of the previous
+paragraph, read from right to left at $g(t) = 2t(1+t^2)^{-2}$, turns
+$\int_0^\infty k(t)\,g(t)\,dt$ into $\int u^2(1+u^2)^{-1}\,\varpi(du)$, at most
+$\int (1 \wedge u^2)\,\varpi(du)$; and $g(t) \ge t/2$ on $(0,1)$, so
+$\int_0^1 t\,k(t)\,dt \le 2\int (1 \wedge u^2)\,\varpi(du) < \infty$.
+
+The second is not implied by the \Levy{} condition: $\varpi(du) = du/(u\log^2 u)$ on $(2,\infty)$
+has finite truncated integral and divergent logarithmic one. What supplies it is the finiteness
+of $F$. Since $B \ge 0$, $F' \ge 0$ on $(0,\infty)$, so the fundamental theorem of calculus on
+$[\varepsilon,1]$ gives $\int_\varepsilon^1 F'(v)\,dv = F(1) - F(\varepsilon) \le F(1)$ for
+every $\varepsilon \in (0,1)$, and letting $\varepsilon \downarrow 0$ along a sequence ---
+monotonically, the integrand being nonnegative --- $\int_0^1 F'(v)\,dv \le F(1) < \infty$.
+Now $F'(v) \ge v^{-1}\int (1 - \cos vu)\,\varpi(du)$, and Tonelli over
+$(0,1) \times (0,\infty)$ with a positive integrand, together with the substitution
+$\int_0^1 (1 - \cos uv)\,v^{-1}dv = \Cin(u)$, turns the integral of that lower bound into
+$\int \Cin(u)\,\varpi(du)$. So $\int \Cin(u)\,\varpi(du) \le F(1) < \infty$. Since
+$\Cin \ge 0$ everywhere and $\Cin(u) = \log u + O(1)$ at infinity (\ref{lem:cin-rays}(1)),
+$\log_+ u \le \Cin(u) + C\,(1 \wedge u^2)$ for a fixed $C$, so
+$\int \log_+ u\,\varpi(du) < \infty$; the second layer cake, at $g(t) = t(1+t^2)^{-1}$, which
+is at least $(2t)^{-1}$ beyond $1$, converts that into $\int_1^\infty k(t)\,t^{-1}dt < \infty$.
+
+So $(\tfrac12 a_B, k)$ is admissible data, and defines an exponent $\tilde F$ of the form
+\ref{eq:sd-profile}. It is $F$, and the identification does not re-derive the representation:
+by \ref{eq:symbol} applied to $\tilde F$, whose profile has $\varpi$ for its tail measure,
+$\omega\tilde F'(\omega) = a_B\omega^2 + \int (1 - \cos\omega u)\,\varpi(du) = B(\omega)
+ = \omega F'(\omega)$ at every real $\omega$, so $\tilde F$ and $F$ have the same derivative at
+every $\omega > 0$; both are continuous and vanish at the origin, so they agree on $[0,\infty)$
+--- a function continuous on $[0,\infty)$ with vanishing derivative on $(0,\infty)$ is constant
+on every $[\varepsilon, \omega]$, and its value at the origin is the limit of those constants
+--- and both are even, so they agree on $\RR$. The uniqueness clause of
+\ref{prop:fourier-toolbox}(3), applied to the two representations of that one function, then
+identifies the pairs: $a = \tfrac12 a_B$ and $\nu(dx) = k(x)\,x^{-1}dx$, which is (3).
+\end{proof}
+
+% CHANGED (article mirror 2026-09-14, R157): two wordings and one anchor. The increments are "not
+% NECESSARILY stationary" -- the Cauchy member has stationary increments in the canonical gauge,
+% so the old phrase excluded a member of the class (the external review's finding on this remark);
+% and a is not a variance RATE, the continuous part having variance 2a tilde-t^2, which is
+% quadratic in the canonical gauge. The causal sentence is dropped, the comparison belonging to
+% Chapter~\ref{ch:bridge}.
+\begin{remark}[the probabilistic reading]\label{rem:sato-process}
+Together with the similarity structure, \ref{eq:sd-profile} says that the kernels are the
+marginal laws of a \emph{symmetric self-similar additive process}: a process
+$(X_{\tilde t})_{\tilde t \ge 0}$ on $\RR$ with independent, symmetric, not necessarily
+stationary increments satisfying $X_{\lambda\tilde t} \seq \lambda X_{\tilde t}$, the Sato
+process of exponent $1$ attached to the self-decomposable law of $X_1$
+(\sscite{sato1999levy}, Thm.~16.1, p.~99). The paths oscillate, and the Gaussian coefficient
+$a$ sets the variance $2a\tilde t^{\,2}$ of their continuous part. Nothing in the proofs uses
+this correspondence, which is stated as a reading and grounds no statement.
+% CHECK (draft, checks for \S7, item 6) --- RESOLVED (2026-09-14): the anchor for the
+% correspondence between self-decomposable laws and self-similar additive processes is
+% Sato \S16, Thm. 16.1, p. 99 (class L is exactly the class of marginals of self-similar
+% additive processes), read from the held copy by the librarian on 2026-09-14 and now printed in
+% the remark. Nothing in the article's proofs uses it, so it still grounds no node and no ledger
+% entry.
+\end{remark}
+
+% CHANGED (skeleton 2026-09-08): the kernel sentence read "the scale-space kernels are
+% phi_t = FT^{-1}[e^{-F(t .)}], symmetric probability DENSITIES for t > 0". Absolute continuity
+% of mu_{0,t} is prop:kernel-regularity, an [A] node grounded in A8, and this theorem neither
+% does nor can \uses it -- the reverse edge exists and adding this one makes the graph cyclic.
+% Stating it here would put A8 in the HEADLINE theorem's #print axioms and contradict its own
+% [T] grade. Narrowed to "the symmetric probability measure with transform e^{-F(t .)}", which
+% is what the construction proves; the density and its unimodality stay in
+% prop:kernel-regularity. Found by writing the Lean statement (Skeleton.main_construction).
+%
+% CHANGED (review 2026-09-09): the status annotation now says so in words -- that the kernels
+% have densities, that this is prop:kernel-regularity's clause and not this theorem's, and why
+% the edge cannot be added here. Answering Q6: the narrowing above is invisible to a reader of
+% the headline alone unless the annotation states it, and the annotation is the right place
+% because it is not part of what the theorem asserts.
+%
+% draft: Theorem 7.3'
+% twin: hcs thm:main-characterization
+% (Hemigroup.SelfDecomposableExponent.main_characterization), which the causal development
+% splits into thm:main-construction, thm:main-analysis and prop:main-uniqueness. The Lean
+% design here is expected to make the same split; the node is kept whole because the draft
+% states it whole and because the split is a formalisation decision, not a mathematical one.
+% CHANGED (proof of record 2026-09-09): three steps of the sufficiency half are rewritten to
+% the machine-checked route (SpatialLine.main_construction).
+%   (A7): the epsilon/3 argument on a compact carrying mass 1-eps, first for compactly
+%     supported continuous f and then by density, is replaced by the estimate bounding the
+%     L1 distance from mu*f to f by the mu-average of the modulus of continuity of
+%     translation -- a BOUNDED CONTINUOUS function of the shift vanishing at 0, because the
+%     translation group acts continuously on L1. \Levy{} continuity then finishes with no
+%     compact and no density step. The two-endpoint structure a hemigroup forces is made
+%     explicit, since it is what the proof actually does.
+%   (ND): the appeal to prop:strict-positivity(2) is replaced by the weaker fact the clause
+%     needs -- that SOME frequency is moved -- which follows from lem:dilation-invariance
+%     alone. The prop:strict-positivity edge in the \uses list is kept, over-approximating
+%     being harmless, but the sufficiency half no longer depends on that node.
+%   The gauge: 'an increasing bijection of [0,infty) is continuous' is given its reason.
+% Statement unchanged.
+%
+% NOTE (proof 2026-09-09, wave 3): the node is CLOSED. All three clauses are proved, in
+% SpatialLine/MainAnalysis.lean and SpatialLine/MainConstruction.lean, and the bundle
+% SpatialLine.main_characterization names all three in one declaration, on the pattern of
+% matern_theorem. Its footprint is Lean core plus A1's forward implication and A3's converse
+% and uniqueness clauses -- no A8, no A9, no A11.
+%   The UNIQUENESS clause has R1's four gauge hypotheses and the printed route, and prints Lean
+% core, which took one new library file: lem:dilation-invariance wants continuity of F at the
+% origin, and the only route to it in the library ran through prop:fourier-toolbox(3)'s
+% converse, spending ledger A3 for a fact dominated convergence gives outright
+% (SpatialLine/ExponentContinuity.lean).
+%   The ANALYSIS direction was assembled in one worktree and its single remaining hypothesis
+% proved in another: SpatialLine.main_analysis_of_profileForm is the statement with
+% lem:selfdecomposable-exponents (1) => (3) as its only hypothesis, and the merge applied it to
+% SpatialLine.sd_exponents_one_implies_three. The assembly's prediction -- 'it waits on that
+% declaration and on nothing else' -- held exactly. The one step of the assembly worth naming
+% is that the gauge's SURJECTIVITY is what makes condition (1) available at every pair of
+% canonical scales; it is the only place in the chapter that clause is consumed.
+\begin{theorem}[main theorem]\label{thm:main-characterization}
+\uses{def:cascade-family,lem:convolution-representation,lem:nonvanishing,lem:additivity,thm:increments-levy,lem:covariance-fourier,lem:action-rigidity,prop:canonical-gauge,lem:selfdecomposable-exponents,prop:fourier-toolbox,prop:levy-continuity,prop:strict-positivity,lem:dilation-invariance,prop:fourier-uniqueness}
+\lean{SpatialLine.main_characterization, SpatialLine.main_construction,
+SpatialLine.main_analysis_exists, SpatialLine.main_analysis,
+SpatialLine.main_uniqueness}\leanok
+\notes{hemigroup-cascade}
+A family $(\Phis{s}{t})_{0 \le s \le t}$ satisfies (A1)--(A8) and (ND) \emph{if and only if}
+there are an increasing bijection $\chi$ of $[0,\infty)$, the gauge, and a function $F$ of the
+form \ref{eq:sd-profile} with $F \not\equiv 0$, such that
+\[
+  \Phis{s}{t} f = \mu_{s,t} * f, \qquad
+  \hat\mu_{s,t}(\omega) = \exp\bigl[-\bigl(F(\chi(t)\,\omega) - F(\chi(s)\,\omega)\bigr)\bigr].
+\]
+In the canonical gauge the kernel at scale $t$ is the symmetric probability measure $\phi_t$
+with $\hat\phi_t = e^{-F(t\,\cdot)}$, and the pair $(\chi,F)$ is unique up to the normalization
+$\chi(1) = 1$.
+\statusT\quad\emph{(The headline. Read against the axioms: the apertures are the marginal laws
+of one symmetric self-similar additive process, the kernel at canonical scale $t$ being the law
+of $tX_1$, so the whole family is generated by one law and the gauge. What the axioms leave
+free is exactly the pair $(a,k)$ of \ref{eq:sd-profile}: a jitter variance and a nonincreasing
+displacement profile. The Gaussian scale space is $(a,0)$; everything else has a catalogue. The
+formalisation splits the statement three ways --- construction, analysis, uniqueness --- on the
+causal development's model, and the three are assembled in one declaration,
+\texttt{main\_characterization}, so that the \texttt{lean} tag names all three clauses. The
+necessity direction appears there in two forms, and both are named. One concludes the
+representation --- from the axioms alone there \emph{are} kernels $\mu_{s,t}$ with
+$\Phis{s}{t}f = \mu_{s,t} * f$, together with the gauge and the profile --- which is the
+sentence this theorem states; the other takes a representing family as a hypothesis, which is
+the shape every lemma of Chapters 5 to 7 uses and which says more about a \emph{given} family,
+since it quantifies over all of them. Nothing is lost by concluding the representation, because
+\ref{lem:convolution-representation} determines the kernel at each admissible pair uniquely.
+Symmetry of the kernels is a conjunct of \emph{both} directions, not of the sufficiency
+direction alone: $\hat\mu_{s,t}$ is the cosine transform, which is the measure's characteristic
+function only where the measure is symmetric, so a necessity clause that omitted the rider would
+say less about $\mu_{s,t}$ than the display appears to. It is (A3) read through the uniqueness
+half of \ref{lem:convolution-representation}, and costs one application of it. The
+normalization is carried across the join: the necessity clause concludes $\chi(1) = 1$, which
+is what the uniqueness clause quantifies over, so the two meet. That was worth stating rather
+than leaving to the reader, because the rest of the necessity conclusion is invariant under
+$(\chi,F) \mapsto (c\,\chi,\ F(c^{-1}\,\cdot))$ for every $c > 0$ and singles out no member of
+that orbit. Its
+\texttt{\#print axioms} is Lean core together with two ledger entries and no more:
+\ledger{A1}, Bochner's symmetric leg in the forward direction, and \ledger{A3}, the symmetric
+\Levy--Khintchine representation at its converse and its uniqueness clauses. The kernels
+have densities as well, unimodal about the origin, but that is \ref{prop:kernel-regularity} and
+not this theorem: the statement here is about measures, deliberately, absolute continuity
+resting on an interface this theorem cannot cite without making the dependency graph cyclic.
+A reader who wants the density should read the two nodes together.)}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\emph{Necessity.} \ref{lem:convolution-representation}, \ref{lem:nonvanishing},
+\ref{lem:additivity}, \ref{thm:increments-levy}, \ref{lem:covariance-fourier},
+\ref{lem:action-rigidity} and \ref{prop:canonical-gauge} together give the representation with
+$F = G(1,\cdot) \in \LEs$ and $F \not\equiv 0$. Every increment
+$F(\chi(t)\,\cdot) - F(\chi(s)\,\cdot) = g_{s,t}$ lies in $\LEs$ by \ref{thm:increments-levy},
+and $\chi$ is onto $(0,\infty)$ by \ref{prop:canonical-gauge}, so condition (1) of
+\ref{lem:selfdecomposable-exponents} holds for every pair $0 < \tilde s \le \tilde t$ of
+canonical scales, and that lemma yields \ref{eq:sd-profile}. The gauge so obtained is already
+\emph{normalized}: it is the inverse of the orbit coordinate $c(\lambda) = S_\lambda 1$, which
+fixes $1$ by \ref{prop:canonical-gauge}, so $\chi(1) = 1$. What this direction returns is
+therefore a normalized representation --- one of those the uniqueness clause compares --- and
+not merely a representative of its orbit under
+$(\chi,F) \mapsto (c\,\chi,\ F(c^{-1}\,\cdot))$.
+
+\emph{Sufficiency.} Let $F$ be of the form \ref{eq:sd-profile} with $F \not\equiv 0$, and work
+in the canonical gauge. For $0 \le s \le t$ the function
+$g_{s,t}(\omega) := F(t\omega) - F(s\omega)$ lies in $\LEs$ by
+\ref{lem:selfdecomposable-exponents}, (3) implies (1) --- for $s = 0$ the increment is
+$F(t\,\cdot)$ itself, which is in $\LEs$ by hypothesis and the dilation identity --- so by the
+converse half of \ref{prop:fourier-toolbox}(3) and by \ref{prop:fourier-toolbox}(1),
+$e^{-g_{s,t}}$ is the transform of a unique probability measure $\mu_{s,t}$ on $\RR$, symmetric
+because the transform is real and even. Put $\Phis{s}{t}f := \mu_{s,t} * f$. Then (A1)--(A5)
+hold by the converse direction of \ref{lem:convolution-representation}; (A6) because the
+exponents add and transforms determine measures (\ref{prop:fourier-uniqueness}); (A8) with
+$S_\lambda t = \lambda t$, since $\hat\mu_{\lambda s,\lambda t}(\omega) =
+\hat\mu_{s,t}(\lambda\omega)$; and (ND) because $F(t\,\cdot) - F(s\,\cdot) \not\equiv 0$ for
+$s < t$: at $s = 0$ that is $F \not\equiv 0$, and for $s > 0$, if the increment vanished
+identically then $F(\omega) = F(c\omega)$ for every $\omega$ with $c = s/t \in (0,1)$, whence
+$F \equiv 0$ by \ref{lem:dilation-invariance}. Only that \emph{some} frequency is moved is
+needed here, which is less than \ref{prop:strict-positivity}(2) asserts.
+
+For (A7), a collapsing-increment estimate does the work. For a probability measure $\mu$ and
+$f \in \Lone$ the $\Lone$ distance from $\mu * f$ to $f$ is at most $\int \Theta_f(y)\,\mu(dy)$,
+where $\Theta_f(y)$ is the $\Lone$ distance from $\Tr{y}f$ to $f$; and $\Theta_f$ is bounded,
+continuous, and vanishes at the origin, because the translation group acts continuously on
+$\Lone$. So if $(s_n,t_n) \to (c,c)$ along admissible pairs then $\hat\mu_{s_n,t_n} \to 1$
+pointwise, by continuity of $F$ and of $\chi$; hence $\mu_{s_n,t_n} \to \delta_0$ weakly by
+\ref{prop:levy-continuity}, hence $\int \Theta_f(y)\,\mu_{s_n,t_n}(dy) \to 0$: a collapsing increment
+tends to the identity in the strong operator topology. At a pair $s < t$ the two endpoints are
+then moved separately --- there is no $t - s$ to move, this being a hemigroup: the left endpoint
+through an increment applied \emph{first}, where the contraction property absorbs it, and the
+right endpoint through one applied \emph{last}, where the same estimate is read at the image.
+No compact set, no density argument and no $\varepsilon/3$ are needed.
+
+Finally, for an arbitrary gauge $\chi$ set $\Phi'_{s,t} := \Phi_{\chi(s),\chi(t)}$: (A1)--(A6)
+and (ND) hold verbatim, (A7) because an increasing bijection of $[0,\infty)$ is continuous ---
+it is an order isomorphism of $[0,\infty)$ onto itself, and an order isomorphism between linear
+orders carrying the order topology is a homeomorphism --- and (A8) with
+$S'_\lambda = \chi^{-1}(\lambda\,\chi(\cdot))$.
+
+\emph{Uniqueness.} The exponents $g_{0,t}$ are determined by the family: the kernels by
+\ref{lem:convolution-representation}, their transforms by \ref{prop:fourier-uniqueness}, and
+$-\log$ is single-valued on them by \ref{lem:nonvanishing}. The normalization $\chi(1) = 1$
+recovers $F = g_{0,1}$; without it the pair is determined up to
+$(\chi,F) \mapsto (c\,\chi,\ F(c^{-1}\,\cdot))$ with $c > 0$, which is the freedom the
+normalization removes. For each $t$, $\chi(t)$ is then the unique $c$ with
+$g_{0,t} = F(c\,\cdot)$: such a $c$ exists by the representation, and if
+$F(c\omega) = F(c'\omega)$ for every $\omega$ with $c/c' \ne 1$, then $F \equiv 0$ by
+\ref{lem:dilation-invariance}, a contradiction.
+\end{proof}
+
+% draft: Corollary 7.4'
+% twin: hcs cor:semigroup-case (Hemigroup.CascadeCore.semigroup_case)
+% CHANGED (proof of record 2026-09-09, wave 3): the whole proof is rewritten to the
+% machine-checked route (SpatialLine.semigroup_case, SpatialLine.semigroup_case_profile).
+% Three differences, and each of them changes what the proof cites.
+%   (i) The printed proof says "homogeneity gives g_{s,t} = (t-s)g" in one clause. That is a
+%     Cauchy equation in the SCALE variable and it is the longest step of the checked proof:
+%     one-parametricity gives equality of OPERATORS, the uniqueness half of
+%     lem:convolution-representation turns it into equality of KERNELS, lem:additivity makes
+%     the accumulated exponent additive in the scale, and an additive function continuous on
+%     [0,infty) is linear there only after an odd extension to R. Three labels are added to
+%     \uses for it: lem:convolution-representation, lem:additivity, thm:increments-levy.
+%   (ii) lem:action-rigidity(3) is NOT consumed. The normalisation makes S_lambda(1) = g(lambda),
+%     so the multiplicative function is g itself and there is no separate homomorphism c whose
+%     continuity has to be established. What IS consumed instead is lem:no-lattice, for strict
+%     positivity of g off the origin, which the logarithm needs; and lem:nonvanishing, for
+%     continuity of g. Both are added to \uses; lem:action-rigidity is kept, over-approximating
+%     being harmless.
+%   (iii) The alpha <= 2 step is made explicit rather than asymptotic, and the profile's two
+%     integrability conditions are the SAME two comparisons that make C_alpha converge, so the
+%     appeal to lem:profile-integrability is dropped from the text (the label stays in \uses).
+% Statement unchanged.
+\begin{corollary}[recovering the semigroup case]\label{cor:semigroup-case}
+\uses{thm:main-characterization,lem:convolution-representation,lem:nonvanishing,lem:additivity,thm:increments-levy,lem:covariance-fourier,lem:action-rigidity,lem:no-lattice,lem:quadratic-growth,lem:profile-integrability}
+\lean{SpatialLine.semigroup_case, SpatialLine.semigroup_case_profile,
+SpatialLine.semigroup_case_gaussian}\leanok
+\notes{covariance-strata}
+Assume in addition that the family is one-parameter, that is, $\Phis{s}{t}$ depends only on
+$t - s$. Then, after the normalization $g_{0,1}(1) = 1$,
+\[
+  F(\omega) = |\omega|^\alpha \quad \text{for some } 0 < \alpha \le 2 :
+\]
+the kernels are exactly the symmetric stable densities, which are the members of the extended
+semigroup class of \sscite{pauwels1995extended} with positive kernels. Here $\alpha = 2$ is the
+Gaussian, and $0 < \alpha < 2$ has Gaussian coefficient $0$ and profile
+$k(x) = C_\alpha^{-1}x^{-\alpha}$ with
+$C_\alpha := \int_0^\infty (1 - \cos u)\,u^{-1-\alpha}du \in (0,\infty)$.
+\statusT\quad\emph{(The semigroup case, recovered from inside the hemigroup theory. The bound
+$\alpha \le 2$ is \ref{lem:quadratic-growth} and not a cited growth estimate, which is the one
+reroute in this chapter.)}
+\end{corollary}
+
+\begin{proof}
+\leanok
+\emph{The exponent is linear in the scale.} One-parametricity makes $\Phis{0}{t}$ and
+$\Phis{s}{s+t}$ the same operator, so the uniqueness half of
+\ref{lem:convolution-representation} makes $\mu_{0,t}$ and $\mu_{s,s+t}$ the same measure, and
+\ref{lem:additivity} then reads $G(s+t,\omega) = G(s,\omega) + G(t,\omega)$ for all
+$s,t \ge 0$: the accumulated exponent is additive in the scale. It is continuous there as well
+(\ref{lem:additivity}), and an additive function continuous on $[0,\infty)$ is linear on it ---
+extend it oddly to $\RR$, where it stays additive and continuous, and a continuous additive map
+between real vector spaces is $\RR$-linear. So $g_{0,t} = t\,g$ with $g := g_{0,1}$.
+
+\emph{The exponent is multiplicative in the frequency.} \ref{eq:similarity} at $t = 1$, read
+through the previous paragraph on the left-hand side, is
+$S_\lambda(1)\,g(\omega) = g(\lambda\omega)$ for every $\lambda > 0$ and every $\omega$. At
+$\omega = 1$ the normalization $g(1) = 1$ gives $S_\lambda(1) = g(\lambda)$, so
+$g(\lambda\omega) = g(\lambda)\,g(\omega)$: the multiplicative function is $g$ itself, and no
+separate homomorphism has to be identified.
+
+\emph{Cauchy.} $g$ is continuous (\ref{lem:nonvanishing}) and strictly positive off the origin
+(\ref{lem:no-lattice}), so $u \mapsto \log g(e^u)$ is additive and continuous on $\RR$, hence
+linear by the same theorem as above, and $g(\omega) = \omega^\alpha$ for $\omega > 0$ with
+$\alpha := \log g(e)$. Evenness of the exponent extends the formula to $\omega < 0$, and
+$g(0) = 0$ covers the origin once $\alpha \ne 0$ is known.
+
+\emph{The index.} $\alpha > 0$ because $g$ is continuous at $0$ with $g(0) = 0$, while
+$\omega^\alpha \ge 1$ on $(0,1]$ when $\alpha \le 0$. For the upper bound,
+\ref{lem:quadratic-growth} applied to the \Levy{} pair of $g$, which \ref{thm:increments-levy}
+supplies, gives a constant $C$ with $g(\omega) \le C(1+\omega^2)$; the normalization $g(1) = 1$
+forces $C \ge 1/2$, and if $\alpha > 2$ then at $\omega := (2C+1)^{1/(\alpha-2)} \ge 1$ the left
+side is $(2C+1)\,\omega^2 > C(1+\omega^2)$, which the bound forbids. So $\alpha \le 2$.
+
+\emph{The profile.} When $0 < \alpha < 2$ the integral $C_\alpha$ converges, by the two regimes
+of the truncation: $1 - \cos u \le u^2/2$ makes its integrand at most $u^{1-\alpha}/2$ near the
+origin, integrable exactly for $\alpha < 2$, and $1 - \cos u \le 2$ makes it at most
+$2u^{-1-\alpha}$ beyond $1$, integrable exactly for $\alpha > 0$. Those two comparisons
+\emph{are} the two integrability conditions of \ref{eq:sd-profile} for
+$k(x) = C_\alpha^{-1}x^{-\alpha}$, which is nonincreasing, with $a = 0$, so no separate appeal
+is needed; and $C_\alpha > 0$ because its integrand is nonnegative and does not vanish on
+$(0,1)$. The substitution $u = |\omega|x$, performed on the $[0,\infty]$-valued integral so that
+integrability does not have to be revisited at each frequency, gives
+$\int_0^\infty (1-\cos\omega x)\,x^{-1-\alpha}dx = C_\alpha|\omega|^\alpha$, hence the exponent
+$|\omega|^\alpha$. When $\alpha = 2$, $k \equiv 0$ and $a = 1$.
+\end{proof}
+
+% CHANGED (article mirror 2026-09-14, R157): the Gaussian coefficient adds a displacement of
+% variance 2at^2 to the kernel AT SCALE t and of variance 2a(t^2 - s^2) to an increment, not
+% "variance 2at^2 to every kernel", which was the external review's finding on this remark; the
+% word "jitter" is out; and the opening sentence, which set the scene on the half-line, is dropped
+% with the rest of the causal framing (the comparison lives in Chapter~\ref{ch:bridge}).
+\begin{remark}[the boundary, the Gaussian ray, and what is not there]\label{rem:boundary}
+The boundary $\alpha = 2$ of the semigroup slice is the Gaussian, nothing is degenerate, and
+the trace of the boundary in the general class is the Gaussian coefficient $a$, which adds an
+independent Gaussian displacement of variance $2at^2$ to the kernel at scale $t$ and of
+variance $2a(t^2 - s^2)$ to every increment. The members of \sscite{pauwels1995extended} beyond
+$\alpha = 2$ have positive transfer functions and sign-changing kernels. They are excluded by
+(A4) through \ref{thm:main-characterization}, and by nothing in
+Chapters~\ref{ch:representation} to \ref{ch:covariance}. So positivity, rather than
+recursivity, narrows the class. One axiom does not transfer: the additional axiom that removed
+the drift in the causal theory has a counterpart here,
+$\lim_{\omega \to \infty} F(\omega)/\omega^2 = 0$, which says $a = 0$. Unlike its causal twin
+it would exclude the Gaussian, and this article does not impose it.
+\end{remark}
+
+% draft: Lemma 7.6' (the FIRST statement so numbered in the draft; see the header note)
+% twin: hcs lem:admissible-cone (Hemigroup.SelfDecomposableExponent.admissible_cone)
+% CHANGED (proof of record 2026-09-09): the proof now says why the two integrability
+% conditions and the exponent are additive with no side condition (nonnegative integrands,
+% so the identity is one in [0,infty]) and where the finiteness that turns it into an
+% identity between REAL numbers comes from (lem:profile-integrability into
+% lem:quadratic-growth). The old one sentence asserted additivity of the integral without
+% either, which is the only step of the machine-checked proof that is not arithmetic;
+% lem:profile-integrability and lem:quadratic-growth are added to \uses accordingly.
+% Statement unchanged.
+\begin{lemma}[the admissible exponents form a convex cone]\label{lem:admissible-cone}
+\uses{thm:main-characterization,lem:selfdecomposable-exponents,lem:profile-integrability,lem:quadratic-growth}
+\lean{SpatialLine.admissible_cone}\leanok
+If $F_1, F_2$ are admissible in the sense of \ref{thm:main-characterization}, of the form
+\ref{eq:sd-profile} with Gaussian coefficients $a_1, a_2 \ge 0$ and nonincreasing profiles
+$k_1, k_2$, then so are $F_1 + F_2$, with data $(a_1+a_2, k_1+k_2)$, and $c\,F_1$ for $c \ge 0$,
+with data $(c\,a_1, c\,k_1)$. So the admissible exponents form a convex cone, and the
+correspondence with the pairs $(a,k)$ is linear.
+\statusT
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each defining condition --- nonnegativity of $a$, nonnegativity and monotonicity of $k$, and
+the two integrability conditions --- is stable under sums and under multiplication by $c \ge 0$,
+the last two because the integrands $x k(x)$ and $k(x)/x$ are nonnegative on $(0,\infty)$, so that
+the integral of a sum is the sum of the integrals with no side condition. The same additivity,
+applied to \ref{eq:sd-profile} at a fixed $\omega$, gives $F_1 + F_2$ and $c\,F_1$ as the exponents of
+the summed and scaled data, as identities in $[0,\infty]$; they are identities between real numbers
+because \ref{lem:profile-integrability} makes each $F_i$ the exponent of a symmetric \Levy{} pair and
+\ref{lem:quadratic-growth} makes that finite at every frequency.
+\end{proof}
+
+% draft: Proposition 7.5' clauses (1) and (2). Clause (3) is split off into
+% prop:kernel-regularity below; see the header note.
+% NEW: no causal counterpart. On the half-line the two facts below were available BEFORE the
+% gauge argument, from the vanishing lemma and the monotonicity of Bernstein functions; here
+% they are consequences of the classification.
+% CHANGED (proof of record 2026-09-09): clause (1)'s proof is rewritten to the
+% machine-checked route (SpatialLine.strict_positivity_monotone). The substitution
+% u = omega x is correct but is a second change of variables on top of the one
+% lem:selfdecomposable-exponents (3) => (1) already performs; reading that node at the
+% single frequency omega = 1 gives the clause in one line, and clause (1) is thereby a
+% corollary of a node already proved rather than a computation of its own. Statement
+% unchanged.
+% CHANGED (proof of record 2026-09-09, wave 3): clause (2)'s proof is rewritten to the
+% machine-checked route (SpatialLine.strict_positivity_strict,
+% SpatialLine.strict_positivity_consequences). Two differences.
+%   (i) The rigidity step no longer covers (0,infty) by the intervals [x, kappa x]. The tail
+%     integral J(eps) = int_eps^infty k(u) du/u is finite off the origin and invariant under
+%     the dilation, so it has no mass on (eps, kappa eps]; antitonicity bounds the integrand
+%     below there by its value at the RIGHT endpoint, which must therefore vanish; and
+%     eps = x/kappa is an arbitrary point of the half-line in disguise. No covering, no
+%     induction, and no almost-everywhere-to-pointwise step.
+%   (ii) The lattice sentence does not consume lem:lattice-zero. A law carried by p Z has
+%     cosine transform 1 at 2 pi / p, so its exponent vanishes at a nonzero frequency, which
+%     clause (2) has just forbidden. The label is kept in \uses -- the annotation still refers
+%     to it, and over-approximating is harmless -- but the proof no longer routes through it.
+% Statement unchanged.
+\begin{proposition}[strict positivity and monotonicity of the admissible exponents]
+\label{prop:strict-positivity}
+\uses{lem:selfdecomposable-exponents,lem:lattice-zero}
+\lean{SpatialLine.strict_positivity_monotone, SpatialLine.strict_positivity_strict,
+SpatialLine.strict_positivity_consequences}\leanok
+Let $F$ be of the form \ref{eq:sd-profile} with $F \not\equiv 0$.
+\begin{enumerate}
+\item $F$ is nondecreasing on $[0,\infty)$.
+\item $F(t\omega) - F(s\omega) > 0$ for all $0 \le s < t$ and every $\omega \ne 0$.
+Consequently, in the canonical gauge, no increment $\mu_{s,t}$ with $s < t$ is a lattice law,
+and $G(\cdot,\omega)$ is strictly increasing for every $\omega \ne 0$.
+\end{enumerate}
+\statusT\quad\emph{(Clause (2) is what \ref{cor:monotonicity} could not give before covariance
+and \ref{lem:no-lattice} gave only for the kernels from the origin: after the classification
+the exceptional set is empty. So the causal theory's strict monotonicity, and the monotonicity
+in the transform variable that its function class supplied for free, both hold here --- for
+the exponents the axioms select, not for the class $\NDs$, in which
+\ref{lem:lattice-zero} shows they are false.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+(1) For $0 \le \omega_1 \le \omega_2$ the difference $F(\omega_2) - F(\omega_1)$ is the value at
+frequency $1$ of the increment $F(\omega_2\,\cdot) - F(\omega_1\,\cdot)$, which lies in $\LEs$ by
+\ref{lem:selfdecomposable-exponents}, (3) implies (1) --- at $\omega_1 = 0$ read as the dilate
+$F(\omega_2\,\cdot)$ itself --- and a member of $\LEs$ is nonnegative. So monotonicity is the
+dilation identity evaluated at one frequency, and no second change of variables is needed.
+
+(2) By the same formula, for $\omega > 0$ --- which suffices, $F$ being even ---
+\[
+  F(t\omega) - F(s\omega)
+  = a(t^2-s^2)\omega^2
+   + \int_0^\infty (1-\cos u)\,\bigl[k(u/(t\omega)) - k(u/(s\omega))\bigr]\,\frac{du}{u},
+\]
+with a nonnegative integrand, reading $k(u/(s\omega)) = k(\infty) = 0$ when $s = 0$. Suppose it
+vanishes. Then $a = 0$, because $t^2 > s^2$ and $\omega \ne 0$; and the integral vanishes, so
+its integrand vanishes for almost every $u > 0$, and since $1 - \cos u$ is positive off the
+countable set $2\pi\ZZ$, which is null, $k(u/(t\omega)) = k(u/(s\omega))$ for almost every
+$u > 0$. For $s = 0$ this says $k = 0$ almost everywhere, and $F \equiv 0$.
+
+For $s > 0$ it says $k(\varkappa x) = k(x)$ for almost every $x > 0$, with
+$\varkappa := t/s > 1$, and the tail integral finishes it. For every $\varepsilon > 0$ the
+integral $J(\varepsilon) := \int_\varepsilon^\infty k(u)\,du/u$ is finite: bound $k(u)/u$ by
+$k(\varepsilon)/\varepsilon$ on $(\varepsilon,1]$, using that $k$ is nonincreasing, and use
+$\int_1^\infty k(u)\,u^{-1}du < \infty$ beyond $1$. The change of variables $u = \varkappa x$
+carries $J(\varkappa\varepsilon)$ to $\int_\varepsilon^\infty k(\varkappa x)\,dx/x$, which is
+$J(\varepsilon)$ by the almost-everywhere relation --- the measure $dx/x$ being invariant under
+the multiplicative group. Splitting $J(\varepsilon)$ at $\varkappa\varepsilon$ and cancelling
+the finite tail gives $\int_\varepsilon^{\varkappa\varepsilon} k(u)\,du/u = 0$; on that interval
+$k$ is bounded below by $k(\varkappa\varepsilon)$, which must therefore vanish; and since
+$\varepsilon$ was arbitrary, reading the conclusion at $\varepsilon = x/\varkappa$ gives
+$k(x) = 0$ for every $x > 0$. So $F \equiv 0$ here too, which is excluded. No covering argument
+and no passage from almost everywhere to everywhere is needed.
+
+In the canonical gauge $g_{s,t} = F(t\,\cdot) - F(s\,\cdot)$, so $G(\cdot,\omega)$ is strictly
+increasing for every $\omega \ne 0$; and if some increment $\mu_{s,t}$ were carried by a lattice
+$p\ZZ$ then its cosine transform at $2\pi/p$ would be the integral of the constant $1$, hence
+$1$, so $g_{s,t}(2\pi/p) = 0$ at a nonzero frequency, which the clause just proved forbids.
+\end{proof}
+
+% draft: Proposition 7.5' clause (3), together with the unimodality claim in the paragraph
+% following it. SPLIT OFF from prop:strict-positivity so that the two elementary clauses stay
+% out of the trust base.
+% twin: hcs prop:volterra-density carries the same Sato absolute-continuity interface
+% (ledger A10 there).
+\begin{proposition}[regularity of the kernels from the origin]\label{prop:kernel-regularity}
+\uses{thm:main-characterization,prop:canonical-gauge,lem:additivity,def:self-decomposable,prop:strict-positivity,lem:selfdecomposable-exponents}
+% CHANGED (review 2026-09-09, R27): the \lean tag names two declarations. The interface proper
+% is kernel_regularity_law -- A8 and A9 as they are stated in the sources, about a nondegenerate
+% symmetric self-decomposable law -- and kernel_regularity is the ASSEMBLY that checks those
+% hypotheses for mu_{0,t}, which is [T] work (main_analysis, strict_positivity_strict). Keeping
+% them apart is what lets #print axioms of the interface show the ledger entries and nothing
+% else. Statement unchanged.
+%
+% CHANGED (proof of record 2026-09-09, wave 3): the assignment paragraph's account of the
+% hypothesis check is rewritten to the machine-checked route
+% (SpatialLine.isSelfDecomposable_kernel, SpatialLine.kernel_ne_dirac_zero). Neither of the
+% two nodes the R27 note named is on the path. Self-decomposability of mu_{0,t} does not go
+% through lem:selfdecomposable-exponents or thm:main-characterization at all: because the gauge
+% is ONTO [0,infty), the factor law that def:self-decomposable asks for at ratio b is an
+% increment of the family itself, mu_{t',t} with chi(t') = chi(t)/b, and lem:additivity
+% supplies its transform. And nondegeneracy needs only that SOME frequency is moved, which is
+% prop:canonical-gauge's last clause, not prop:strict-positivity(2). Both old labels are kept
+% in \uses, over-approximating being harmless, and prop:canonical-gauge, lem:additivity and
+% def:self-decomposable are added. Statement unchanged.
+%
+% The interface proper is now an admitted Lean axiom, SpatialLine.kernel_regularity_law, on
+% blueprint/trust-boundary.txt with A8's and A9's **Lean:** lines naming it; the assembly
+% SpatialLine.kernel_regularity is machine-checked and its #print axioms is Lean core plus that
+% one name. The node is \leanok in that sense and in no other: what is verified is the
+% ASSEMBLY, and the analysis itself remains cited.
+%
+% CHANGED (fidelity review 2026-09-10, F6-1): the two Lean declarations are NARROWED at the
+% origin. Both stated the monotonicity conjunct as AntitoneOn p (Set.Ici 0), on the CLOSED
+% half-line; that forces p x <= p 0 < infinity for every x >= 0, i.e. a density bounded by a
+% real number, and it is FALSE. Sato Thm. 27.13 gives absolute continuity and Yamazato Thm. 1
+% gives convexity left of the mode and concavity right of it; neither pins a value AT the mode,
+% and a concave distribution function on (0,infty) may have F'(0+) = +infinity. The
+% counterexample is inside this development: the Matern member at gamma <= 1/2 -- admitted by
+% matern_exponent and built for every gamma > 0 by witness_two_members_matern_family -- is
+% symmetric, nondegenerate and self-decomposable with density of order |x|^(2gamma-1) at the
+% origin, unbounded for gamma < 1/2 and logarithmically unbounded at gamma = 1/2 (which is what
+% ledger A10 says in Sato's vocabulary, c = 2gamma < 1). Both declarations now read
+% AntitoneOn p (Set.Ioi 0), the development's own convention for a profile
+% (SDProfile.k_antitone). THE STATEMENT BELOW IS UNCHANGED and remains true: "unimodal with
+% mode at the origin" is a claim about the shape of the density and not about its value there,
+% and this is exactly the case where prose may leave the reading open and a formal statement may
+% not. Recorded at A8 and A9. The other two consumers of the axiom
+% (SpatialLine.polya_frequency, SpatialLine.exists_smoothing_law) destructure the
+% absolute-continuity conjunct only, so nothing downstream rested on the false clause.
+\lean{SpatialLine.kernel_regularity_law, SpatialLine.kernel_regularity}\leanok
+Let $(\Phis{s}{t})$ satisfy (A1)--(A8) and (ND). Then for every $t > 0$ the kernel $\mu_{0,t}$
+is absolutely continuous, and its density is unimodal with mode at the origin.
+\statusA\quad\ledger{A8}\quad\ledger{A9}\quad\emph{(\textbf{Assignment.} \ledger{A8} carries
+absolute continuity and \ledger{A9} unimodality, both for nondegenerate self-decomposable laws
+on $\RR$. What they do not carry is the hypothesis check, and that check is cheaper than it
+looks: that $\mu_{0,t}$ is self-decomposable is \ref{prop:canonical-gauge} with
+\ref{lem:additivity} --- the factor law \ref{def:self-decomposable} asks for at ratio $b$ is
+the increment $\mu_{t',t}$ at the scale $t'$ with $\chi(t') = \chi(t)/b$, which exists because
+the gauge is onto $[0,\infty)$ --- and that it is nondegenerate is the last clause of
+\ref{prop:canonical-gauge}, that some frequency is moved. Both are \textbf{[T]} and neither
+needs \ref{lem:selfdecomposable-exponents} or \ref{prop:strict-positivity}(2). The symmetric
+case places the mode at the origin, which is elementary given unimodality. The statement is
+made for the kernels \emph{from the origin} only: the increments $\mu_{s,t}$ with $s > 0$ are
+infinitely divisible but not in general self-decomposable, and nothing is claimed about them.)}
+\end{proposition}
+
+% ADDED (article mirror 2026-09-14, R157): an [A] node with no proof environment printed nothing
+% between its two cited facts and its conclusion, and the hypothesis check --- which is this
+% article's work, not the sources' --- sat in the annotation alone. The paper prints the proof
+% below; the blueprint is the text of record, so it carries it too. The mode argument is the
+% external review's repair: an even unimodal density whose mode is at m /= 0 does NOT have a
+% second mode at -m to contradict, because the set of modes is an interval; what the symmetry
+% gives is that the interval is symmetric about 0, hence contains it.
+\begin{proof}
+\leanok
+For a nondegenerate self-decomposable law on $\RR$ the statement is the two cited facts:
+absolute continuity is \sscite{sato1999levy}, Thm.~27.13, and unimodality is
+\sscite{yamazato1978unimodality}, Thm.~1. What remains is the hypothesis check. That
+$\mu_{0,t}$ is self-decomposable is \ref{prop:canonical-gauge} with \ref{lem:additivity}: the
+factor law \ref{def:self-decomposable} asks for at ratio $b$ is the increment $\mu_{t',t}$ at
+the scale $t'$ with $\chi(t') = \chi(t)/b$, which exists because the gauge is onto
+$[0,\infty)$. That it is nondegenerate is the last clause of \ref{prop:canonical-gauge}, that
+some frequency is moved. The mode is at the origin because the density is even: the set of
+modes of a unimodal law is an interval, and for an even density that interval is symmetric
+about $0$, so it contains $0$.
+\end{proof}
+
+So the Fourier theory ends where the Laplace theory began. The causal vanishing lemma is false
+for $\NDs$ (\ref{lem:lattice-zero}) but true, monotonicity in $\omega$ included, for the
+exponents the axioms select (\ref{prop:strict-positivity}); and the axioms never produce a
+multimodal kernel from the origin. No truncation of the Gaussian is admissible, for a
+different reason: the transform of an even density carried by $[-R,R]$ with $p(R-) > 0$ has
+the leading term $2p(R-)\sin(R\omega)/\omega$ as $\omega \to \infty$, by integration by parts,
+so it changes sign, which \ref{lem:nonvanishing} forbids.
+
+\begin{remark}[the scale evolution, in one line]\label{rem:scale-evolution-preview}
+In the canonical gauge $\hat\phi_t(\omega) = e^{-F(t\omega)}$, so on the Fourier side the
+family solves $\partial_t\hat u = -t^{-1}B(t\omega)\,\hat u$ with $B = \omega F'$ the symbol of
+\ref{lem:selfdecomposable-exponents}(2). By \ref{eq:symbol} that symbol is the generator of the
+symmetric \Levy{} process with Gaussian part $2a$ and jump measure $\varpi$. For the Gaussian,
+$B(\omega) = 2a\omega^2$ and the equation is the heat equation in the variance gauge; for the
+\Matern{} member, $F = \gamma\log(1+\omega^2)$ and $B(\omega) = 2\gamma\omega^2/(1+\omega^2)$, a
+\emph{bounded} symbol. That the
+symbol be a polynomial, so that the evolution is a differential equation in $x$, forces
+$\varpi = 0$ by \ref{eq:symbol}. The equation and the observation are stated here without
+proof; the evolution in generator form is Chapter~\ref{ch:generator} and the locality theorem
+they lead to is Chapter~\ref{ch:locality}.
+\end{remark}

@@ -1,0 +1,75 @@
+% Author contribution and AI-use disclosure. Placement: after the appendix, before the
+% bibliography.
+%
+% Form (the author's decision of 2026-09-14, response-plan D5): a short contributor section --
+% roles, verification and review status, responsibility -- in the first person, since it is the
+% author's own declaration (ADR-0015's neutral third person governs the body). The chronology,
+% the figures with their caveats, and the detailed account of the reviews are in the
+% repository's notes/PROCESS.md, which this section cites; that note is the material for any
+% longer account. The hub standard's four rules (writing-style-and-ai-use.md section 6) apply:
+% never claim less involvement than there was; numbers from chronicler with their date and
+% caveats (in the note, not here); do not repeat the trust boundary, which section 1.1 owns;
+% anonymity outranks completeness (not in play, the release is not double-blind).
+%
+% History: the first version (2026-09-12) was on Paper I's model with the chronology and the
+% numbers in the paper; the author's review (2026-09-14) put it in the first person and brought
+% it up to date; the external reviews of the same day both asked for the chronology and the
+% figures to move to supplementary material, and the author agreed. What moved is in
+% notes/PROCESS.md verbatim, including the three places where the archive corrected the
+% author's recollection. Update the note, not this section, when the figures are re-derived.
+
+\section*{Author contribution and use of AI}
+
+This article was written in close collaboration with generative AI, and the collaboration
+went beyond editing assistance at every stage. I write this section in the first person
+because it is my own declaration; the article itself is written in the neutral third person.
+
+\paragraph{Roles.} The research programme and the question are mine. The axioms of
+\sscite{pauwels1995extended} were the template for my semigroup theory of temporal scale
+space \sscite{fagerstrom2005temporal}, and after the time-causal article had been drafted I
+asked what the hemigroup weakening would give on the line, naming that paper as the point of
+departure. Every decision of scope, method and policy is mine: the method of drafting, one
+section per exchange in dialogue; the notation; the reference policy toward the companion
+article; the split of the material into three modules and the decision to release this one
+first; the cut of this version at the characterization theorem; the rule that the proof of
+record follows the machine-checked route; and the voice of the text. I reviewed the article
+section by section and set the scope of every claim.
+
+The prose and the code were written by AI agents throughout, in dialogue with me; I worked
+almost entirely from the conversation rather than from the editor. The Lean~4 development is
+theirs essentially in full, and none of the proof terms are mine. So is mathematical content:
+the results this article rests on were identified by an agent on reading the source, before
+any plan existed, and during the work the agents found and repaired errors in the mathematics
+of record that no human had seen. The technical decisions of the formalization were, for the
+most part, the agents' recommendations approved by me rather than my own drafts; I read each
+with its consequences and followed all of them.
+
+\paragraph{Verification and review.} What is machine-checked, and the axioms on which the
+verified development rests, are set out in \S\ref{sec:machine-checked}. Review by agents that
+had no part in the writing was a working method throughout: the statement skeleton before any
+proof was attempted, the finished development against the article in a fidelity review, and
+the sections blind against the writing standard. Before the final revision the manuscript was
+read by AI systems of two other vendors, in two rounds: a referee-style review returning a
+verdict of major revision and a presentation review, then, on the revised text, a second
+presentation review and a referee report the reviewing system left unfinished. Every
+finding was verified against the text and the formal development before it was acted on,
+and the errors the first referee report found, in the one construction that is not
+machine-checked and in claims stated beyond their results, are corrected in this version.
+The reviews are archived verbatim in the repository beside the plan that records the
+disposition of each finding. Beyond me, no human reader has
+yet reviewed the article.
+
+\paragraph{The record.} The sessions were archived as the work went on, so the division of
+labour can be stated rather than estimated, and it is stated, with its dates and its caveats,
+in the repository's process note (\texttt{notes/PROCESS.md}), together with the chronology of
+the work and the places where the archive corrected my own recollection of it. The short
+form: the sustained work took eight days, the agents' words outnumber mine by about
+twenty-two to one, which is the ratio of the companion article, and the difference from that
+article is that the formalization ran as parallel agents with me approving their
+recommendations. Those figures are lower bounds. I would not, unaided and as a spare-time
+activity, have written this article.
+
+\paragraph{Responsibility.} I directed the work throughout, have satisfied myself of the
+mathematical content, and have checked every citation. Responsibility for this article,
+including for its errors, is mine alone; the validity of the machine-checked results depends
+on the Lean kernel and not on how, or by whom, the proof terms were produced.

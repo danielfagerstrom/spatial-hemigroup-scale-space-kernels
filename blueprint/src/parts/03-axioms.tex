@@ -1,0 +1,490 @@
+% !TEX root = ../print.tex
+% Draft \S3 --- Axioms
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S3 (lines 77-138).
+%
+% The axiom system is the causal one with causality replaced by reflection symmetry; that
+% is the whole difference between the two articles, and this chapter records it. The
+% relation to the causal theory is stated once, in rem:provenance-causal, and nowhere else
+% in this chapter.
+%
+% Two members are exhibited because the theory has to fit between them. The Gaussian clause
+% is elementary and self-contained; the Matern clause needs its kernels to be symmetric
+% probability measures, which is settled in Chapter 10, so the node carries forward \uses
+% edges. Those edges are honest and the graph stays acyclic: Chapter 10 reaches this
+% chapter only through def:cascade-family.
+%
+% prop:no-positivity-no-classification is the article's thesis in negative form and is the
+% one node here with real work in it; its proof is the draft's, written out.
+
+\chapter{Axioms}
+\label{ch:axioms}
+
+The primitive object is a two-parameter family of operators indexed by ordered pairs of
+scales. Positivity is stated in its place in the list, but the theory is developed so that
+its role stays visible: \ref{prop:no-positivity-no-classification} says what the other axioms
+admit without it, and \ref{thm:main-characterization} what it cuts that down to.
+
+% draft: Definition 3.1
+% twin: hcs def:cascade-family (Hemigroup.CascadeFamily) --- identical except that (A3)
+% reads reflection symmetry here and causal support there, and that the ambient space is
+% L^1(R) rather than L^1 of a half-line.
+% The Lean rendering splits the axiom list: PreCascadeCore carries (A1)--(A3) and (A5)--(A7),
+% IsPositive is (A4) and IsNondegenerate is (ND), with CascadeCore extending PreCascadeCore by
+% the two. The split is what makes prop:no-positivity-no-classification -- a family satisfying
+% every axiom but (A4) -- statable at all, and it lets each later node carry exactly the axiom
+% list this definition gives it. Nothing about the definition itself changes.
+\begin{definition}[symmetric cascade measurement family]\label{def:cascade-family}
+\lean{SpatialLine.PreCascadeCore, SpatialLine.IsPositive, SpatialLine.IsNondegenerate,
+SpatialLine.CascadeCore, SpatialLine.IsScaleCovariant, SpatialLine.CascadeFamily}\leanok
+\notes{scale-space-axioms}
+A family of linear operators $\Phis{s}{t} : \Lone \to \Lone$, $0 \le s \le t < \infty$, is a
+\emph{symmetric cascade measurement family} if:
+\begin{enumerate}
+\item[(A1)] \emph{Boundedness.} Each $\Phis{s}{t}$ is a bounded operator on $\Lone$.
+\item[(A2)] \emph{Translation covariance.} $\Phis{s}{t}\,\Tr{a} = \Tr{a}\,\Phis{s}{t}$ for
+every $a \in \RR$.
+\item[(A3)] \emph{Reflection symmetry.} $\Phis{s}{t}\,R = R\,\Phis{s}{t}$.
+\item[(A4)] \emph{Positivity.} $\Phis{s}{t}\,L^1_+ \subseteq L^1_+$.
+\item[(A5)] \emph{Unit mass.} $\int \Phis{s}{t} f = \int f$ for every $f \in L^1_+$.
+\item[(A6)] \emph{Cascade (hemigroup).} $\Phis{t}{t} = \mathrm{Id}$, and
+$\Phis{s}{t}\,\Phis{r}{s} = \Phis{r}{t}$ for all $r \le s \le t$.
+\item[(A7)] \emph{Continuity.} For every $f \in \Lone$ the map $(s,t) \mapsto \Phis{s}{t}f$ is
+continuous from $\{0 \le s \le t\}$ to $\Lone$.
+\item[(A8)] \emph{Scale covariance.} There is a family $(S_\lambda)_{\lambda > 0}$ of
+increasing bijections of $[0,\infty)$ with
+$\Dil{\lambda}\,\Phis{s}{t} = \Phi_{S_\lambda s,\,S_\lambda t}\,\Dil{\lambda}$ for all
+$0 \le s \le t$ and all $\lambda > 0$.
+\item[(ND)] \emph{Nondegeneracy.} $\Phis{s}{t} \ne \mathrm{Id}$ whenever $s < t$.
+\end{enumerate}
+\statusT
+\end{definition}
+
+\begin{remark}[provenance: Pauwels et al.]\label{rem:provenance-pauwels}
+The axioms of \sscite{pauwels1995extended} are, for a family $\{K_t\}_{t \ge 0}$: a linear
+integral operator with an $\Lone$ kernel, shift invariance, evenness of the kernel, unit mass,
+continuity of the kernel in $x$ and in $t$, \emph{recursivity} $K_sK_t = K_{s+t}$, and scale
+invariance with a free rescaling function, $k_t(x) = \psi(t)^{-1}\phi(x/\psi(t))$ with $\psi$
+continuous, strictly increasing, $\psi(0) = 0$ and $\psi(t) \to \infty$. Their linearity,
+integral form and shift invariance are (A1)--(A2) together with the representation of
+Chapter~\ref{ch:representation}. Evenness is (A3), unit mass is (A5), and continuity in $t$ is
+(A7). Recursivity is (A6) with the tacit assumption that the increments are stationary in the
+scale parameter, which is what this article drops. Their $\psi$ is the relabelling $S_\lambda$
+of (A8), recovered rather than posited in \ref{prop:canonical-gauge}. Two things they assume
+and this article does not: kernels that are continuous \emph{functions}, and the semigroup.
+Measures are allowed here so that the identity is the diagonal limit, and nothing is lost,
+since by \ref{prop:kernel-regularity} every nondegenerate admissible kernel has a density
+anyway. Positivity, which in their paper enters only at the end, to bound the stability index
+through a second moment, is an axiom here.
+\end{remark}
+
+% CHANGED (article mirror 2026-09-14, R157): three wordings, each in the safe direction. "The two
+% systems differ in nothing else" is dropped -- one axiom is weakened and two smaller changes go
+% with it, which is what the remark itself lists. "The degenerate member is not a pure translation"
+% is replaced by "the member that stands where the pure delay stood": the identity family is
+% excluded by (ND) and not by (A3), and calling the Gaussian the degenerate member contradicts the
+% word "nondegenerate" used of it everywhere else. And the causal article is cited by key.
+\begin{remark}[relation to the causal theory]\label{rem:provenance-causal}
+(A1), (A2), (A4)--(A8) and (ND) are the axioms of the time-causal article
+\sscite{fagerstrom2026hemigroup} up to the change of letters, and (A3) replaces causality by
+reflection symmetry: the axiom that removed the Gaussian there is the axiom that admits it
+here. Three consequences are visible already. The convolution representation yields symmetric
+probability measures on $\RR$ rather than probability measures on a half-line, and the Fourier
+transform can vanish where the Laplace transform cannot, so a nonvanishing lemma
+(\ref{lem:nonvanishing}) replaces the positivity of the causal integrand. The drift slot of the
+causal profile representation is occupied here by the Gaussian coefficient, so the member that
+stands where the pure delay stood is the Gaussian scale space itself, admissible, extreme and
+nondegenerate. And the gauge argument, which used the causal vanishing lemma twice, is
+re-routed through a smoothed transform (\ref{cor:smoothed-transmittance}) and a dilation
+argument (\ref{lem:dilation-atom}), the exclusion of lattice laws following from covariance
+(\ref{lem:no-lattice}) rather than from the function class.
+\end{remark}
+
+% PROVED (proof 2026-09-09): both clauses' axiom content is machine-checked and moved to
+% SpatialLine --- two_members_gaussian (SpatialLine/Gaussian.lean) and two_members_matern
+% (SpatialLine/Matern.lean). The proof below is rewritten to be the proof of record for what was
+% actually verified, and two of its steps changed:
+%  * (A7). The old text derived strong convergence of the operators from continuity of the
+%    transform "by the argument written out in the proof of thm:main-characterization". That is
+%    an epsilon/3 argument and it is not needed: for the Gaussian the semigroup makes a
+%    difference of operators factor through one increment, and for the Matern hemigroup the two
+%    endpoints are moved separately through an intermediate. Both then reduce to the estimate
+%    || mu*f - f ||_1 <= int Theta_f d mu, which is Fubini. The node no longer depends on the
+%    continuity argument inside thm:main-characterization, and clause (2)'s axioms no longer go
+%    through that theorem's constructive direction at all.
+%  * (ND). The old text exhibited a frequency at which the transform is not 1. The axiom is
+%    about the OPERATOR, so what is needed is that convolution by a probability measure is the
+%    identity only for delta_0 --- proved by testing at a bump with a strict maximum at the
+%    origin. That lemma (SpatialLine.eq_dirac_of_mconvL1_eq_id) is what
+%    lem:convolution-representation's uniqueness clause should start from.
+% No ledger interface is consumed: in particular the Matern clause never reaches the Bessel-K
+% density (A15/A16), and prop:levy-continuity's first clause (A6) is proved from Mathlib.
+% The node stays \notready: two_members_matern_moments and matern_density are still sorry.
+% SKELETON NOTE (phase B, 2026-09-09): clause (2)'s sentence "its kernel at scale t is the
+% Matern kernel of smoothness gamma - 1/2 and range t" is discharged by Skeleton.matern_density
+% (Chapter 10), which is now named in the \lean tag below. Phase A's question Q1 asked whether
+% to add the declaration or to move the sentence into the annotation; the declaration is the
+% more faithful tag and the forward \uses edges to prop:matern-density were already in place,
+% so the statement text is unchanged.
+% CHANGED (2026-09-14, R156; a NARROWING, requested by the article session on 2026-09-12 and
+% required by the external review's finding C): the density sentence LEAVES clause (2). The
+% density (|x|/2t)^{gamma-1/2} K_{gamma-1/2}(|x|/t) is a probability density for every gamma > 0,
+% but a Matern COVARIANCE function only for smoothness gamma - 1/2 > 0: at gamma = 1/2 it is K_0,
+% which diverges logarithmically at the origin, so the identification as stated was false on
+% 0 < gamma <= 1/2, which this node's own hypothesis admits. Three consequences, all in the
+% direction of claiming less: the sentence goes (the mean, the variance and the finiteness of
+% every moment stay); Skeleton.matern_density leaves the \lean tag and prop:matern-density leaves
+% \uses; and two_members_matern_moments takes its integrability conjunct from matern_moments
+% (the even moments of the Gamma mixture with |x|^n <= 1 + x^{2n}) instead of
+% matern_moments_integrable (the moment criterion, ledger A13). So the node is \leanok and prints
+% Lean core, and the closed form of the density is a cited fact of chapter 10 that nothing here
+% asserts. The paper's copy of the statement is updated verbatim; the draft is mirrored.
+% draft: the two members of \S3 ("Two members, at the two corners of what the axioms admit")
+\begin{proposition}[two members]\label{prop:two-members}
+\uses{def:cascade-family,prop:matern-exponent,thm:main-characterization,lem:convolution-representation,prop:fourier-uniqueness,prop:levy-continuity}
+\lean{SpatialLine.two_members_gaussian, SpatialLine.two_members_matern,
+SpatialLine.two_members_matern_moments}\leanok
+\notes{gamma-matern-corner}
+\begin{enumerate}
+\item \emph{(The Gaussian family.)} Let $g_v$ be the centred Gaussian law of variance $v$, so
+that $\hat g_v(\omega) = e^{-v\omega^2/2}$, and put $\Phis{s}{t}f := g_{t^2-s^2} * f$ for
+$0 \le s \le t$. This family satisfies (A1)--(A8) and (ND), with $S_\lambda t = \lambda t$.
+\item \emph{(The \Matern{} family.)} For $\gamma > 0$ let $\rho_{s,t}$ be the symmetric
+probability measure with
+\[
+  \hat\rho_{s,t}(\omega) = \Bigl(\frac{1 + s^2\omega^2}{1 + t^2\omega^2}\Bigr)^{\gamma},
+  \qquad 0 \le s \le t,
+\]
+and put $\Phis{s}{t}f := \rho_{s,t} * f$. This family satisfies (A1)--(A8) and (ND), with
+$S_\lambda t = \lambda t$. Its kernel at scale $t$ has mean displacement $0$, variance
+$2\gamma t^2$, and every moment finite.
+\end{enumerate}
+\statusT\quad\emph{(The Gaussian clause is elementary at the kernel: variances add, which is
+(A6); the image of $g_v$ under $x \mapsto \lambda x$ is $g_{\lambda^2v}$, which is (A8); and
+$g_v$ being a symmetric probability density gives (A1)--(A5). The \Matern{} clause is elementary
+in the same way once its kernels are known to be symmetric probability measures, which is the
+one non-obvious point and is \ref{prop:matern-exponent}. The forward reference is deliberate:
+this proposition is where the article says what the theory must fit between, while the existence
+of the second member is a corner computation belonging to Chapter~\ref{ch:corners}. Two clauses
+are not elementary at the kernel and are proved at the operator, as the proof shows: (A7), which
+asks for strong convergence in $\Lone$ and not merely weak convergence of the kernels, and (ND),
+which asks that the operator is not the identity and not merely that the transform is not $1$.
+\textbf{Both members are machine-checked in full, and the node prints Lean core}: the moment
+sentence of (2) is \texttt{two\_members\_matern\_moments}, whose mean and variance are
+\ref{prop:moments-tails}(1)'s variance formula on this profile --- the catalogue's first moment
+being $\int_0^\infty x\,2\gamma e^{-x}dx = 2\gamma$ --- and whose finiteness of every moment is
+the even moments of the Gamma mixture of \ref{prop:matern-exponent}(3) with
+$|x|^n \le 1 + x^{2n}$, so that the moment criterion of \ref{prop:moments-tails}, ledger A13, is
+no longer on the path (2026-09-14, R156). What the node no longer says is the \emph{density}
+sentence: the identification of the kernel at scale $t$ as the \Matern{} kernel of smoothness
+$\gamma - \tfrac12$ and range $t$, which holds as a covariance function only for
+$\gamma > \tfrac12$ and is \ref{prop:matern-density}, cited there and asserted here of no
+member.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+(1) Each $g_v$ with $v > 0$ is a symmetric probability density, and $g_0 := \delta_0$; so
+(A1)--(A5) hold by the converse clause of \ref{lem:convolution-representation}, (A3) because
+$g_v$ is invariant under reflection. For (A6),
+$\hat g_{t^2-s^2}\,\hat g_{s^2-r^2} = \hat g_{t^2-r^2}$ and transforms determine measures
+(\ref{prop:fourier-uniqueness}); $\Phis{t}{t} = \mathrm{Id}$ is $g_0 = \delta_0$. For (A8) with
+$S_\lambda t = \lambda t$, the image of $g_v$ under $x \mapsto \lambda x$ is $g_{\lambda^2 v}$,
+and $\lambda^2(t^2 - s^2) = (\lambda t)^2 - (\lambda s)^2$. For (ND): a probability measure whose
+convolution operator fixes every $f \in \Lone$ is $\delta_0$ --- convolve a bump attaining a
+strict maximum at the origin, and read the resulting identity there --- and $g_{t^2-s^2} =
+\delta_0$ only when $s = t$.
+
+For (A7) the semigroup does the work. For $0 \le v \le w$ one has $g_w = g_v * g_{w-v}$, so
+$g_w * f - g_v * f = g_v * (g_{w-v} * f - f)$, and convolution by a probability measure is a
+contraction of $\Lone$:
+\[
+  \| g_w * f - g_v * f \|_1 \ \le\ \| g_{w-v} * f - f \|_1 .
+\]
+Continuity in $(s,t)$ therefore reduces to continuity of $v \mapsto g_v * f$ at $v = 0$, and that
+follows from the elementary estimate
+\[
+  \| \mu * f - f \|_1 \ \le\ \int_\RR \Theta_f(y)\, \mu(dy),
+  \qquad \Theta_f(y) := \| \Tr{y} f - f \|_1,
+\]
+valid for every probability measure $\mu$, which is Fubini applied to
+$(\mu * f - f)(x) = \int (f(x-y) - f(x))\,\mu(dy)$. The function $\Theta_f$ is continuous,
+bounded by $2\|f\|_1$, and vanishes at $y = 0$, by strong continuity of translation on $\Lone$;
+and $g_v$ is the image of $g_1$ under $z \mapsto \sqrt{v}\,z$, so
+$\int \Theta_f\,dg_v = \int \Theta_f(\sqrt{v}\,z)\,g_1(dz) \to 0$ as $v \to 0$ by dominated
+convergence.
+
+(2) By \ref{prop:matern-exponent} the function $F(\omega) = \gamma\log(1 + \omega^2)$ is
+admissible in the sense of \ref{thm:main-characterization}, with Gaussian coefficient $0$ and
+folded profile $k(x) = 2\gamma e^{-x}$, and
+$\hat\rho_{s,t}(\omega) = \exp[-(F(t\omega) - F(s\omega))]$; so $\rho_{s,t}$ is the increment
+kernel of the admissible family attached to $F$ in the canonical gauge. The mean, the variance
+and the finiteness of every moment are \ref{prop:matern-exponent}(3): the mean and the variance
+from the variance formula on the profile $2\gamma e^{-x}$, and every moment from the even
+moments of the Gamma mixture, $|x|^n \le 1 + x^{2n}$ bounding the odd ones.
+
+The axioms themselves are read off the transform and need neither of those. (A1)--(A5) are again
+\ref{lem:convolution-representation}, the kernels being symmetric probability measures; (A6) is
+$\hat\rho_{r,s}\,\hat\rho_{s,t} = \hat\rho_{r,t}$ together with $\hat\rho_{t,t} \equiv 1$ and
+\ref{prop:fourier-uniqueness}; (A8) with $S_\lambda t = \lambda t$ is
+$\hat\rho_{s,t}(\lambda\omega) = \hat\rho_{\lambda s,\,\lambda t}(\omega)$; and (ND) is
+$\hat\rho_{s,t}(1) = \bigl((1+s^2)/(1+t^2)\bigr)^{\gamma} < 1$ for $s < t$.
+
+(A7) costs more than in (1), because a hemigroup has no single increment parameter: $\Phis{s}{t}$
+and $\Phi_{s',t'}$ are compared through the intermediate $\Phi_{s',t}$, one endpoint at a time.
+Moving the left endpoint leaves an increment applied \emph{first}, which the contraction bound
+absorbs as in (1); moving the right endpoint leaves one applied \emph{last}, to $\Phi_{s',t}f$
+rather than to $f$, so the estimate above is read at that element --- which loses nothing, since
+translation commutes with convolution and hence $\Theta_{\mu * f} \le \Theta_f$. Both remainders
+are increments whose two endpoints come together, and for those $\hat\rho_{a,b} \to 1$
+pointwise, so $\rho_{a,b} \to \delta_0$ weakly (\ref{prop:levy-continuity}) and
+$\int \Theta_f\,d\rho_{a,b} \to \Theta_f(0) = 0$. On the diagonal $s = t$ the intermediate is
+unavailable and unnecessary: the limit operator is the identity, and one collapsing increment
+suffices.
+
+Both families are verified in the machine-checked development, every axiom including (A7); the
+forward reference to \ref{prop:matern-exponent} carries the \emph{existence} of the \Matern{}
+kernels and their moments, and is not used in the verification of the axioms.
+\end{proof}
+
+The Gaussian family plays here the role the pure delay played in the causal theory: the member
+with no catalogue, the boundary the class closes on, and an extreme ray of the cone
+(\ref{prop:choquet-cone}). Unlike the pure delay it is not degenerate. Between it and the
+\Matern{} family the theory has to fit, and \ref{thm:main-characterization} says exactly what
+fits.
+
+% draft: Proposition 3.6
+% CHANGED (skeleton 2026-09-08): the example's q is now required to have MEAN ZERO. Without it
+% phi_eps(omega) = eps*int q - eps*qhat(omega) tends to eps*int q at infinity, and by
+% Riemann--Lebesgue no member of A(R) does that -- so the exhibited family was not an instance
+% of the proposition's own setting. The witness is unaffected: q = 1_{[1,2] u [-2,-1]} -
+% 1_{[3,4] u [-4,-3]} is even, carried by {|x| >= 1}, of mean zero, and not a.e. nonnegative.
+% Found by writing the Lean statement (Skeleton.no_positivity_example).
+% CHANGED (review 2026-09-09, R28): the proof's last paragraph now says why BOTH signs of eps
+% are excluded. Mean zero does two things, not one: it puts phi_eps in the Wiener algebra, and
+% together with "not a.e. nonnegative" it gives "not a.e. nonpositive", which is what makes
+% eps*q a non-positive measure for eps < 0 as well. The statement is unchanged.
+% CHECK (draft, checks for \S2--\S3, item 5): the one imported ingredient in the proof was
+% uniqueness of the SIGNED \Levy--Khintchine representation, which prop:fourier-toolbox(3)
+% does NOT supply -- that clause is stated for positive measures. RESOLVED (proof 2026-09-10):
+% the proposition does not need it. See the CHANGED note below.
+% CHANGED (proof of record 2026-09-10): the example's proof is rewritten to the machine-checked
+% route (SpatialLine.no_positivity_example). The printed route proved signed uniqueness inline
+% and then read the example off it; the checked route averages both readings of F over [0,T]
+% and reads the resulting identity twice -- at rate T^2, which fixes the Gaussian coefficient
+% at 1, and at rate 1, where Fatou kills the \Levy{} measure -- so no signed measure is ever
+% transformed and prop:fourier-uniqueness is spent only on the Jordan parts of q, exactly as
+% wave 3 had already proved. Two things the rewrite records: the finiteness of the \Levy{} measure,
+% which the surveyed route established as a separate step, is not needed (Fatou asks nothing of
+% it); and the statement is unchanged. The signed-uniqueness argument survives as
+% rem:signed-levy-uniqueness, marked not machine-checked, because it is the more informative
+% statement.
+% CHANGED (proof of record 2026-09-10, wave 6): the POSITIVITY paragraph is rewritten to the
+% machine-checked route (SpatialLine.no_positivity_classification), and both directions gain a
+% step the printed argument did not have.
+% Forwards, the printed proof says "the family satisfies every axiom, so
+% thm:main-characterization applies". It does not yet: that theorem is stated for PROBABILITY
+% kernels and this node's kernels are integrable FUNCTIONS not known to be nonnegative -- which
+% is what the clause is about. The missing step is where (A4) is spent, and it is the
+% approximate identity plus the closedness of the positive cone of L^1. The printed proof also
+% says the gauge is the identity "since S_lam t = lam t". The checked route does not prove that
+% and does not need it: it reads the conclusion at t = 1 and absorbs the constant chi(1) by
+% DILATING the profile (SpatialLine.SDProfile.dilate), which is one definition against a
+% rigidity argument. This is also the one place F(0) = 0 is spent, which is why the split
+% auxiliary needed that normalisation and the node does not (it has phi(0) = 0 by hypothesis).
+% Backwards, the printed proof says the profile form "makes every kernel a probability measure",
+% which again presumes the identification of mu_{s,t} with the constructed law. The checked
+% route makes it: the Jordan split against nu + mu^- dx, one application of
+% prop:fourier-uniqueness, and one test of the resulting identity on the set where mu_{s,t} is
+% negative. That is the signed-uniqueness step the CHECK above records as not supplied by
+% prop:fourier-toolbox(3), and it is supplied here rather than imported
+% (SpatialLine/SignedUniqueness.lean).
+% CHANGED (2026-09-11, R122; a proof repair, no statement or status changed): the printed proof
+% said b -> phi(b .) is continuous into A(R) and derived (A7) from the norm continuity of h_{s,t}.
+% That is false at the edge s = 0: for b > 0, phi(b .) is the transform of the dilate h_b, whose
+% L^1 norm is ||h||_1, while phi(0 .) = 0, so the map jumps at b = 0 unless phi = 0. (A7) holds
+% all the same, by strong continuity of the convolution operators h_b * ., which is what the proof
+% now argues. Found by the estimate of no_positivity_family, which priced a Lean route along the
+% same operator form at about 615 lines and was not attempted (over the pass's 600-line bound).
+% Draft Proposition 3.6's proof mirrored.
+% CHANGED (article mirror 2026-09-14, R157; a proof repair, no statement or status changed): the
+% Gaussian factor of the construction had the wrong variance. The proof needs a kernel with
+% transform e^{-(t^2-s^2)omega^2}, and under this article's normalisation ghat_v = e^{-v omega^2/2}
+% (prop:two-members) that is the Gaussian of variance 2(t^2-s^2), not of variance t^2-s^2. Found by
+% the external review (finding A, 2026-09-14); it is the one construction of the article that is not
+% machine-checked, so no declaration carried the factor. The normalisation is now named where the
+% kernel is introduced.
+% CHANGED (article mirror 2026-09-14, R157): retitled. "Without positivity there is no
+% classification" reads as an impossibility theorem about every possible classification, which is
+% more than the node proves and more than the article claims; the external review read it that way.
+% The title now says what the statement exhibits, and the impossibility is where it belongs, in the
+% annotation and the lead, stated of a classification in the style of thm:main-characterization.
+% The label is unchanged. The paper's subsection heading carries the same wording.
+\begin{proposition}[without positivity: an affine family through the Gaussian]
+\label{prop:no-positivity-no-classification}
+\uses{def:cascade-family,thm:main-characterization,lem:selfdecomposable-exponents,prop:fourier-uniqueness,prop:fourier-toolbox}
+\lean{Skeleton.no_positivity_no_classification, Skeleton.no_positivity_family,
+SpatialLine.no_positivity_classification, SpatialLine.no_positivity_example}\notready
+Let $A(\RR) := \{\hat h : h \in \Lone\}$ be the Wiener algebra and let $\phi \in A(\RR)$ be
+real and even with $\phi(0) = 0$. Put $F(\omega) := \omega^2 + \phi(\omega)$ and define
+$\mu_{s,t}$, $0 \le s \le t$, by $\hat\mu_{s,t}(\omega) = e^{-(F(t\omega) - F(s\omega))}$. Then
+each $\mu_{s,t}$ is a finite symmetric signed measure, an integrable function when $s < t$, and
+$\Phis{s}{t} := \mu_{s,t} * {}$ satisfies (A1)--(A3), (A5)--(A8) with
+$S_\lambda t = \lambda t$, and (ND). It satisfies (A4) if and only if $F$ is of the form
+\ref{eq:sd-profile}. In particular, for $q \in \Lone$ even, supported in $\{|x| \ge 1\}$, of
+mean zero and not almost everywhere nonnegative, and
+$\phi_\varepsilon(\omega) := \varepsilon\int_\RR (1 - \cos\omega x)\,q(x)\,dx$, the family
+violates (A4) for every $\varepsilon \ne 0$.
+\statusT\quad\emph{(The inversion of the semigroup literature's headline, and the article's
+thesis in negative form: under the hemigroup the non-positive class contains an
+infinite-dimensional affine family through the Gaussian, so no classification in the style of
+\ref{thm:main-characterization} is possible without (A4). No attempt is made to describe the
+non-positive class beyond this. Every step is elementary. \textbf{Partly formalised}
+(2026-09-10): the final sentence, that the family of the example violates (A4) for every
+$\varepsilon \ne 0$, is machine-checked as \texttt{SpatialLine.no\_positivity\_example} and
+rests on Lean core; so does the Ces\`aro identity it is built from, which is stated for an
+arbitrary symmetric \Levy{} pair. \textbf{The positivity equivalence is machine-checked as well}
+(2026-09-10, wave 6), as \texttt{SpatialLine.no\_positivity\_classification}, by the two routes
+this annotation had predicted: forwards by reading (A4) at an approximate identity, which makes
+the function kernel the density of a probability measure and hands the family to
+\ref{thm:main-characterization}; backwards by identifying $k\,dx$ with the constructed law
+through the Jordan split. It spends \ledger{A1} and \ledger{A3}, and each direction spends less
+than the pair: the forward one only \ledger{A3}'s uniqueness clause, the backward one only
+\ledger{A1} with \ledger{A3}'s converse. \textbf{One clause is unchecked}, the Wiener-algebra
+construction of $h_{s,t}$: Mathlib carries the $\Lone$ Fourier transform but not $A(\RR)$ as a
+Banach algebra, and that is the whole of what keeps this node \texttt{notready}. \textbf{Priced
+2026-09-11}: about $615$ Lean lines (range $480$--$720$), on Lean core, by a route that needs no
+Wiener algebra --- exponentiate the convolution operators $f \mapsto h_b * f$ in the Banach
+algebra of bounded operators on $\Lone$ rather than the functions, and read every transform
+through the character pairing, as the proof below does for (A7). Not attempted in that pass,
+being over its bound; the pieces, the risks and a stop-loss are recorded with the estimate.)}
+\end{proposition}
+
+\begin{proof}
+\emph{The family.} $A(\RR)$ is a Banach algebra under pointwise multiplication, invariant
+under dilation, so $\phi_{s,t} := \phi(t\,\cdot) - \phi(s\,\cdot)$ lies in it, and
+$e^{-\phi_{s,t}} = 1 + \hat h_{s,t}$ with $h_{s,t} \in \Lone$, the exponential series converging
+in the algebra. (The map $b \mapsto \phi(b\,\cdot)$ is \emph{not} norm-continuous into $A(\RR)$
+at $b = 0$: for $b > 0$ it is the transform of the dilate $h_b := b^{-1}h(\cdot/b)$, of norm
+$\|h\|_1$, while $\phi(0\,\cdot) = \phi(0) = 0$. So $h_{s,t}$ is not norm-continuous up to the
+edge $s = 0$, and (A7) is argued below through operators.) With $g_{2(t^2-s^2)}$ the
+Gaussian kernel of variance $2(t^2-s^2)$, whose transform is $e^{-(t^2-s^2)\omega^2}$ in the
+normalization $\hat g_v = e^{-v\omega^2/2}$ of \ref{prop:two-members} --- a density for
+$s < t$, and $\delta_0$ on the diagonal
+--- we get $\mu_{s,t} = g_{2(t^2-s^2)} + g_{2(t^2-s^2)} * h_{s,t}$: a finite signed measure,
+symmetric because its transform is real and even, and an integrable function for $s < t$.
+
+\emph{The axioms.} (A1) holds with $\|\mu_{s,t}\| \le 1 + \|h_{s,t}\|_1$; (A2) because
+convolution commutes with translation; (A3) by symmetry; (A5) from $\hat\mu_{s,t}(0) = 1$; (A6)
+because the exponents add and transforms determine measures (\ref{prop:fourier-uniqueness});
+(A8) with $S_\lambda t = \lambda t$, because $F(\lambda t\omega) - F(\lambda s\omega)$ is
+$F(t\,\cdot) - F(s\,\cdot)$ evaluated at $\lambda\omega$; and (ND) because
+$F(t\omega) - F(s\omega) = (t^2-s^2)\omega^2 + \phi_{s,t}(\omega)$ is unbounded, $\phi_{s,t}$
+being bounded. For (A7), let $h_e$ be the even part of $h$ and $H_b f := h_b * f$ for
+$b > 0$, with $h_b$ the dilate of $h_e$, and $H_0 := 0$. Each $H_b$ is a bounded operator on
+$\Lone$ of norm at most $\|h\|_1$, the $H_b$ commute with one another and with the Gaussian
+convolutions, and $b \mapsto H_b f$ is continuous on $[0,\infty)$ for every $f \in \Lone$: at
+$b > 0$ by strong continuity of dilation, and at $b = 0$ because $h_b$ is an approximate
+identity of total mass $\int h_e = \phi(0) = 0$, so $h_b * f \to 0$ in $\Lone$. Then
+$\mu_{s,t} * f = g_{2(t^2-s^2)} * \exp\bigl(-(H_t - H_s)\bigr)f$, the exponential series converging in
+operator norm uniformly in $(s,t)$, its $n$-th term being bounded by $(2\|h\|_1)^n/n!$. A product
+of uniformly bounded, strongly continuous operator families is strongly continuous, so each
+partial sum is, hence so is the sum, and composing with the strongly continuous Gaussian family
+gives (A7). The route is strong continuity throughout, and it does not need $h_{s,t}$ to depend
+continuously on $(s,t)$ in norm, which it does not at $s = 0$.
+
+\emph{Positivity.} Suppose (A4) holds. The kernels $\mu_{s,t}$ are so far only integrable
+functions, and \ref{thm:main-characterization} is a statement about probability kernels, so the
+first step is to see that (A4) makes them nonnegative. Convolve with an approximate identity:
+$\mu_{s,t} * \rho_\varepsilon \ge 0$ for every $\varepsilon > 0$ because $\rho_\varepsilon \ge 0$,
+and $\mu_{s,t} * \rho_\varepsilon \to \mu_{s,t}$ in $\Lone$; the positive cone of $\Lone$ is
+closed, so $\mu_{s,t} \ge 0$ almost everywhere. Its total mass is $\hat\mu_{s,t}(0) = 1$, so
+$\mu_{s,t}\,dx$ is a probability measure, the family satisfies every axiom, and
+\ref{thm:main-characterization} applies. It returns a gauge $\chi$ and a profile $P$ with
+$F(t\omega) - F(0) = P(\chi(t)\omega)$; reading that at $t = 1$ and using $F(0) = \phi(0) = 0$
+gives $F(\omega) = P(\chi(1)\omega)$, and $\chi(1) > 0$, so $F$ is $P$ dilated and is itself of
+the form \ref{eq:sd-profile}.
+
+Conversely, suppose $F$ has that form. Each increment exponent
+$\omega \mapsto F(t\omega) - F(s\omega)$ is then a member of $\NDs$ by
+\ref{lem:selfdecomposable-exponents}, hence the exponent of a symmetric probability law $\nu$
+(\ref{prop:fourier-toolbox}); and $\nu$ has the same cosine transform as $\mu_{s,t}$, which is
+even and integrable. The Jordan parts of $\mu_{s,t}$ split it as a difference of two finite
+measures whose characteristic functions are determined by that cosine transform, evenness
+making both sine transforms vanish, so $\mu_{s,t}^+\,dx = \nu + \mu_{s,t}^-\,dx$ by
+\ref{prop:fourier-uniqueness}. Testing this on the set where $\mu_{s,t}$ is negative makes its
+left side vanish, so $\mu_{s,t}^- = 0$ almost everywhere: $\mu_{s,t} \ge 0$, and (A4) is
+positivity of an integral.
+
+\emph{The example.} Write $g(\omega) := \int (1 - \cos\omega x)\,q(x)\,dx$, so that
+$F = \omega^2 + \varepsilon g$. Since $\int q = 0$ we have $g = -\hat q$, so $g$ is bounded and
+$g(0) = 0$; hence $\phi_\varepsilon = -\varepsilon\,\hat q$ lies in $A(\RR)$, real and even
+because $q$ is, and the family is one of those described. (Mean zero is not cosmetic: without
+it $\phi_\varepsilon$ tends to $\varepsilon\int q \ne 0$ at infinity, which no member of the
+Wiener algebra does.)
+
+Suppose $F$ were of the form \ref{eq:sd-profile}, with Gaussian coefficient $a \ge 0$ and
+\Levy{} measure $\nu$ on $(0,\infty)$ subject to $\int (1 \wedge x^2)\,\nu(dx) < \infty$.
+Average the two readings of $F$ over $[0,T]$. The elementary primitive
+$\int_0^T (1 - \cos\omega x)\,d\omega = T\bigl(1 - \frac{\sin Tx}{Tx}\bigr)$ and Tonelli give,
+for every $T > 0$,
+\[
+  \frac{T^2}{3}
+   + \varepsilon\int \Bigl(1 - \frac{\sin Tx}{Tx}\Bigr) q(x)\,dx
+  \;=\; \frac{a\,T^2}{3}
+   + \int \Bigl(1 - \frac{\sin Tx}{Tx}\Bigr) \nu(dx),
+\]
+both integrals converging absolutely because
+$0 \le 1 - \frac{\sin u}{u} \le \min(2,\, u^2/6)$.
+
+Read this identity at rate $T^2$. Divided by $T^2$, the perturbation term vanishes in the limit
+because its integral is bounded by $2\|q\|_1$, and the \Levy{} term vanishes by dominated
+convergence, the integrand $T^{-2}\bigl(1 - \frac{\sin Tx}{Tx}\bigr)$ being at most
+$2\,(1 \wedge x^2)$ for $T \ge 1$ and tending to $0$ pointwise. Hence $a = 1$, and the identity
+reduces to
+$\int \bigl(1 - \frac{\sin Tx}{Tx}\bigr)\nu(dx)
+ = \varepsilon\int \bigl(1 - \frac{\sin Tx}{Tx}\bigr) q(x)\,dx$.
+
+Now read it at rate $1$. The right-hand side tends to $\varepsilon \int q = 0$ as
+$T \to \infty$, by dominated convergence against $|q|$. On the left,
+$1 - \frac{\sin Tx}{Tx} \to 1$ at every $x \ne 0$ and $\nu$ gives the origin no mass, so Fatou
+forces $\nu\bigl((0,\infty)\bigr) = 0$. With $a = 1$ and $\nu = 0$, \ref{eq:sd-profile} reads
+$F(\omega) = \omega^2$, that is $\varepsilon\,g \equiv 0$, that is $\hat q \equiv 0$ because
+$\varepsilon \ne 0$. An even integrable function whose cosine transform vanishes identically is
+null: its positive and negative parts are two finite measures whose cosine transforms agree and
+whose sine transforms both vanish, evenness being what kills the latter, so
+\ref{prop:fourier-uniqueness} identifies them. Thus $q = 0$ almost everywhere, against the
+hypothesis that $q$ is not almost everywhere nonnegative --- and both signs of $\varepsilon$
+are covered, neither the identity nor either reading of it seeing the sign. So $F$ is not of
+the form \ref{eq:sd-profile}, and (A4) fails by the previous paragraph.
+\end{proof}
+
+\begin{remark}[the route through signed uniqueness]\label{rem:signed-levy-uniqueness}
+The last clause of the proposition, that the family built from $q$ violates (A4), is usually
+argued the other way round: $\omega^2 + \phi_\varepsilon$ \emph{is} a
+signed \Levy--Khintchine representation, with Gaussian coefficient $1$ and signed measure
+$\varepsilon\,q(x)\,dx$, and such representations are unique among signed measures $m$ with
+$\int (1 \wedge x^2)\,|m|(dx) < \infty$. Since $\varepsilon\,q$ is not a nonnegative measure,
+$F$ is not of the form \ref{eq:sd-profile}. The uniqueness is the averaging identity
+\[
+  \frac{1}{2h}\int_{\omega-h}^{\omega+h}\psi(u)\,du \;-\; \psi(\omega)
+  \;=\; \frac{a\,h^2}{3}
+   + \int \cos(\omega x)\Bigl(1 - \frac{\sin hx}{hx}\Bigr)\,m(dx)
+\]
+for $\psi(\omega) = a\omega^2 + \int (1-\cos\omega x)\,m(dx)$, whose right-hand side is a
+constant plus the Fourier--Stieltjes transform of the finite signed measure
+$\bigl(1 - \frac{\sin hx}{hx}\bigr)\,m(dx)$; so $\psi$ determines that measure for every
+$h > 0$, hence $m$ off the origin, hence $a$. This is the more informative statement, because
+it is about the representation rather than about one $F$. It is
+also strictly more than the proposition needs, and it is \textbf{not machine-checked}: the
+proof of record above replaces it by the two readings of the averaged identity, at the rates
+$T^2$ and $1$, which identify $a$ and $\nu$
+for the single exponent at hand and never mention a signed measure.
+\end{remark}
+
+Under recursivity the same setting forces $F(\omega) = a|\omega|^\alpha$ with $\alpha > 0$: a
+one-parameter class whether or not positivity is imposed, positivity entering only to bound
+$\alpha \le 2$ (\sscite{pauwels1995extended}, Prop.~1). Under the hemigroup the non-positive
+class contains the affine family $\omega^2 + A(\RR)_{\mathrm{even},0}$ through the Gaussian ---
+and the same family through every admissible exponent unbounded at infinity --- so it is
+positivity, not recursivity, that narrows.

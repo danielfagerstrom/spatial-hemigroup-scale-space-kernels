@@ -1,0 +1,44 @@
+% This article's macros.
+%
+% The framework's vocabulary (\lean/\leanok/\uses/\notready, \ledger, \notes, \sscite, and
+% the [T]/[A] status tags) lives in linkage-macros.tex, which the `article-kit` repo owns.
+% Everything below the rule is this article's own NOTATION — yours to change.
+%
+% Anything you add here is automatically render-safe (fatal check 4 reads this file's
+% \newcommand definitions); anything you use but do not define must be vetted in
+% render-allowlist.txt, or the manifest would silently drop it.
+
+\input{linkage-macros}
+
+% -- Notation (the shared header of the spatial modules; change only by a versioned decision,
+% -- see the hub's RELEASES.md rule 3) ------------------------------------------------------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\Lone}{L^1}
+\newcommand{\Tr}[1]{T_{#1}}              % translation by #1
+\newcommand{\Dil}[1]{D_{#1}}             % dilation by #1
+\newcommand{\Phis}[2]{\Phi_{#1,#2}}      % the cascade operator from scale #1 to #2
+\newcommand{\NDs}{\mathrm{ND}_{\mathrm{s}}}   % symmetric continuous negative definite functions
+\newcommand{\LEs}{\mathrm{LE}_{\mathrm{s}}}   % the same class named by its Levy-Khintchine form
+\newcommand{\IDs}{\mathrm{ID}_{\mathrm{s}}}   % symmetric infinitely divisible laws
+\newcommand{\SDs}{\mathrm{SD}_{\mathrm{s}}}   % symmetric self-decomposable laws
+\newcommand{\GGCs}{\mathrm{GGC}_{\mathrm{s}}} % the symmetric Thorin subclass
+\newcommand{\Cin}{\operatorname{Cin}}
+\newcommand{\Ein}{\operatorname{Ein}}
+\newcommand{\Lap}{\operatorname{Lap}}
+\newcommand{\Expo}{\operatorname{Exp}}   % the one-sided exponential kernel
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\erfc}{\operatorname{erfc}}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\Sch}{\mathcal{S}(\RR)}      % the Schwartz class on the line
+\newcommand{\FT}{\mathcal{F}}            % the Fourier transform
+\newcommand{\seq}{\stackrel{d}{=}}       % equality in distribution
+\newcommand{\Levy}{L\'evy}               % the name, accented through one macro (mirrored in
+                                         % paper/macros.tex); statements carry no raw accent,
+                                         % and the render pipeline expands this like any other
+\newcommand{\Matern}{Mat\'ern}           % the same device for the second member's name
+                                         % (2026-09-14); write \Matern{} before a space or a
+                                         % letter, and never the raw accent in a statement

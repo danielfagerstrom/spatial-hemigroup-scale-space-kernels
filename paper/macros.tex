@@ -1,0 +1,59 @@
+% Paper-side notation. Mirrors the notation half of blueprint/src/macros.tex (below its rule)
+% so that statements shared verbatim with the blueprint compile here unchanged. Keep the two
+% files in sync by hand; a drifted macro shows up as a compile error or a visibly different
+% rendering, never silently. The notation itself is the shared header of the spatial modules
+% (hub RELEASES.md rule 3): it changes only by a versioned decision, never locally.
+%
+% \sscite is the blueprint's citation macro (framework-owned there); here it is plain \cite.
+
+\newcommand{\sscite}[1]{\cite{#1}}
+
+% -- Notation (mirrored from the blueprint) -------------------------------------------------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\Lone}{L^1}
+\newcommand{\Tr}[1]{T_{#1}}              % translation by #1
+\newcommand{\Dil}[1]{D_{#1}}             % dilation by #1
+\newcommand{\Phis}[2]{\Phi_{#1,#2}}      % the cascade operator from scale #1 to #2
+\newcommand{\NDs}{\mathrm{ND}_{\mathrm{s}}}   % symmetric continuous negative definite functions
+\newcommand{\LEs}{\mathrm{LE}_{\mathrm{s}}}   % the same class named by its Levy-Khintchine form
+\newcommand{\IDs}{\mathrm{ID}_{\mathrm{s}}}   % symmetric infinitely divisible laws
+\newcommand{\SDs}{\mathrm{SD}_{\mathrm{s}}}   % symmetric self-decomposable laws
+\newcommand{\GGCs}{\mathrm{GGC}_{\mathrm{s}}} % the symmetric Thorin subclass
+\newcommand{\Cin}{\operatorname{Cin}}
+\newcommand{\Ein}{\operatorname{Ein}}
+\newcommand{\Lap}{\operatorname{Lap}}
+\newcommand{\Expo}{\operatorname{Exp}}   % the one-sided exponential kernel
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\erfc}{\operatorname{erfc}}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\Sch}{\mathcal{S}(\RR)}      % the Schwartz class on the line
+\newcommand{\FT}{\mathcal{F}}            % the Fourier transform
+\newcommand{\seq}{\stackrel{d}{=}}       % equality in distribution
+\newcommand{\Levy}{L\'evy}               % the name, accented through one macro in both files
+                                         % (statements avoid raw accents for the render pipeline)
+\newcommand{\Matern}{Mat\'ern}           % the same device for the second member's name
+                                         % (2026-09-14; mirrored from blueprint/src/macros.tex)
+
+% -- Paper-only convenience -----------------------------------------------------------------
+\newcommand{\Ex}{\mathbb{E}}
+
+% Equations are cited with \ref in the blueprint (its render allowlist has no \eqref), and a
+% statement shared verbatim must cite them the same way. So the paper wraps \ref: a label
+% beginning `eq:` prints in parentheses, as \eqref would have; every other label is untouched.
+% Installed at \begin{document}, after hyperref has finished redefining \ref. Use \ref for
+% equations throughout the paper, never \eqref (it would print double parentheses).
+\usepackage{xstring}
+% Declared robust: a caption is a moving argument, and the xstring test must not be expanded
+% into the .lof entry (it errored with "Illegal parameter number" at the first figure).
+% The original is copied with \NewCommandCopy, not \let: the kernel's \ref is itself robust
+% (\ref expands to \protect\ref<space>), so \let would copy only that wrapper, and
+% \DeclareRobustCommand would then overwrite the inner macro the copy points at -- an
+% infinite loop at the first \ref (it hung a build for 43 minutes).
+\AtBeginDocument{%
+  \NewCommandCopy{\paperOrigRef}{\ref}%
+  \DeclareRobustCommand{\ref}[1]{\IfBeginWith{#1}{eq:}{\textup{(\paperOrigRef{#1})}}{\paperOrigRef{#1}}}%
+}

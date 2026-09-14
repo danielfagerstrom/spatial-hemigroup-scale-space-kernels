@@ -1,0 +1,17 @@
+% The displacement profile and its dilates: what the self-decomposability condition means.
+% Paper-only figure (2026-09-14, the presentation review's one missing figure); the image is
+% figures/fig-profile.png from scripts/make-fig-profile.py (numpy + matplotlib, no data).
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig-profile.png}
+\caption{The condition of Lemma~\ref{lem:selfdecomposable-exponents}, drawn for the profile
+$k(x) = 2e^{-x}$ of the second member of \S\ref{sec:axioms}. Left: the profile at scales
+$s = 1$ and $t = 2$ is the same function dilated, $k(x/s)$ and $k(x/t)$, and the increment
+from $s$ to $t$ has profile $k(x/t) - k(x/s)$, the shaded difference. The difference is
+nonnegative for every $s < t$ exactly when $k$ is nonincreasing, which is what makes the
+increment a symmetric \Levy{} exponent. Right: in the log-displacement coordinate
+$\theta = \log x$ the dilates are translates of one function $\tilde k(\theta) = k(e^\theta)$,
+shifted by $\log(t/s)$, and the condition says that the profile can only rise as one moves
+to finer scales.}
+\label{fig:profile}
+\end{figure}

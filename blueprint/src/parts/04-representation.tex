@@ -1,0 +1,245 @@
+% !TEX root = ../print.tex
+% Draft \S4 --- Convolution representation
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S4 (lines 140-197).
+%
+% Two nodes, both [T], both proved from scratch. lem:convolution-representation is the
+% Wendel step on the line, sharpened by (A3)-(A5) to a symmetric probability measure; the
+% argument is an approximate identity, tightness, Prokhorov, and identification, and it
+% cites only prop:fourier-uniqueness. Prokhorov and the portmanteau theorem are held [T],
+% deliberately not ledger entries, as in the causal article: Mathlib has both.
+%
+% lem:nonvanishing is the first statement of the article with no causal counterpart. On the
+% half-line the positivity of the transform was free; here it costs (A6) and (A7). It also
+% REROUTES a candidate ledger entry: the classical fact that infinitely divisible transforms
+% have no zeros (Sato Lemma 7.5, p. 32) is a corollary of thm:increments-levy and is never
+% used, because the elementary lemma below comes first and is what the exponents are defined
+% from. The order cannot be reversed.
+
+\chapter{Convolution representation}
+\label{ch:representation}
+
+The first step uses no covariance and no cascade: (A1)--(A5) force the measurement operators
+to be convolutions by symmetric probability measures on $\RR$, the apertures as measures.
+Where those measures have densities is settled once covariance and (ND) are imposed
+(\ref{prop:kernel-regularity}). Continuity (A7) is added only for the second lemma, which
+extracts from the measures the one function the rest of the article works with.
+
+\emph{The device.} The characters $e_\omega(x) := e^{-i\omega x}$ are bounded on all of $\RR$,
+so $e_\omega \in L^\infty$ and complex-valued functionals on the real space $\Lone$ may be used
+freely, $\langle w, f\rangle := \int_\RR w f$; equivalently one pairs with $\cos\omega x$ and
+$\sin\omega x$. For a finite measure $\mu$ and $f \in \Lone$, Fubini gives
+\begin{equation}\label{eq:pairing}
+  \langle e_\omega, \mu * f\rangle = \hat\mu(\omega)\,\hat f(\omega), \qquad \omega \in \RR .
+\end{equation}
+With $f$ the standard Gaussian density, $\hat f(\omega) = e^{-\omega^2/2} > 0$, so a single
+test function reads off the transform of the kernel at every frequency. This is the one place
+where the line is easier than the half-line, which had to clamp the exponential to make it a
+functional; \ref{lem:nonvanishing} is where the line is harder.
+
+% draft: Lemma 4.1'
+% twin: hcs lem:convolution-representation
+% (Hemigroup.CascadeCore.existsUnique_repr, Hemigroup.mconvL1_satisfies_axioms)
+\begin{lemma}[representation]\label{lem:convolution-representation}
+\uses{def:cascade-family,prop:fourier-uniqueness}
+\lean{SpatialLine.representation_existsUnique, SpatialLine.representation_symmetric,
+SpatialLine.representation_converse}\leanok
+\notes{covariant-measurement}
+Under (A1), (A2), (A4), (A5), for each pair $0 \le s \le t$ there is a unique probability
+measure $\mu_{s,t}$ on $\RR$ with
+\[
+  \Phis{s}{t} f = \mu_{s,t} * f, \qquad f \in \Lone ;
+\]
+under (A3) it is symmetric, $R\mu_{s,t} = \mu_{s,t}$. Conversely every symmetric probability
+measure on $\RR$ defines an operator satisfying (A1)--(A5).
+\statusT\quad\emph{(Proved from scratch, as in the causal article and for the same reason:
+the Riesz--Markov duality that the weak-* route needs is not available in the form the
+formalisation would want, whereas tightness plus Prokhorov delivers a probability measure
+directly. Symmetry is stated as a rider rather than folded into the hypotheses because
+\ref{prop:no-positivity-no-classification} needs the representation without (A4); neither
+form covers that case, and Wendel's theorem proper does. \textbf{Formalised 2026-09-09},
+statement unchanged, and every step of the proof below is machine-checked. Two notes on what
+the machine checks. First, the uniqueness clause does \emph{not} spend \ledger{A5}: the Lean
+reads \ref{prop:fourier-uniqueness} off Mathlib's \texttt{Measure.ext\_of\_charFun}, so the
+trust boundary is untouched and the cited interface is discharged by an import, as that node's
+own annotation anticipated. Second, the symmetry rider is proved from (A3) together with a
+representing measure already in hand; the (A2), (A4) and (A5) in its hypothesis list are
+carried because the node carries them, and are consumed by the existence clause alone.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Fix $(s,t)$ and write $\Phi = \Phis{s}{t}$.
+
+\emph{Convolution as a vector-valued integral.} For $f, g \in \Lone$,
+$f * g = \int_\RR f(y)\,\Tr{y}g\,dy$ as a Bochner integral in $\Lone$: the integrand is
+strongly measurable, since $y \mapsto \Tr{y}g$ is continuous because translation acts
+continuously on $\Lone$, and it is dominated by $|f(y)|\,\|g\|_1$. An $\Lone$-valued integral commutes with every bounded operator, so (A1) and
+(A2) give the interchange identity $\Phi(f * g) = f * \Phi g$.
+
+\emph{The approximants.} Let $\rho_\varepsilon := (2\varepsilon)^{-1}\mathbf 1_{(-\varepsilon,\varepsilon)}$
+and $h_\varepsilon := \Phi\rho_\varepsilon$. By (A4) and (A5), $h_\varepsilon \ge 0$ with
+$\int h_\varepsilon = 1$, so $\nu_\varepsilon := h_\varepsilon\,dx$ is a probability measure on
+$\RR$.
+
+\emph{Tightness.} By the interchange identity $\rho_1 * h_\varepsilon = \Phi(\rho_1 *
+\rho_\varepsilon)$, and $\rho_1 * \rho_\varepsilon \to \rho_1$ in $\Lone$ as
+$\varepsilon \downarrow 0$, so $\rho_1 * h_\varepsilon$ converges in $\Lone$; and a convergent
+sequence in $\Lone$ has uniformly small tails. Convolution with a nonnegative unit-mass density
+carried by $[-1,1]$ moves mass by at most $1$: for $|y| > R+1$ the translate
+$\rho_1(\cdot - y)$ is carried by $\{|x| > R\}$, so by Tonelli
+\[
+  \int_{|x| > R} (\rho_1 * h_\varepsilon)(x)\,dx
+  \;=\; \int_\RR h_\varepsilon(y)\int_{|x|>R}\rho_1(x-y)\,dx\,dy
+  \;\ge\; \int_{|y| > R+1} h_\varepsilon(y)\,dy
+  \;=\; \nu_\varepsilon(\{|y| > R+1\}).
+\]
+Along $\varepsilon_n = 1/(n+1)$ the tails of $\nu_{\varepsilon_n}$ are therefore small
+uniformly in $n$: the family is tight, with compacts $[-R-1, R+1]$.
+
+\emph{The limit.} By Prokhorov's theorem a subsequence $\nu_{\varepsilon_{n_k}}$ converges
+weakly to a probability measure $\mu$ on $\RR$.
+
+\emph{Identification.} Let $\Psi \in L^\infty$ and $f \in \Lone$. The map
+$y \mapsto \Psi(\Tr{y}f)$ is continuous and bounded by $\|\Psi\|\,\|f\|_1$, hence a legitimate
+test function for weak convergence. Reading $f * h_\varepsilon = \int h_\varepsilon(y)\,\Tr{y}f\,dy$
+with $h_\varepsilon$ in the density slot,
+\[
+  \Psi(f * h_{\varepsilon_{n_k}}) = \int_\RR \Psi(\Tr{y}f)\,\nu_{\varepsilon_{n_k}}(dy)
+  \ \xrightarrow{\ k \to \infty\ }\ \int_\RR \Psi(\Tr{y}f)\,\mu(dy) = \Psi(\mu * f),
+\]
+the last equality because $\mu * f = \int \Tr{y}f\,\mu(dy)$ is again an $\Lone$-valued Bochner
+integral. On the other hand $f * h_\varepsilon = \Phi(f * \rho_\varepsilon) \to \Phi f$ in
+$\Lone$, by the interchange identity and (A1). Hence $\Psi(\Phi f) = \Psi(\mu * f)$ for every
+$\Psi \in L^\infty$, and $\Phi f = \mu * f$ for every $f \in \Lone$ at once.
+
+\emph{Uniqueness.} Take $f$ the standard Gaussian density and pair against $e_\omega$: by
+\ref{eq:pairing}, $\langle e_\omega, \Phi f\rangle = \hat\mu(\omega)\,e^{-\omega^2/2}$, so
+$\Phi$ determines $\hat\mu$ on all of $\RR$, and a finite measure on $\RR$ is determined by its
+transform (\ref{prop:fourier-uniqueness}). One test function suffices.
+
+\emph{Symmetry.} Under (A3), $R(\mu * f) = (R\mu) * (Rf)$ gives
+$(R\mu) * f = R\,\Phi\,R f = \Phi f = \mu * f$ for every $f$, so $R\mu = \mu$ by uniqueness.
+
+\emph{Converse.} A probability measure $\mu$ on $\RR$ makes $f \mapsto \mu * f$ bounded with
+norm at most $1$ by Young's inequality (A1), translation-commuting because convolution is
+(A2), positive (A4), and mass-preserving by Tonelli (A5); if $\mu$ is symmetric it commutes
+with $R$ (A3).
+\end{proof}
+
+The rest of the article works with one function of the measures, the \emph{exponent}
+$g_{s,t}(\omega) := -\log\hat\mu_{s,t}(\omega)$, the quantity the cascade makes additive. For
+it to exist the transform must be positive, which on the half-line was free and on the line is
+not: a symmetric probability measure can have a negative or vanishing transform, as the uniform
+density on $[-1,1]$ does. That the axioms exclude this, stage by stage, is the first statement
+of the article with no causal counterpart, and it needs the cascade and continuity, not just
+(A1)--(A5).
+
+% draft: Lemma 4.2'
+% twin: hcs lem:transform-continuity (Hemigroup.CascadeCore.transform_continuity) for the
+% continuity clause only; the nonvanishing clause has no causal counterpart at all.
+\begin{lemma}[nonvanishing of the transforms]\label{lem:nonvanishing}
+\uses{def:cascade-family,lem:convolution-representation}
+\lean{SpatialLine.nonvanishing, SpatialLine.nonvanishing_exponent}\leanok
+\notes{hemigroup-cascade}
+Assume (A1)--(A3), (A5)--(A7), and let $\Phis{s}{t}f = \mu_{s,t} * f$ be the representation of
+\ref{lem:convolution-representation}. Then $\hat\mu_{s,t}(\omega) > 0$ for every
+$\omega \in \RR$ and every $s \le t$. Consequently
+$g_{s,t}(\omega) := -\log\hat\mu_{s,t}(\omega) \in [0,\infty)$ is well defined and even, is
+continuous in $\omega$ and continuous in $(s,t)$ on $\{0 \le s \le t\}$, and satisfies
+$g_{t,t} = 0$ and $g_{s,t}(0) = 0$.
+\statusT\quad\emph{(Elementary but genuinely two-axiom: the multiplicativity of (A6) and the
+continuity of (A7) are both used, and no clause of \ref{prop:fourier-toolbox} is. It is the
+hands-on precursor of the classical fact that an infinitely divisible law has a zero-free
+characteristic function, which \ref{thm:increments-levy} establishes for the stages; the order
+of dependence cannot be reversed, since that theorem's proof manipulates the exponents this
+lemma defines. \textbf{Formalised 2026-09-09}, statement unchanged. The machine-checked
+nonvanishing argument is the chain form described in the proof's closing remark rather than the
+minimum of $Z$; both consume the same hypothesis, the joint continuity established in the first
+step, and nothing else.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+By (A3) and the uniqueness clause of \ref{lem:convolution-representation},
+$R\mu_{s,t} = \mu_{s,t}$, so $\hat\mu_{s,t}$ is real and even.
+
+\emph{Continuity in $(s,t)$.} Let $\rho$ be the standard Gaussian density, with
+$\hat\rho(\omega) = e^{-\omega^2/2} > 0$. If $(s_n,t_n) \to (s,t)$ then
+$\mu_{s_n,t_n} * \rho \to \mu_{s,t} * \rho$ in $\Lone$ by (A7), and
+\[
+  \bigl|\hat\mu_{s_n,t_n}(\omega)\hat\rho(\omega) - \hat\mu_{s,t}(\omega)\hat\rho(\omega)\bigr|
+  \ \le\ \|\mu_{s_n,t_n} * \rho - \mu_{s,t} * \rho\|_1 ;
+\]
+divide by $\hat\rho(\omega)$. The test density must have a zero-free transform, which is why an
+indicator --- whose transform vanishes on $2\pi\ZZ \setminus \{0\}$ --- would not do.
+
+\emph{Nonvanishing.} Fix $s$ and $\omega$. The function $t \mapsto \hat\mu_{s,t}(\omega)$ is
+continuous on $[s,\infty)$, equals $1$ at $t = s$, and is multiplicative over adjacent intervals
+by (A6): $\hat\mu_{s,t} = \hat\mu_{t',t}\,\hat\mu_{s,t'}$ for $s \le t' \le t$. Let
+$Z := \{t \ge s : \hat\mu_{s,t}(\omega) = 0\}$, a closed set. If $Z \ne \emptyset$, put
+$t_* := \min Z$, which exceeds $s$. For $t' \in (s,t_*)$ we have
+$0 = \hat\mu_{s,t_*}(\omega) = \hat\mu_{t',t_*}(\omega)\,\hat\mu_{s,t'}(\omega)$ with the second
+factor nonzero by minimality, so $\hat\mu_{t',t_*}(\omega) = 0$; letting $t' \uparrow t_*$,
+joint continuity gives $\hat\mu_{t_*,t_*}(\omega) = 0$, against
+$\hat\mu_{t_*,t_*} = \hat\delta_0 = 1$. So $Z = \emptyset$: the function is continuous and
+zero-free on the interval $[s,\infty)$ and equals $1$ at its left end, hence is positive
+throughout, by the intermediate value theorem.
+
+The same conclusion follows without an extremal element, and this is the form the formalisation
+takes. Fix $s \le t$. The triangle $\{(a,b) : s \le a \le b \le t\}$ is compact and
+$(a,b) \mapsto \hat\mu_{a,b}(\omega)$ is continuous on it, hence uniformly continuous; since the
+function is $1$ on the diagonal, there is a single $\delta > 0$ with
+$\hat\mu_{a,b}(\omega) > \tfrac12$ whenever $s \le a \le b \le t$ and $b - a < \delta$. Put
+$r_n := \min(s + n\delta/2,\, t)$. Then $r_0 = s$, $r_n = t$ for $n$ large, consecutive steps are
+shorter than $\delta$, and $\hat\mu_{s,r_{n+1}} = \hat\mu_{r_n,r_{n+1}}\,\hat\mu_{s,r_n}$, so
+induction on $n$ carries positivity from $s$ to $t$. Both arguments use exactly the joint
+continuity of the first step and nothing else.
+
+\emph{The clauses on $g$.} $g \ge 0$ since $|\hat\mu| \le \|\mu\| = 1$; $g_{s,t}(0) = 0$ by
+(A5); continuity in $\omega$ by dominated convergence; evenness and continuity in $(s,t)$ from
+the corresponding properties of $\hat\mu$; and $g_{t,t} = 0$ from $\mu_{t,t} = \delta_0$.
+\end{proof}
+
+% CHANGED (article mirror 2026-09-14, R157): the hypotheses under which the uniform blur is
+% excluded are (A1)--(A3), (A5)--(A7) --- the lemma's, which include the kernels being PROBABILITY
+% measures --- and not (A6)--(A7) alone, which was the external review's finding B: the lemma is
+% about probability kernels, and a signed kernel with a sign-changing transform is no
+% counterexample to it. Two expository changes with it: the exponent is "minus its logarithm" and
+% not "its optical density", the optical metaphor stopping at the transfer function; and the
+% family, not "the medium", is what covariance makes self-similar.
+\begin{remark}[modulation transfer; no contrast reversal]\label{rem:modulation-transfer}
+On the line the probe $e_\omega$ is a wave and $\omega$ a wavenumber, so
+$\hat\mu_{s,t}(\omega) = \mathbb{E}\cos(\omega X_{s,t})$ is the stage's \emph{modulation
+transfer function}, the contrast a sinusoidal grating of frequency $\omega$ retains after the
+random displacement $X_{s,t}$, and the exponent is minus its logarithm.
+\ref{lem:nonvanishing} then says, in the language of imaging: no stage in a continuous cascade
+reverses contrast, none extinguishes a frequency as the box blur does at the zeros of
+$\sin\omega/\omega$, and none amplifies. The uniform blur is thereby excluded as a stage of any
+family of probability kernels satisfying (A6)--(A7), by an argument that does not yet know the
+stages are infinitely divisible. The lemma says nothing about the sign of the \emph{kernel}. The
+extended semigroup class of \sscite{pauwels1995extended} beyond $\alpha = 2$ has positive
+transfer functions and sign-changing kernels. Those members are excluded by positivity (A4),
+through \ref{thm:main-characterization}, and not by this lemma.
+Transfer functions multiply along the cascade, so optical densities add
+(Chapter~\ref{ch:cascade}), and the family is self-similar
+(Chapter~\ref{ch:covariance}). The reading of the density's two parts, a Gaussian part and a
+catalogue of jump displacements, is \ref{rem:displacement-dictionary}.
+\end{remark}
+
+\begin{remark}[what the representation is, and the relation to the causal theory]\label{rem:wendel}
+Wendel's theorem states that the translation-invariant bounded
+operators on the $\Lone$ of a locally compact group are exactly the convolutions by finite
+measures \sscite{wendel1952left}. \ref{lem:convolution-representation} is that step specialised
+to $\RR$ and sharpened by (A3)--(A5) to a
+symmetric probability measure. It is proved rather than cited. The only imported fact is
+\ref{prop:fourier-uniqueness}. Against the causal version in \sscite{fagerstrom2026hemigroup},
+two devices have fallen away and
+one has been added. The clamped exponential is gone, since characters are bounded on all of
+$\RR$, which is why \ref{eq:pairing} needs no support hypothesis. The causal support clause is
+gone, and with it the one-sided tail bound of the tightness step. Its replacement, that
+convolution with a density carried by $[-1,1]$ moves mass by at most $1$, is simpler and
+would have served there too. What has been added is \ref{lem:nonvanishing}, which on the
+half-line was a one-line consequence of the positivity of the integrand. Its continuity step
+tests against a Gaussian where the causal proof could test against an indicator.
+\end{remark}

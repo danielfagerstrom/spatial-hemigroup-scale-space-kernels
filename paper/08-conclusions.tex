@@ -1,0 +1,87 @@
+% §8 Concluding remarks --- paper-only, written 2026-09-12 for the scope §§1-7 (v0.1 stops at §7,
+% the author's decision of that day). On Paper I's model: the summary, the scope, one
+% methodological remark on what the formalization changed in the printed proofs (each item is a
+% blueprint CHANGED marker in chapters 5-7), and the open questions --- stated as open, not as
+% promised (hub RELEASES.md rule 1). No blueprint node is shared here.
+
+\section{Concluding remarks}\label{sec:conclusions}
+
+This paper weakened one axiom of \sscite{pauwels1995extended}, with two smaller changes
+recorded in Remark~\ref{rem:provenance-pauwels}. Recursivity, the one-parameter semigroup in
+scale, carries the tacit assumption that an increment depends on the scale difference
+alone, the stationarity of the increments in the scale parameter; it was replaced by the
+two-parameter hemigroup. Under the remaining axioms
+the admissible measurement families on the line are exactly the symmetric self-decomposable
+laws, each determined by a Gaussian coefficient and a nonincreasing displacement profile,
+with the gauge and the exponent unique up to one normalization
+(Theorem~\ref{thm:main-characterization}). The semigroup case is the symmetric stable
+family with $\alpha \le 2$ (Corollary~\ref{cor:semigroup-case}), so the heavy tails of the
+stable members below $\alpha = 2$ are a consequence of stationarity and not of
+covariance. Positivity is the narrowing axiom: without it the hemigroup axioms admit an
+infinite-dimensional affine family through the Gaussian
+(Proposition~\ref{prop:no-positivity-no-classification}, whose construction is the one
+step of this paper not machine-checked), and with it the class is a convex cone in which the
+Gaussian scale space is the extreme ray without jumps. The kernels from the origin are
+absolutely continuous and unimodal (Proposition~\ref{prop:kernel-regularity}). No truncation of the
+Gaussian is admissible, since its transform changes sign (Lemma~\ref{lem:nonvanishing}).
+
+On scope: this paper delivers the classification on the line, in the $L^1$ signal model, and
+nothing more. It makes no empirical claims about natural signals. The geometry of the cone,
+the families at its corners, the scale evolution in generator form, locality, non-creation
+of local extrema, the exact implementation of the cascade, higher dimension and the
+discrete covariance strata are outside it.
+
+In relation to the axiom systems of \S\ref{sec:introduction}: the Gaussian axiomatics,
+from Iijima's conditions \sscite{iijima1962basic,weickert1999linear} to the non-creation
+and non-enhancement principles \sscite{koenderink1984structure,lindeberg1994scale}, keep
+the semigroup and add a requirement on how structure may change across scale. Within the
+class characterized here, the semigroup selects the stable slice and such a requirement
+selects its end $\alpha = 2$. The extended class of \sscite{pauwels1995extended} and the
+$\alpha$-scale spaces of \sscite{duits2004axioms} are that slice, and the Poisson scale
+space of \sscite{felsberg2001scale} is its member $\alpha = 1$. The Bessel scale space of
+\sscite{burgeth2005bessel}, composed along the range, is the variance-gamma member, with jumps of
+every size and every moment finite. The time-causal classification of
+\sscite{fagerstrom2026hemigroup} is the corresponding theorem under the Laplace transform,
+with a drift term where the Gaussian term is here; the axiom that differs, causality there
+and reflection symmetry here, is what excludes the Gaussian on the half-line and admits it
+on the line.
+
+One methodological remark. Several of the proofs printed above are not the ones first written, and in
+each case the machine-checked route is shorter or assumes less. The null-array limit of
+Theorem~\ref{thm:increments-levy} extracts the representation of an increment through a
+truncation inequality proved in a few lines, and never uses the closure of the class under
+pointwise limits. The analysis direction of Lemma~\ref{lem:selfdecomposable-exponents} first
+argued through the convexity of a tail function and a right derivative. The checked proof
+defines the profile as a supremum of dyadic difference quotients, which is nonincreasing by
+construction, and uses no convexity at all. The continuity axiom in the sufficiency half of
+Theorem~\ref{thm:main-characterization} was first verified by an $\varepsilon/3$ argument on
+a compact set carrying most of the mass. The checked proof bounds the distance of a
+convolution from its argument by the average of the modulus of continuity of translation,
+and needs no compact set and no density argument. The strict positivity of the admissible
+exponents (Proposition~\ref{prop:strict-positivity}) first covered the half-line by
+intervals and passed from almost everywhere to everywhere. The checked proof reads a
+dilation-invariant tail integral at one point. And the bound $\alpha \le 2$ of the
+semigroup case is the three-line quadratic growth estimate rather than a cited one. The net
+effect is that the characterization rests on the two cited facts of
+\S\ref{sec:machine-checked}, and that the printed proofs are the verified ones. The two
+further clauses the classical route uses, the closure of the class under pointwise limits
+and the existence half of the \Levy--Khintchine representation, are used nowhere.
+
+Four questions are left open. First, the construction in
+Proposition~\ref{prop:no-positivity-no-classification} (the signed family built from an
+even integrable transform) is the one step of this paper that is not machine-checked. A
+route through the convolution operators has been estimated and not carried out. Second, the
+non-positive hemigroup class is shown to admit no description in the form of the theorem,
+and it is not described: what it contains beyond the affine families through the admissible
+exponents is not known. Third,
+the closed form of the Mat\'ern member's kernel is cited in \S\ref{sec:axioms} and not
+claimed, and a self-contained derivation of the densities of the members with a completely
+monotone profile would make it a statement of the paper.
+Fourth, the classification is on the line. Which of it survives rotation invariance in
+dimension $d$, and which of it survives covariance under a discrete group of dilations only,
+are the questions the hemigroup form of the axioms raises next. The probability classes
+that would answer them are known: the self-decomposable laws and self-similar additive
+processes in $\RR^d$ (\sscite{sato1991selfsimilar}), and for a discrete group the
+semi-selfdecomposable laws and semi-selfsimilar processes of Maejima and Sato
+(\sscite{maejima1999semi}, Def.~1, p.~348, and Thm.~6, p.~360). What is open is the
+derivation from measurement axioms, and its formalization.

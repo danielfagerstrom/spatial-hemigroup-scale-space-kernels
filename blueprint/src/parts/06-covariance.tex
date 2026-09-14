@@ -1,0 +1,401 @@
+% !TEX root = ../print.tex
+% Draft \S6 --- Scale covariance: the similarity form
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S6 (lines 280-364).
+%
+% Five nodes. lem:covariance-fourier and the bulk of lem:action-rigidity and
+% prop:canonical-gauge port verbatim from the causal chapter. Three things are new and are
+% exactly the three places the causal proof used its vanishing lemma:
+%
+%   lem:no-lattice      -- the a priori exclusion of lattice kernels, from covariance at a
+%                          single non-integer ratio and the chain structure of the zero sets;
+%   lem:action-rigidity(3) -- continuity of the action, read off the smoothed transmittance
+%                          rather than off the accumulated exponent at one frequency;
+%   lem:dilation-atom   -- the direction of the orbit coordinate, where the causal argument
+%                          used monotonicity of Bernstein functions, unavailable here before
+%                          the classification (it is recovered in prop:strict-positivity(1)).
+%
+% CHECK (draft, checks for \S6, item 3): the iteration "a function invariant under one
+% dilation different from 1 and continuous at 0 with value 0 there vanishes identically" is
+% used three times below (lem:action-rigidity(4), the injectivity of c, and the uniqueness
+% clause of thm:main-characterization). It is stated once, as lem:dilation-invariance.
+
+\chapter{Scale covariance: the similarity form}
+\label{ch:covariance}
+
+Covariance turns the free relabelling $S_\lambda$ of (A8) into a coordinate: the action is
+rigid, its orbit through $1$ parametrizes the scale axis, and in the resulting gauge the
+accumulated exponent is a dilate of a single function. In the reading of
+\ref{rem:modulation-transfer}, covariance makes the family of transfer functions
+\emph{self-similar} --- descending the scale axis is indistinguishable from probing at a finer
+wavenumber --- and the rigidity lemma says that no scale is distinguished by the action.
+
+% draft: Lemma 6.1'
+% twin: hcs lem:covariance-laplace (Hemigroup.CascadeCore.covariance_laplace) --- verbatim.
+% The Lean statement (Skeleton.covariance_fourier) takes the setting the proviso in clause (3)
+% describes -- (A6)--(A7) present, so the exponents exist -- and is therefore unconditional
+% there. The (A1)--(A5)-only form is not stated in Lean because nothing consumes it.
+\begin{lemma}[Fourier form of covariance]\label{lem:covariance-fourier}
+\uses{def:cascade-family,lem:convolution-representation,lem:nonvanishing}
+\lean{SpatialLine.covariance_fourier, SpatialLine.covariance_similarity}\leanok
+\notes{covariance-strata}
+Under (A1)--(A5) the following are equivalent: (1) axiom (A8); (2)
+$\Dil{\lambda}\mu_{s,t} = \mu_{S_\lambda s,\,S_\lambda t}$ for all $0 \le s \le t$ and
+$\lambda > 0$; (3) $g_{S_\lambda s,\,S_\lambda t}(\omega) = g_{s,t}(\lambda\omega)$ for all
+$0 \le s \le t$, $\lambda > 0$ and $\omega \in \RR$, whenever the exponents exist. In
+particular, under (A8) together with (A6)--(A7),
+\begin{equation}\label{eq:similarity}
+  G(S_\lambda t,\,\omega) = G(t,\,\lambda\omega)
+  \qquad \text{for all } t \ge 0,\ \lambda > 0,\ \omega \in \RR .
+\end{equation}
+\statusT\quad\emph{(The proviso in clause (3) is there because (A1)--(A5) alone do not give
+\ref{lem:nonvanishing}; under (A6)--(A7) it is vacuous, and every later use is in that
+setting. \textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean core, in the
+setting the proviso describes: the formal statement carries (A6)--(A7) and a kernel family,
+which is what makes clause (3) unconditional, and the equivalence is stated on the
+intertwining alone, the three conditions on $S_\lambda$ being hypotheses shared by all three
+clauses.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The compatibility $\Dil{\lambda}(\mu * f) = (\Dil{\lambda}\mu) * (\Dil{\lambda}f)$ turns (A8)
+into the statement that $\Dil{\lambda}\mu_{s,t}$ and $\mu_{S_\lambda s,S_\lambda t}$ represent
+the same operator, and the uniqueness clause of \ref{lem:convolution-representation} makes
+that an identity of measures; this is (1) if and only if (2). For (2) if and only if (3),
+$\widehat{\Dil{\lambda}\mu}(\omega) = \hat\mu(\lambda\omega)$, so taking $-\log$
+(\ref{lem:nonvanishing}) gives $g_{S_\lambda s,S_\lambda t}(\omega) = g_{s,t}(\lambda\omega)$.
+Equation \ref{eq:similarity} is the case $s = 0$ of that identity together with
+$S_\lambda 0 = 0$, which holds because an increasing bijection of $[0,\infty)$ fixes $0$.
+\end{proof}
+
+The first thing covariance buys on the line is the exclusion of the lattice laws that
+\ref{lem:lattice-zero} left open.
+
+% draft: Lemma 6.0' (stated in \S6, after the Fourier form of covariance it uses)
+% NEW: no causal counterpart; on the half-line the corresponding statement is the vanishing
+% lemma, hcs lem:vanishing, which is a property of the function class and needs no axiom.
+\begin{lemma}[the kernels from the origin are not lattice laws]\label{lem:no-lattice}
+\uses{lem:covariance-fourier,lem:lattice-zero,lem:additivity,lem:nonvanishing}
+\lean{SpatialLine.no_lattice}\leanok
+Under (A1)--(A8) and (ND), for every $t > 0$ the kernel $\mu_{0,t}$ is carried by no lattice
+$p\ZZ$ with $p > 0$; equivalently $G(t,\omega) > 0$ for every $\omega \ne 0$.
+\statusT\quad\emph{(Covariance at a single non-integer ratio, and nothing else beyond the
+cascade. The argument does not extend to the increments $\mu_{s,t}$ with $s > 0$, because
+$S_\lambda$ moves both endpoints and the increments do not form a chain; strict positivity for
+every increment is recovered after the classification, in
+\ref{prop:strict-positivity}(2). That covariance is the operative axiom is shown by
+\ref{rem:lattice-family}, a family satisfying (A1)--(A7) and (ND) all of whose kernels are
+lattice laws. \textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean core. The
+formal comparison of the two chain members is made element-wise rather than by classifying the
+inclusions: whichever way the chain runs, one generator lands in the other lattice and produces
+$3/2 = n$ or $2/3 = n$ in $\ZZ$.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $N_t := N(\mu_{0,t})$ in the notation of \ref{lem:lattice-zero}, a closed subgroup of
+$\RR$. For $s \le t$, $g_{0,t} = g_{0,s} + g_{s,t}$ with both terms nonnegative
+(\ref{lem:additivity}, \ref{lem:nonvanishing}), so $N_t \subseteq N_s$: the family
+$(N_t)_{t>0}$ is a chain under inclusion, and $N_t \ne \RR$ for $t > 0$ by (ND) and
+\ref{lem:lattice-zero}. By \ref{lem:covariance-fourier},
+$\hat\mu_{0,S_\lambda t}(\omega) = \hat\mu_{0,t}(\lambda\omega)$, so
+$N_{S_\lambda t} = \lambda^{-1}N_t$, and $S_\lambda t > 0$. Suppose $N_t = c\ZZ$ for some
+$t > 0$ and $c > 0$. Then for every $\lambda > 0$ the two chain members $\lambda^{-1}c\ZZ$ and
+$c\ZZ$ are comparable under inclusion, which happens if and only if $\lambda$ or
+$\lambda^{-1}$ is a positive integer; $\lambda = 3/2$ is neither. So $N_t = \{0\}$, which is
+the statement.
+\end{proof}
+
+% additive: the iteration the draft performs three times (its Lemma 6.2'(4), the injectivity
+% of c in Proposition 6.3', and the uniqueness clause of Theorem 7.3'), stated once as the
+% draft's own check for \S6 (item 3) suggests.
+\begin{lemma}[a function fixed by one dilation vanishes]\label{lem:dilation-invariance}
+\lean{SpatialLine.dilation_invariance}\leanok
+Let $h : \RR \to \RR$ be continuous at $0$ with $h(0) = 0$, and suppose
+$h(\omega) = h(\varkappa\omega)$ for every $\omega$ and one fixed $\varkappa > 0$ with
+$\varkappa \ne 1$. Then $h \equiv 0$.
+\statusT\quad\emph{(Three lines, stated once so that the three uses cite it instead of
+repeating it. \textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean core. The Lean
+proof iterates over $n \in \NN$ and reduces the expanding case $\varkappa > 1$ to the
+contracting one by replacing $\varkappa$ with $\varkappa^{-1}$, which is the same argument
+written without a sign choice.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Iterating, $h(\omega) = h(\varkappa^n\omega)$ for every $n \in \ZZ$. Choose the sign of $n$ so
+that $\varkappa^n \to 0$; then $\varkappa^n\omega \to 0$ and continuity at $0$ gives
+$h(\omega) = h(0) = 0$.
+\end{proof}
+
+Nothing in (A8) says that the relabellings $S_\lambda$ are unique, that they compose, or that
+they move every point. The next lemma says all three. The causal engine was the injectivity of
+the accumulated exponent in scale at one fixed value of the transform variable, which
+\ref{cor:monotonicity} does not deliver here. Two weaker facts replace it and suffice: the
+accumulated exponent is injective in scale \emph{as a function of $\omega$}, which is (ND)
+restated, and the smoothed transmittance is injective in scale at a single number.
+
+% draft: Lemma 6.2'
+% twin: hcs lem:action-rigidity (Hemigroup.CascadeCore.action_rigidity); clauses (2) and (4)
+% port verbatim, clauses (1) and (3) have new proofs.
+\begin{lemma}[rigidity of the action]\label{lem:action-rigidity}
+\uses{lem:covariance-fourier,cor:smoothed-transmittance,lem:convolution-representation,lem:additivity,lem:dilation-invariance}
+\lean{SpatialLine.action_rigidity_injective, SpatialLine.action_rigidity_group,
+SpatialLine.action_rigidity_continuous, SpatialLine.action_rigidity_no_fixed_point}\leanok
+\notes{covariance-strata}
+Assume (A1)--(A8) and (ND). Then:
+\begin{enumerate}
+\item If $G(t_1,\cdot) = G(t_2,\cdot)$ as functions on $\RR$, then $t_1 = t_2$; consequently,
+for each $\lambda$, $S_\lambda$ is uniquely determined by \ref{eq:similarity}.
+\item $S_\lambda S_\kappa = S_{\lambda\kappa}$ for all $\lambda,\kappa > 0$, and
+$S_1 = \mathrm{Id}$.
+\item $\lambda \mapsto S_\lambda t$ is continuous for each $t > 0$.
+\item The action has no fixed point in $(0,\infty)$, in the strong form: if
+$S_\lambda t^* = t^*$ for one $\lambda \ne 1$, then $t^* = 0$.
+\end{enumerate}
+\statusT\quad\emph{(Three of the four clauses are the function-injectivity of (1) and nothing
+else. Clause (3) is the one that needs more, and what it needs is a single strictly monotone
+number attached to each scale, which is what $\Theta$ is. Clause (4) is where (ND) bites in
+this chapter, exactly as in the causal argument: a fixed point of the action would be a scale
+at which the family is the identity, an idle stretch, and the orbit below could stall there.
+The strong form, one $\lambda$ rather than all, costs nothing and is used in
+\ref{prop:canonical-gauge}. \textbf{Machine-checked}, \texttt{\#print axioms} reducing to Lean
+core, one declaration per clause. One remark on clause (3): the proof below inverts $\Theta$,
+and the formalisation does not, because it does not have to. The order characterisation of a
+limit in $\RR$ splits the claim into the two one-sided bounds $a < S_\lambda t$ and
+$S_\lambda t < b$, and each follows from the strict monotonicity of $\Theta$ by contraposition
+against a bound the continuity of $\theta_t$ already supplies; no inverse function is
+constructed.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\emph{(1).} If $t_1 < t_2$ then $G(t_2,\cdot) - G(t_1,\cdot) = g_{t_1,t_2}$ by
+\ref{lem:additivity}; if this vanishes identically then $\hat\mu_{t_1,t_2} \equiv 1$, so
+$\mu_{t_1,t_2} = \delta_0$ and $\Phi_{t_1,t_2} = \mathrm{Id}$ by
+\ref{lem:convolution-representation}, against (ND). If $S$ and $S'$ both satisfy
+\ref{eq:similarity} then $G(S_\lambda t,\cdot) = G(t,\lambda\,\cdot) = G(S'_\lambda t,\cdot)$,
+so $S_\lambda t = S'_\lambda t$.
+
+\emph{(2).} Applying \ref{eq:similarity} twice,
+$G(S_\lambda S_\kappa t,\omega) = G(S_\kappa t,\lambda\omega) = G(t,\lambda\kappa\omega)
+= G(S_{\lambda\kappa}t,\omega)$ for every $\omega$, and (1) gives
+$S_\lambda S_\kappa t = S_{\lambda\kappa}t$. Taking $\lambda = 1$ in \ref{eq:similarity} gives
+$G(S_1t,\cdot) = G(t,\cdot)$, whence $S_1 = \mathrm{Id}$.
+
+\emph{(3).} Fix $t > 0$ and let $\rho$ be the standard Gaussian density. By
+\ref{eq:similarity} and the definition of $\Theta$ in \ref{cor:smoothed-transmittance},
+\[
+  \Theta(S_\lambda t)
+  = \int_\RR \hat\mu_{0,S_\lambda t}(\omega)\,\rho(\omega)\,d\omega
+  = \int_\RR \hat\mu_{0,t}(\lambda\omega)\,\rho(\omega)\,d\omega
+  = \int_\RR \hat\mu_{0,t}(u)\,\rho(u/\lambda)\,\lambda^{-1}\,du \;=:\; \theta_t(\lambda).
+\]
+The last integrand is continuous in $\lambda$ and, for $\lambda$ in a compact subinterval
+$[\lambda_0/2, 2\lambda_0]$ of $(0,\infty)$, is dominated by
+$\tfrac{2}{\lambda_0}(2\pi)^{-1/2}e^{-u^2/(8\lambda_0^2)}$, which is integrable; so $\theta_t$
+is continuous by dominated convergence. Under (ND), $\Theta$ is continuous and strictly
+decreasing on $[0,\infty)$ (\ref{cor:smoothed-transmittance}), hence has a continuous inverse
+on its image, and $\theta_t(\lambda) = \Theta(S_\lambda t)$ lies in that image; so
+$S_\lambda t = \Theta^{-1}(\theta_t(\lambda))$ is continuous in $\lambda$.
+
+\emph{(4).} Suppose $S_\lambda t^* = t^*$ for some $\lambda \ne 1$. Then \ref{eq:similarity}
+gives $G(t^*,\omega) = G(t^*,\lambda\omega)$ for every $\omega$, and $G(t^*,\cdot)$ is
+continuous with $G(t^*,0) = 0$ (\ref{lem:additivity}), so $G(t^*,\cdot) \equiv 0$ by
+\ref{lem:dilation-invariance}; that is, $\mu_{0,t^*} = \delta_0$ and
+$\Phi_{0,t^*} = \mathrm{Id}$, which by (ND) forces $t^* = 0$.
+\end{proof}
+
+The direction of the orbit coordinate needs one more elementary fact, the Fourier form of "a
+law whose dilates converge to a point mass is a point mass".
+
+% draft: Lemma 6.2''
+% NEW: the replacement for the causal argument, which oriented the orbit coordinate by the
+% monotonicity of Bernstein functions. Monotonicity of F in omega is not available here before
+% the classification; it is recovered from it, in prop:strict-positivity(1).
+\begin{lemma}[dilation to infinity keeps only the atom at the origin]\label{lem:dilation-atom}
+\lean{SpatialLine.dilation_atom}\leanok
+Let $\mu$ be a probability measure on $\RR$ and let $\lambda_n \to \infty$. If
+$\hat\mu(\lambda_n\omega) \to 1$ for every $\omega \in \RR$, then $\mu = \delta_0$.
+\statusT\quad\emph{(The Fourier form of "$\Dil{\lambda_n}\mu \to \delta_0$ weakly implies
+$\mu = \delta_0$", proved so as to need no weak convergence at all: two applications of
+dominated convergence with the constant bound $1$. \textbf{Machine-checked},
+\texttt{\#print axioms} reducing to Lean core. The formal proof reaches the same conclusion by
+a different route, and the reason is worth recording: the truncation inequality
+$\mu\{|x| > r\} \le \tfrac r2\,\bigl|\int_{-2/r}^{2/r}(1 - \hat\mu)\bigr|$ is already in
+Mathlib, so applying it to the dilate of $\mu$ by $\lambda_n$ at the fixed radius $1$ leaves
+one dominated convergence over a fixed interval and needs neither the Gaussian nor Fubini. The
+proof written here is the proof of record; the substitution is an implementation choice.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $\rho$ the standard Gaussian density, Fubini gives
+$\int \hat\mu(\lambda_n\omega)\rho(\omega)\,d\omega = \int e^{-\lambda_n^2x^2/2}\,\mu(dx)$. The
+left side tends to $\int\rho = 1$ by dominated convergence, since $|\hat\mu| \le 1$; the right
+side tends to $\mu(\{0\})$ by dominated convergence, the integrand being bounded by $1$ and
+tending pointwise to the indicator of $\{0\}$. So $\mu(\{0\}) = 1$.
+\end{proof}
+
+The coordinate itself is the orbit. Fix the point $1$ on the scale axis and follow it under the
+action: $\lambda \mapsto S_\lambda 1$ is continuous, injective, and, having no fixed point to
+stall at, sweeps the whole axis; the one thing to settle is which way it sweeps.
+
+% draft: Proposition 6.3'
+% twin: hcs prop:canonical-gauge (Hemigroup.CascadeCore.canonical_gauge); the direction clause
+% has a new proof.
+% CHANGED (proof of record 2026-09-09): the surjectivity step now follows the machine-checked
+% route, per CLAUDE.md's convention. The old argument took the limits of c at 0 and at infinity
+% and asserted that each is fixed by every S_kappa "S_kappa being continuous" -- continuity of
+% S_kappa in the SCALE variable, which this chapter never proves. The new one fixes u > 0 and
+% argues by contradiction from the infimum and the supremum of the orbit, using only that
+% S_kappa is nondecreasing: c(lambda) = S_kappa(c(lambda/kappa)) bounds S_kappa m below m and
+% S_kappa M above M, and reading each at kappa and kappa^{-1} makes it a fixed point, which
+% lem:action-rigidity(4) forbids; the intermediate value theorem then closes it. This is
+% SpatialLine.canonical_gauge_orbit's proof. Statement unchanged; \uses unchanged.
+% CHANGED (proof of record 2026-09-09): the DIRECTION clause now follows the machine-checked
+% route too, closing the divergence the previous marker left open (wave 2's merge). The old
+% argument proved injectivity from lem:dilation-invariance, deduced strict monotonicity from
+% "continuous and injective on a connected set", and excluded the decreasing case by an appeal
+% to continuity of S_lambda in the SCALE variable. The new one proves the single statement
+% SpatialLine.lt_S_of_one_lt -- for kappa > 1 and u > 0, u < S_kappa u -- by running the old
+% decreasing-case argument on the orbit of u, with the limit shown to be a fixed point by
+% monotonicity alone; strict monotonicity of lambda |-> S_lambda t for EVERY t > 0, injectivity
+% included, is then one line of the group law (SpatialLine.S_strictMonoOn_ratio). Statement
+% unchanged. \uses LOSES lem:dilation-invariance, which the rewritten proof no longer cites;
+% lem:dilation-atom and lem:nonvanishing are still spent, in the expanding step.
+\begin{proposition}[orbit coordinate; the gauge]\label{prop:canonical-gauge}
+\uses{lem:action-rigidity,lem:dilation-atom,lem:covariance-fourier,thm:increments-levy,lem:nonvanishing}
+\lean{SpatialLine.canonical_gauge_orbit, SpatialLine.canonical_gauge}\leanok
+\notes{covariance-strata}
+Assume (A1)--(A8) and (ND). Then $c(\lambda) := S_\lambda 1$ is a continuous strictly
+increasing bijection of $(0,\infty)$ onto $(0,\infty)$ with $c(1) = 1$. Consequently
+\[
+  \chi := c^{-1} : (0,\infty) \to (0,\infty), \qquad \chi(0) := 0,
+\]
+is an increasing bijection of $[0,\infty)$, the \emph{canonical gauge}, satisfying
+$\chi(S_\lambda t) = \lambda\,\chi(t)$; the maps $\lambda \mapsto S_\lambda t$ are strictly
+increasing for every $t > 0$; and
+\begin{equation}\label{eq:gauge}
+  G(t,\omega) = F\bigl(\chi(t)\,\omega\bigr), \qquad F := G(1,\cdot) \in \LEs,\ F \not\equiv 0,
+\end{equation}
+with $F$ even and continuous, $F(0) = 0$, and with the pair $(a,\nu)$ of
+\ref{eq:levy-khintchine}.
+\statusT\quad\emph{(The gauge is recovered, not posited; it is the semigroup literature's free
+rescaling function, and the hemigroup case differs from the semigroup case only by the
+generality of the reparametrization and the freedom in $F$. In the canonical gauge every
+increment reads $g_{s,t}(\omega) = F(t\omega) - F(s\omega)$, which is the form
+Chapter~\ref{ch:characterization} classifies. \textbf{Machine-checked}, \texttt{\#print axioms}
+reducing to Lean core, in two declarations: the orbit coordinate --- that $c$ is a continuous
+strictly increasing bijection of $(0,\infty)$ with $c(1) = 1$ --- and the gauge with the
+similarity form, which also states the normalization $\chi(1) = 1$. That conjunct is immediate
+from $c(1) = 1$, and it is stated because \ref{thm:main-characterization} has no other route to
+it: it is the normalization that theorem's uniqueness clause quantifies over, and the necessity
+direction reaches it only through this gauge.
+The clause $F \in \LEs$ is \ref{thm:increments-levy} at $(0,1)$, whose own
+footprint is Lean core, so no interface is spent here. Two riders are read rather than restated
+in the formalisation, so that a reader of the declaration list does not look for names that do
+not exist: that $F$ is even and continuous with $F(0) = 0$ is
+\ref{lem:nonvanishing}'s own declaration \texttt{SpatialLine.nonvanishing\_exponent} applied at
+$(0,1)$, and that $F$ carries a pair $(a,\nu)$ of \ref{eq:levy-khintchine} is the definition of
+$\LEs$ unfolded. The surjectivity step below is the machine-checked proof, written out. It replaces
+an argument that read the limits of $c$ at $0$ and at $\infty$ off the continuity of $S_\lambda$
+in the \emph{scale} variable --- a fact this chapter does not prove --- by one that uses the
+monotonicity of $S_\kappa$ alone: the extrema of the orbit satisfy $S_\kappa m \le m$ and
+$M \le S_\kappa M$ for every $\kappa$, directly from
+$c(\lambda) = S_\kappa\bigl(c(\lambda/\kappa)\bigr)$, and reading that at $\kappa$ and at
+$\kappa^{-1}$ makes each a fixed point. The direction clause below is the machine-checked proof
+too, and with it the last divergence closes. The formalisation obtains the direction and the
+strict monotonicity of $\lambda \mapsto S_\lambda t$, for every $t > 0$ at once, from a single
+statement --- for $\varkappa > 1$ and $u > 0$, $u < S_\varkappa u$, which is the old
+decreasing-case argument run on the orbit of $u$ --- so the printed proof no longer appeals to
+"continuous and injective on a connected set, hence strictly monotone" nor, inside the excluded
+decreasing case, to the continuity of $S_\lambda$ in the scale variable, which this chapter does
+not prove. Injectivity is contained in the strict monotonicity and is no longer argued
+separately, so \ref{lem:dilation-invariance} leaves this node's uses: it was cited by the
+injectivity paragraph alone.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+\emph{$c$ is continuous} by \ref{lem:action-rigidity}(3), and $c(1) = S_11 = 1$ by
+\ref{lem:action-rigidity}(2).
+
+\emph{The action expands above $1$: for every $\varkappa > 1$ and every $u > 0$,
+$u < S_\varkappa u$.} Suppose not. Equality is impossible, because
+\ref{lem:action-rigidity}(4) leaves $S_\varkappa$ no fixed point but $0$ and $u > 0$; so
+$S_\varkappa u < u$ for some such pair. Write $w_n := S_{\varkappa^n}u$ for the orbit of $u$.
+The group law gives $w_{n+1} = S_\varkappa w_n$, and $S_\varkappa$ is increasing, so
+$w_1 < w_0 = u$ propagates by induction to $w_{n+1} < w_n$ for every $n$. The orbit is
+nonnegative, hence decreases to $L := \inf_n w_n \ge 0$, and that infimum is a fixed point of
+$S_\varkappa$ by monotonicity alone: $S_\varkappa L \le S_\varkappa w_n = w_{n+1}$ for every
+$n$, so $S_\varkappa L \le L$; and $S_{\varkappa^{-1}}L \le S_{\varkappa^{-1}}w_{n+1} = w_n$
+for every $n$, so $S_{\varkappa^{-1}}L \le L$ and therefore
+$L = S_\varkappa\bigl(S_{\varkappa^{-1}}L\bigr) \le S_\varkappa L$. Thus $S_\varkappa L = L$,
+and \ref{lem:action-rigidity}(4) gives $L = 0$: the orbit of $u$ decreases to $0$. By
+\ref{eq:similarity}, $\hat\mu_{0,u}(\varkappa^n\omega) = \hat\mu_{0,w_n}(\omega)$, which tends
+to $\hat\mu_{0,0}(\omega) = 1$ for every $\omega$, by continuity of
+$\hat\mu_{0,\cdot}(\omega)$ in scale (\ref{lem:nonvanishing}). Then \ref{lem:dilation-atom}
+gives $\mu_{0,u} = \delta_0$, against (ND).
+
+\emph{$c$ is strictly increasing}, and so is $\lambda \mapsto S_\lambda t$ for every $t > 0$.
+Let $0 < a < b$ and $t > 0$. The group law reads $S_b t = S_{b/a}(S_a t)$ with $b/a > 1$ and
+$S_a t > 0$, so the previous paragraph gives $S_a t < S_b t$. Taking $t = 1$ is the assertion
+for $c$; injectivity is contained in it, and nothing here needs $c$ to be continuous.
+
+\emph{$c$ is onto $(0,\infty)$.} Fix $u > 0$. Since $c$ is continuous and strictly increasing on
+$(0,\infty)$, it is enough to exhibit one value of $c$ below $u$ and one above it, the
+intermediate value theorem then supplying a $\lambda$ with $c(\lambda) = u$. Both are obtained
+from the same two lines, and neither uses any continuity of $S_\kappa$ in the scale variable.
+
+Suppose $c \ge u$ on $(0,\infty)$, and let $m := \inf_{\lambda > 0} c(\lambda)$, so
+$m \ge u > 0$. For every $\kappa > 0$ and every $\lambda > 0$ the group law gives
+$c(\lambda) = S_\kappa\bigl(c(\lambda/\kappa)\bigr) \ge S_\kappa m$, because $S_\kappa$ is
+nondecreasing on $[0,\infty)$ and $c(\lambda/\kappa) \ge m$; taking the infimum over $\lambda$,
+$S_\kappa m \le m$ for every $\kappa > 0$. Reading that at $\kappa^{-1}$ and applying the
+nondecreasing $S_\kappa$ to it, $m = S_\kappa\bigl(S_{\kappa^{-1}}m\bigr) \le S_\kappa m$, so
+$S_\kappa m = m$. Taking $\kappa = 2$, \ref{lem:action-rigidity}(4) gives $m = 0$, contradicting
+$m \ge u > 0$.
+
+Suppose instead $c \le u$ on $(0,\infty)$, and let $M := \sup_{\lambda > 0} c(\lambda)$, which
+is finite and at least $c(1) = 1$. The same computation with the inequalities reversed gives
+$c(\lambda) = S_\kappa\bigl(c(\lambda/\kappa)\bigr) \le S_\kappa M$ and hence
+$M \le S_\kappa M$ for every $\kappa > 0$; reading that at $\kappa^{-1}$ and applying $S_\kappa$,
+$S_\kappa M \le S_\kappa\bigl(S_{\kappa^{-1}}M\bigr) = M$, so $S_\kappa M = M$ and
+\ref{lem:action-rigidity}(4) gives $M = 0$, contradicting $M \ge 1$.
+
+\emph{The gauge relation.} By the group law,
+$S_\lambda t = S_\lambda S_{\chi(t)}1 = S_{\lambda\chi(t)}1 = c(\lambda\chi(t))$, so
+$\chi(S_\lambda t) = \lambda\chi(t)$, and $\lambda \mapsto S_\lambda t$ is strictly increasing
+because $c$ is.
+
+\emph{The similarity form.} For $t > 0$, writing $t = S_{\chi(t)}1$ and using
+\ref{eq:similarity}, $G(t,\omega) = G(S_{\chi(t)}1,\omega) = G(1,\chi(t)\omega) =
+F(\chi(t)\omega)$. Here $F = g_{0,1} \in \LEs$ by \ref{thm:increments-levy}, even and
+continuous with $F(0) = 0$ by \ref{lem:nonvanishing}, and $F \not\equiv 0$ by (ND). The case
+$t = 0$ is $G(0,\cdot) = 0 = F(0)$.
+\end{proof}
+
+\begin{remark}[gauge freedom]\label{rem:gauge-freedom}
+In the hemigroup setting the scale coordinate carries no intrinsic parametrization: replacing
+$t$ by any increasing bijection of $[0,\infty)$ yields an equivalent family.
+\ref{prop:canonical-gauge} fixes the \emph{canonical gauge} $\tilde t := \chi(t)$, in which
+$S_\lambda$ acts by multiplication and $G(t,\omega) = F(\tilde t\,\omega)$. In it scale carries
+the dimension of length. Since $\omega$ is dual to position, $\tilde t\omega$ must be
+dimensionless for $F(\tilde t\omega)$ to make sense, so $t$ in this article is a length, the
+standard deviation of the Gaussian member, where the scale-space literature's $t$ is the
+variance. The other homogeneous gauges are $c_0\,\tilde t^{\,\beta}$ with $c_0, \beta > 0$. The
+one that recurs is the \emph{variance gauge} $\tilde t^{\,2}$, in which the Gaussian member is a
+one-parameter semigroup and the diffusion equation has its textbook form. It is named at each
+use and never written $\tilde t$.
+\end{remark}
+
+For the Gaussian member, $G(t,\omega) = \tfrac12t^2\omega^2$ in the coordinate of
+Chapter~\ref{ch:axioms}, so $F(\omega) = \tfrac12\omega^2$ and that coordinate already is the
+canonical gauge: it is the standard deviation. In the semigroup case the straightening is the
+classical reparametrization: in the semigroup's own additive parameter $v$ the accumulated
+exponent is $v\,|\omega|^\alpha$, the action is $S_\lambda v = \lambda^\alpha v$, and the gauge
+is $\chi(v) = v^{1/\alpha}$, which is exactly the rescaling function of
+\sscite{pauwels1995extended}; their functional equations for the exponent are the Cauchy step
+of \ref{cor:semigroup-case}.

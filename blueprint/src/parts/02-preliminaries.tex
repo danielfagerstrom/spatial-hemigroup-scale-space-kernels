@@ -1,0 +1,573 @@
+% !TEX root = ../print.tex
+% Draft \S2 --- Preliminaries and notation
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S2 (lines 12-138).
+%
+% This is the chapter where the trust boundary is set. Four of the draft's numbered
+% clauses are classical Fourier analysis and are taken as cited interfaces: Bochner,
+% Schoenberg, the symmetric \Levy--Khintchine representation with its unique triple, and
+% \Levy's continuity theorem. Two further facts the draft uses without stating them --
+% uniqueness of a Fourier--Stieltjes transform, and the continuity theorem in its
+% measure form -- are recorded here as nodes so that the trust they carry is visible in
+% the dependency graph rather than buried inside proofs; that is the causal article's
+% convention and its reason.
+%
+% Three things the draft names as candidates for the ledger are NOT taken on trust, and
+% the reroute is recorded at each node: the quadratic growth bound for continuous
+% negative definite functions (\ref{lem:quadratic-growth}, proved from the truncation
+% split in three lines, so Jacob Vol. I Lemma 3.6.22 is not needed); the nonvanishing of
+% infinitely divisible transforms (Sato Lemma 7.5, superseded by the elementary
+% \ref{lem:nonvanishing} of Chapter 4); and the null-array convergence theorem (Sato
+% Thm. 8.7, superseded by the self-contained proof of \ref{thm:increments-levy}).
+
+\chapter{Preliminaries and notation}
+\label{ch:preliminaries}
+
+Space runs over $\RR$ with coordinate $x$ and the transform variable is the wavenumber
+$\omega$; scale is $t$, and a stage is indexed by an ordered pair of scales $s \le t$, with
+a third letter $r \le s \le t$ when three are needed. The dilation ratio is $\lambda$.
+
+We write $\Lone = L^1(\RR, dx)$, real, with positive cone $L^1_+$ and
+$\int f := \int_\RR f(x)\,dx$; $M_+(\RR)$ for the finite positive Borel measures on $\RR$,
+of total mass $\|\mu\| = \mu(\RR)$; translations $(\Tr{a} f)(x) = f(x-a)$; the reflection
+$(Rf)(x) = f(-x)$, extended to measures as the pushforward under $x \mapsto -x$, a measure
+being \emph{symmetric} when $R\mu = \mu$; dilations $(\Dil{\lambda} f)(x) = \lambda^{-1}
+f(x/\lambda)$ on functions and the pushforward under $x \mapsto \lambda x$ on measures; and
+convolution $(\mu * f)(x) = \int f(x-y)\,\mu(dy)$, for which $\|\mu * f\|_1 \le \|\mu\|\,\|f\|_1$,
+$\Dil{\lambda}(\mu * f) = (\Dil{\lambda}\mu) * (\Dil{\lambda}f)$ and
+$R(\mu * f) = (R\mu) * (Rf)$.
+
+For $\mu \in M_+(\RR)$ the Fourier transform is
+\begin{equation}\label{eq:transform}
+  \hat\mu(\omega) = \int_\RR e^{-i\omega x}\,\mu(dx), \qquad \omega \in \RR,
+\end{equation}
+continuous, with $|\hat\mu| \le \|\mu\|$ and $\hat\mu(0) = \|\mu\|$; for symmetric $\mu$ it is
+real and even, $\hat\mu(\omega) = \int \cos(\omega x)\,\mu(dx)$. Under dilation
+$\widehat{\Dil{\lambda}\mu}(\omega) = \hat\mu(\lambda\omega)$, and
+$\widehat{\mu * \nu} = \hat\mu\,\hat\nu$. Unlike the Laplace transform of a measure carried by
+a half-line, $\hat\mu$ need not be positive; that the axioms exclude this is
+\ref{lem:nonvanishing}.
+
+% draft: Definition 2.1
+% CHANGED (review 2026-09-09): the inequality now says "\ge 0 (in particular real)". The
+% displayed sum is complex, and the standard reading -- the only one under which
+% prop:fourier-toolbox(1) is true -- is that it is a NONNEGATIVE REAL, so that Hermitian
+% symmetry of varphi is part of the assertion rather than a separate hypothesis. The Lean
+% (SpatialLine.IsPositiveDefinite) reads it that way, through 0 <= z under ComplexOrder;
+% answering Q4, the prose should commit to it too.
+\begin{definition}[positive definite]\label{def:positive-definite}
+\lean{SpatialLine.IsPositiveDefinite}\leanok
+\notes{positive-definite-functions}
+A function $\varphi : \RR \to \CC$ is \emph{positive definite} if
+\[
+  \sum_{j,k} c_j\,\overline{c_k}\,\varphi(\omega_j - \omega_k) \ge 0
+  \quad\text{(in particular real)}
+\]
+for every finite family $(\omega_j) \subset \RR$ and every finite family $(c_j) \subset \CC$.
+\statusT\quad\emph{(The parenthesis is part of the definition: the double sum of a complex
+function is asserted to be a nonnegative real, which is what makes $\varphi$ Hermitian ---
+$\varphi(-\omega) = \overline{\varphi(\omega)}$ --- and it is the reading under which
+\ref{prop:fourier-toolbox}(1) holds.)}
+\end{definition}
+
+% draft: Definition 2.2
+% twin: hcs def:bernstein-function (Hemigroup.levyExponent) --- the causal class is defined
+% by complete monotonicity of the derivative, this one by positive definiteness of the
+% exponential; the two definitions play the same structural role.
+\begin{definition}[symmetric continuous negative definite function]\label{def:symmetric-negdef}
+\uses{def:positive-definite}
+\lean{SpatialLine.IsSymNegDef}\leanok
+\notes{positive-definite-functions}
+A function $\psi : \RR \to [0,\infty)$ is a \emph{symmetric continuous negative definite
+function} if $\psi$ is continuous and even, $\psi(0) = 0$, and $e^{-\tau\psi}$ is positive
+definite for every $\tau > 0$. We write $\psi \in \NDs$.
+\statusT\quad\emph{(The exponential form is taken as primitive, so that the class is defined
+without any derivative and Schoenberg's theorem is needed only to import results stated for
+the kernel form. This is the choice the causal article made for its Bernstein class in the
+opposite direction, and it is why \ref{prop:fourier-toolbox}(2) is an interface rather than a
+definition.)}
+\end{definition}
+
+% draft: Proposition 2.3
+% twin: hcs prop:bernstein-toolbox (ledger A1-A4 there); the four clauses correspond one to
+% one, with Bochner in the place of Bernstein--Widder and Schoenberg in the place of
+% "e^{-tau g} completely monotone for every tau".
+% NOTE (proof 2026-09-09): the CONVERSE half of clause (3) is now admitted in the Lean as the
+% axiom SpatialLine.fourier_toolbox_levy_converse, on blueprint/trust-boundary.txt, with A3's
+% **Lean:** line naming it. Its only consumer is lem:profile-integrability's "consequently"
+% clause. The other clauses are admitted nowhere; the statement is unchanged.
+\begin{proposition}[the Fourier toolbox]\label{prop:fourier-toolbox}
+\uses{def:positive-definite,def:symmetric-negdef}
+\lean{Skeleton.fourier_toolbox_bochner, Skeleton.fourier_toolbox_bochner_symm,
+Skeleton.fourier_toolbox_schoenberg, Skeleton.fourier_toolbox_levy_exists,
+Skeleton.fourier_toolbox_levy_converse, Skeleton.fourier_toolbox_levy_unique,
+Skeleton.fourier_toolbox_cone, Skeleton.fourier_toolbox_kernel_closed,
+Skeleton.fourier_toolbox_closure}\notready
+\notes{positive-definite-functions}
+\begin{enumerate}
+\item \emph{(Bochner.)} $\varphi$ is the Fourier transform of a probability measure on $\RR$
+if and only if $\varphi$ is continuous, positive definite and $\varphi(0) = 1$; it is the
+transform of a \emph{symmetric} probability measure if and only if moreover $\varphi$ is real,
+equivalently even.
+\item \emph{(Schoenberg.)} For continuous even $\psi \ge 0$ with $\psi(0) = 0$: $\psi \in \NDs$
+if and only if $\psi$ is negative definite in the kernel sense,
+\[
+  \sum_{j,k}\bigl(\psi(\omega_j) + \psi(\omega_k) - \psi(\omega_j - \omega_k)\bigr)\,
+  c_j\,\overline{c_k} \ \ge\ 0
+\]
+for every finite family; equivalently, by clause (1), if and only if $e^{-\tau\psi}$ is the
+transform of a symmetric probability measure for every $\tau > 0$.
+\item \emph{(\Levy--Khintchine, symmetric form.)} Every $\psi \in \NDs$ has the representation
+\begin{equation}\label{eq:levy-khintchine}
+  \psi(\omega) \;=\; a\,\omega^2 + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\nu(dx),
+  \qquad a \ge 0, \quad \int_{(0,\infty)} (1 \wedge x^2)\,\nu(dx) < \infty,
+\end{equation}
+the pair $(a,\nu)$ being unique; and conversely every such pair defines a member of $\NDs$.
+\item \emph{(Closure.)} $\NDs$ is a convex cone, and in the kernel form of clause (2) the
+class is closed under pointwise limits with no proviso. If $\psi_n \in \NDs$ and
+$\psi_n \to \psi$ pointwise with $\psi$ continuous at $0$, then $\psi \in \NDs$.
+\end{enumerate}
+\statusA\quad\ledger{A1}\quad\ledger{A2}\quad\ledger{A3}\quad\ledger{A4}\quad\emph{(The
+classical Fourier analysis this article stands on, taken as four cited interfaces and not
+reproven. \textbf{Assignment.} \ledger{A1} carries clause (1), both the general and the
+symmetric leg; \ledger{A2} carries clause (2); \ledger{A3} carries clause (3) --- existence,
+converse, and uniqueness of the pair; \ledger{A4} carries clause (4), the cone and both
+closure statements. What none of them carries is the \emph{folding} convention by which a
+symmetric \Levy{} measure on $\RR \setminus \{0\}$ is written as a measure on $(0,\infty)$: the
+sources state clause (3) on $\RR$ with a centering term, and the reduction to
+\ref{eq:levy-khintchine} --- the centering term vanishes by symmetry, and the two halves of
+the measure are added under $x \mapsto |x|$ --- is ours and elementary, written out
+immediately below. The classes $\NDs$ and $\LEs$ (\ref{def:levy-exponents}) are the same class,
+named by the definition and by the representation respectively, and the clause that identifies
+them is (3) of this proposition; this article's proofs manipulate the representation, and the
+machine-checked development defines $\LEs$ alone.)}
+\end{proposition}
+
+% ADDED (article mirror 2026-09-14, R157): written for the paper at the author's request
+% (2026-09-13), condensed from the hub's wiki/positive-definite-functions.md, and mirrored here
+% because the blueprint is the text of record for what the paper prints. The Feller anchors are
+% the ones the librarian confirmed (Lemma 1 p. 621 with the even window and the Gaussian factor
+% (2.4); the Toeplitz form (2.6)-(2.7) p. 622; Lemma 3 p. 622).
+\begin{remark}[what the two classes are, and why the transform sees them]
+\label{rem:pd-nd-intuition}
+The prototype of a positive definite function is a single \emph{character},
+$\omega \mapsto e^{-i\omega x}$ for a fixed $x$: the double sum of \ref{def:positive-definite}
+collapses to $|\sum_j c_j e^{-i\omega_j x}|^2 \ge 0$. The condition is linear in $\varphi$ and
+survives pointwise limits, so every positive mixture of characters, that is every Fourier
+transform of a positive measure, is positive definite for free. Bochner's theorem is the
+converse: a continuous positive definite function is such a mixture, and the mixing measure is
+unique. In the language of convex cones, the characters are the extreme rays of the cone of
+positive definite functions, and every continuous member is the barycentre of the rays, with
+the measure as the weights. In the symmetric case the rays are $\cos\omega x$, $x \ge 0$.
+
+The negative definite functions are the same picture one level up. Ask which $\psi$ make
+$e^{-\tau\psi}$ a transform for every $\tau > 0$, which is what the cascade of
+Chapter~\ref{ch:cascade} will ask. The answer is again a cone described twice: by the checkable
+kernel-form inequality of clause (2), and by its extreme rays, which is the \Levy--Khintchine
+representation \ref{eq:levy-khintchine}. The rays are $\omega^2$ and $1 - \cos\omega x$ for
+$x > 0$, and there is no constant ray because $\psi(0) = 0$. Each ray has a probabilistic
+identity, given in \ref{rem:displacement-dictionary} below.
+
+The mechanism behind Bochner's theorem is the one this article reuses. In Feller's proof the
+transform is inverted against an even window and the general case is reached through the
+convergence factor $e^{-\varepsilon\omega^2}$ (\sscite{feller2009introduction}, Vol.~2,
+\S~XIX.2, Lemma~1, p.~621, and (2.4)); positive definiteness is what makes the windowed inverse
+transforms nonnegative, and the finite-family inequality is the discrete form of that, the
+Toeplitz form (2.6)--(2.7) on p.~622. The same device, a transform read against a Gaussian
+window, is the test function of Chapter~\ref{ch:representation} and the smoothed transmittance
+of Chapter~\ref{ch:cascade}. Two facts used throughout are also Feller's (Lemma~3, p.~622):
+$|\varphi| \le \varphi(0)$ and $\varphi(-\omega) = \overline{\varphi(\omega)}$.
+
+The contrast with the half-line is one of kind. Complete monotonicity, the transform-free
+description of ``comes from positive mass'' for the Laplace transform, is a pointwise test:
+countably many derivative signs at each point. Positive definiteness is a global quadratic-form
+condition, and there is no local test for it. That is the first sign that the half-line theory
+is the more rigid of the two.
+\end{remark}
+
+\emph{The folding convention.} A symmetric \Levy{} measure $\nu_2$ on $\RR \setminus \{0\}$
+enters \ref{eq:levy-khintchine} as its image $\nu$ under $x \mapsto |x|$. So a two-sided
+\Levy{} density written $h(|x|)/|x|$ --- the form the probabilistic sources use --- has folded
+profile $k = 2h$ in \ref{eq:sd-profile} below: the factor is the two directions of a
+displacement of a given size, and it is the one place where a constant is easily lost in
+carrying a statement from a source into this article. The centering term of the general
+representation vanishes by symmetry, read on the compensated integrand: the odd part of
+$e^{-i\omega x} - 1 + i\omega x\,\mathbf 1_{|x| < 1}$ is
+$-i(\sin\omega x - \omega x\,\mathbf 1_{|x|<1})$, which is $O(x^3)$ at the origin and bounded,
+hence $\nu_2$-integrable, and odd, so its integral against a symmetric $\nu_2$ is $0$. The
+uncompensated $\int \sin(\omega x)\,\nu_2(dx)$ need not converge.
+
+\emph{Which vocabulary does the work.} The later chapters name the class by its representation.
+
+% ADDED (article mirror 2026-09-14, R157): a node for the name the chapters from 5 on use. The
+% blueprint had it only as a sentence of prop:fourier-toolbox's annotation, and the paper gave it
+% a definition of its own at the author's request (2026-09-13); the blueprint is the text of
+% record, so the node belongs here too. The identification LEs = NDs is prop:fourier-toolbox(3),
+% ledger A3, and is stated in the annotation rather than in the definition, so that the \leanok
+% covers exactly what SpatialLine.IsSymLevyExponent defines.
+\begin{definition}[symmetric \Levy{} exponents]\label{def:levy-exponents}
+\uses{prop:fourier-toolbox}
+\lean{SpatialLine.IsSymLevyExponent}\leanok
+$\LEs$ is the set of functions $\psi : \RR \to [0,\infty)$ of the form
+\ref{eq:levy-khintchine}, for some $a \ge 0$ and some measure $\nu$ on $(0,\infty)$ with
+$\int (1 \wedge x^2)\,\nu(dx) < \infty$.
+\statusT\quad\emph{(The same class as $\NDs$ of \ref{def:symmetric-negdef}, named by its
+representation instead of by its definition: that $\LEs = \NDs$ is \ref{prop:fourier-toolbox}(3)
+and is cited there, on ledger A3. The article's proofs manipulate the representation, and the
+machine-checked development defines $\LEs$ alone, so this is the name the chapters from
+Chapter~\ref{ch:cascade} on use; \ref{def:symmetric-negdef} enters only where the class $\NDs$
+is the subject, and in one leg of \ref{lem:selfdecomposable-exponents}.)}
+\end{definition}
+
+% additive: not in the draft, which uses the fact without stating it. Used by
+% lem:convolution-representation, lem:additivity, thm:main-characterization.
+% twin: hcs prop:laplace-uniqueness (ledger A6 there)
+% CHANGED (proof 2026-09-09): DEMOTED from [A] (ledger A5) to [T]. The statement is not cited
+% but proved: Mathlib's MeasureTheory.Measure.ext_of_charFun is it verbatim for finite measures
+% on a complete second-countable inner product space, and SpatialLine.fourier_uniqueness is one
+% line from it. Ledger A5 is retired -- kept for the record, grounding no node -- and no name
+% reaches trust-boundary.txt. The author's decision of 2026-09-09, answering the statement
+% review's Q2; the statement text itself is unchanged.
+\begin{proposition}[uniqueness of the Fourier--Stieltjes transform]\label{prop:fourier-uniqueness}
+\lean{SpatialLine.fourier_uniqueness}\leanok
+A finite Borel measure on $\RR$ is determined by its Fourier transform: if
+$\hat\mu(\omega) = \hat\rho(\omega)$ for every $\omega \in \RR$, then $\mu = \rho$.
+\statusT\quad\emph{(Classical, and machine-checked rather than cited. The Lean declaration is
+one line from Mathlib's \texttt{MeasureTheory.Measure.ext\_of\_charFun}, which is this statement
+for finite measures on a complete second-countable inner product space, of which $\RR$ is one;
+the node carried the grade \textbf{[A]} on ledger A5 until 2026-09-09, and A5 is now retired and
+grounds no node. The statement is about \emph{finite} measures on $\RR$ and claims nothing for
+infinite ones; the corresponding statement on $(0,\infty)$ is
+\ref{prop:laplace-uniqueness-locally-finite}.)}
+\end{proposition}
+
+\begin{proof}\leanok
+The functions $e_\omega(x) = e^{-i\omega x}$, $\omega \in \RR$, span a subalgebra $\mathcal{A}$
+of the bounded continuous functions on $\RR$: it contains the constants, since $e_0 = 1$; it is
+closed under conjugation, since $\overline{e_\omega} = e_{-\omega}$; and it separates points,
+since $e_\omega(x) = e_\omega(y)$ for every $\omega$ forces $x = y$. The hypothesis says that
+$\mu$ and $\rho$ give equal integrals to every $e_\omega$, hence, by linearity, to every member
+of $\mathcal{A}$. Two finite Borel measures on a complete separable metric space that give equal
+integrals to every member of such an algebra are equal: on each compact set the
+Stone--Weierstrass theorem makes $\mathcal{A}$ uniformly dense in the continuous functions, and a
+finite Borel measure on a Polish space is inner regular, so the equality extends first to the
+bounded continuous functions and then, by the portmanteau theorem, to the Borel sets. This is
+the argument Mathlib's \texttt{MeasureTheory.Measure.ext\_of\_charFun} runs, in the stated
+generality; every step of it is machine-checked, and the article's declaration is its
+specialisation to $\RR$.
+\end{proof}
+
+% additive: not in the draft, which uses the fact inside the proof of Theorem 7.3'. Used by
+% thm:main-characterization, prop:matern-exponent, prop:thorin-machine.
+% twin: hcs prop:laplace-continuity (ledger A5 there)
+% CHANGED (proof 2026-09-09): DEMOTED from [A] (ledger A6) to [T], and SPLIT. The node now
+% states only the clause the article consumes -- the limit is known in advance to be the
+% transform of a probability measure -- which is proved, from Mathlib's
+% MeasureTheory.ProbabilityMeasure.tendsto_of_tendsto_charFun. The general clause, in which the
+% limit function is only continuous at the origin, is used by NO node: all four consumers
+% (prop:two-members(1), thm:main-characterization, prop:matern-density, prop:thorin-machine)
+% apply the theorem with the limit already in hand, which is what reading the \uses edges shows.
+% It is therefore moved out of the statement into rem:levy-continuity-general below, and ledger
+% A6 is retired -- kept for the record, grounding no node. No \uses edge changes: the label is
+% the same and still names what every consumer needs. Author's decision of 2026-09-09,
+% answering the statement review's Q2.
+\begin{proposition}[\Levy's continuity theorem]\label{prop:levy-continuity}
+\uses{prop:fourier-uniqueness}
+\lean{SpatialLine.levy_continuity}\leanok
+Let $\mu_n, \mu$ be probability measures on $\RR$. If $\hat\mu_n(\omega) \to \hat\mu(\omega)$
+for every $\omega \in \RR$, then $\mu_n \to \mu$ weakly.
+\statusT\quad\emph{(Classical, and machine-checked rather than cited; the node carried the grade
+\textbf{[A]} on ledger A6 until 2026-09-09, and A6 is now retired and grounds no node. Weak
+convergence is read, in the Lean statement, as convergence of $\int g\,d\mu_n$ for every bounded
+continuous $g : \RR \to \RR$, which is the form the $\varepsilon/3$ argument in the proof of
+\ref{thm:main-characterization} consumes; the Lean declaration is Mathlib's
+\texttt{MeasureTheory.ProbabilityMeasure.tendsto\_of\_tendsto\_charFun} read through that
+characterization of the weak topology. What is \emph{not} part of this statement is the passage
+from weak convergence to convergence of the convolution operators in $\Lone$, which is the
+$\varepsilon/3$ argument itself and is proved where it is used. The general form of the theorem,
+in which the limit function is only assumed continuous at the origin, is
+\ref{rem:levy-continuity-general}; no node of this article uses it.)}
+\end{proposition}
+
+\begin{proof}\leanok
+Since $\hat\mu$ is continuous at $0$ with $\hat\mu(0) = 1$, the sequence is tight. Indeed, for a
+probability measure $\rho$ on $\RR$ and $r > 0$, Fubini's theorem gives
+\[
+  \frac1r\int_{-r}^{r}\bigl(1 - \hat\rho(\omega)\bigr)\,d\omega
+  = 2\int_\RR\Bigl(1 - \frac{\sin rx}{rx}\Bigr)\,\rho(dx)
+  \ \ge\ \rho\bigl(\{|x| \ge 2/r\}\bigr),
+\]
+because the integrand is nonnegative and is at least $\tfrac12$ where $|rx| \ge 2$. Applying
+this to $\mu_n$ and letting $n \to \infty$ --- the integrands are bounded by $2$, so bounded
+convergence applies --- bounds the upper limit of $\mu_n(\{|x| \ge 2/r\})$ by
+$\frac1r\int_{-r}^r(1 - \hat\mu)$, which tends to $0$ as $r \downarrow 0$ by continuity of
+$\hat\mu$ at $0$. So $\{\mu_n\}$ is tight. By Prokhorov's theorem every subsequence has a
+further subsequence converging weakly to some probability measure $\rho$; along it
+$\hat\rho = \lim \hat\mu_n = \hat\mu$, since $x \mapsto e^{-i\omega x}$ is bounded and
+continuous, so $\rho = \mu$ by \ref{prop:fourier-uniqueness}. Every subsequence therefore has a
+further subsequence converging weakly to $\mu$, which is convergence of the whole sequence.
+The statement is machine-checked: Mathlib's
+\texttt{MeasureTheory.ProbabilityMeasure.tendsto\_of\_tendsto\_charFun} proves it with the same
+tightness estimate (\texttt{isTightMeasureSet\_of\_tendsto\_charFun}) and, in place of the
+subsequence extraction, a direct density argument in the algebra of characters.
+\end{proof}
+
+\begin{remark}[the general form of the continuity theorem]\label{rem:levy-continuity-general}
+The classical statement is more general: if $\hat\mu_n \to \varphi$ pointwise with $\varphi$
+continuous at $0$, then $\varphi$ is the transform of a probability measure $\mu$ and
+$\mu_n \to \mu$ weakly. The tightness estimate in the proof above uses only continuity of the
+limit function at the origin, so it applies unchanged. What the general form needs in addition
+is that the limit along a Prokhorov subsequence has transform $\varphi$, which identifies
+$\varphi$ as a transform. The continuity proviso is what the line costs against the half-line,
+where pointwise limits of Laplace exponents on $(0,\infty)$ suffice --- and it is why
+\ref{prop:fourier-toolbox}(4) carries it too. No statement of this article uses the general
+form: every use of \ref{prop:levy-continuity} has the limit law already in hand.
+\end{remark}
+
+% additive: not in the draft. Used by thm:scale-monotone-noncreation and
+% prop:thorin-subclass, where a \Levy{} tail has to be recovered from its Laplace transform.
+% twin: hcs prop:laplace-uniqueness-sigma-finite
+% (Hemigroup.laplaceL_injective_of_ne_top) --- proved there, so [T] here rather than [A].
+\begin{proposition}[uniqueness of the Laplace transform of a locally finite measure]
+\label{prop:laplace-uniqueness-locally-finite}
+\lean{SpatialLine.laplace_uniqueness_locally_finite}\leanok
+Let $m, m'$ be Borel measures on $(0,\infty)$, not necessarily finite, and suppose that
+$\int e^{-\tau u}\,m(du) = \int e^{-\tau u}\,m'(du) < \infty$ for every $\tau$ in some
+interval $(\tau_0,\infty)$. Then $m = m'$.
+\statusT\quad\emph{(Elementary once finiteness of the transform is used to reduce to finite
+measures. Held \textbf{[T]} rather than cited because its causal twin is proved in the causal
+development and that argument transfers verbatim: the statement is about a measure on a
+half-line and says nothing about $\RR$. Machine-checked 2026-09-09, on Lean core alone, as that
+port; the Lean file mentions neither symmetry nor the Fourier transform, and the two
+developments' copies now differ in one predicate, which is what makes it the shared core's first
+candidate. The proof below uses finiteness of the transform at \emph{one} point of the ray, which
+is weaker than the hypothesis stated and is the sharpening the causal side found.)}
+\end{proposition}
+
+\begin{proof}\leanok
+Fix $\tau_1 > \tau_0$. Both transforms being finite at $\tau_1$, the measures
+$e^{-\tau_1 u}m(du)$ and $e^{-\tau_1 u}m'(du)$ are finite, and they have equal Laplace
+transforms on $(0,\infty)$ after the shift $\tau \mapsto \tau + \tau_1$; so it is enough to
+treat finite measures. For finite $m$, the map $u \mapsto e^{-u}$ carries $(0,\infty)$
+homeomorphically onto $(0,1)$, and $\int e^{-n u}\,m(du)$, $n \in \NN$, is the $n$-th moment
+of the image measure on $[0,1]$. A finite measure on a bounded interval is determined by its
+moments, the polynomials being dense in the continuous functions there. So the image measures
+agree, and so do $m$ and $m'$.
+\end{proof}
+
+% additive: not in the draft, which cites a growth bound for continuous negative definite
+% functions at two places (its Corollary 7.4' and its Theorem 12.2). REROUTED: the bound is
+% three lines from the truncation split, so no ledger entry is opened for it.
+\begin{lemma}[continuous negative definite functions grow at most quadratically]
+\label{lem:quadratic-growth}
+\uses{prop:fourier-toolbox}
+\lean{SpatialLine.SymLevyPair.quadratic_growth,
+SpatialLine.SymLevyPair.quadratic_growth_isBigO}\leanok
+Let $\psi \in \NDs$ have the pair $(a,\nu)$ of \ref{eq:levy-khintchine}. Then
+\[
+  \psi(\omega) \ \le\ C\,(1 + \omega^2), \qquad \omega \in \RR,
+  \qquad C := a + \tfrac12\int_{(0,1]} x^2\,\nu(dx) + 2\,\nu((1,\infty)) \ < \ \infty .
+\]
+In particular $\psi(\omega) = O(\omega^2)$ as $|\omega| \to \infty$.
+\statusT\quad\emph{(Elementary, and it replaces a cited growth bound at both places the draft
+used one. Both constants are finite exactly because $\int (1 \wedge x^2)\,\nu < \infty$.
+Machine-checked 2026-09-09, on Lean core alone: the Lean statement is in $[0,\infty]$, so the
+bound \emph{implies} finiteness of the exponent rather than presupposing it, which is what lets
+the representation structure carry no finiteness field. The corollary
+$\psi(\omega) < \infty$ is the helper \texttt{SymLevyPair.exponentL\_ne\_top}, on which every
+statement of this article that reads an exponent as a real number rests.)}
+\end{lemma}
+
+\begin{proof}\leanok
+Split the integral in \ref{eq:levy-khintchine} at $x = 1$. For $x \le 1$ use
+$1 - \cos\omega x \le \tfrac12\omega^2x^2$; for $x > 1$ use $1 - \cos\omega x \le 2$. This
+gives
+$\psi(\omega) \le a\omega^2 + \tfrac12\omega^2\int_{(0,1]}x^2\,\nu(dx) + 2\,\nu((1,\infty))
+\le C\,(1+\omega^2)$. Finiteness of the two integrals is
+$\int (1 \wedge x^2)\,\nu(dx) < \infty$.
+\end{proof}
+
+The next statement is the draft's Remark 2.4, promoted to a node because three later proofs
+turn on it. It is the exact point at which the line parts from the half-line: the causal
+theory has a vanishing lemma saying that a member of its function class vanishing at one
+interior point vanishes identically, and the Fourier-side analogue is false.
+
+% draft: Remark 2.4 (promoted to a lemma: used by cor:monotonicity, lem:no-lattice,
+% prop:strict-positivity and prop:bridge-strictness)
+% twin: hcs lem:vanishing (Hemigroup.levyExponent_eq_zero_of_eq_zero) --- the twin is the
+% statement this one contradicts: on the half-line the zero set of an exponent is trivial,
+% on the line it is a closed subgroup and may be a lattice.
+\begin{lemma}[the zero set of a symmetric exponent is a closed subgroup]\label{lem:lattice-zero}
+\uses{prop:fourier-uniqueness,prop:fourier-toolbox}
+\lean{SpatialLine.lattice_zero_isClosedSubgroup, SpatialLine.lattice_zero_trichotomy,
+SpatialLine.lattice_zero_eq_univ_iff, SpatialLine.lattice_zero_mem_iff,
+SpatialLine.lattice_zero_exponent, SpatialLine.lattice_zero_example_mem,
+SpatialLine.lattice_zero_example_lattice}\leanok
+\notes{positive-definite-functions}
+Let $\mu$ be a probability measure on $\RR$ and put
+$N(\mu) := \{\omega \in \RR : \hat\mu(\omega) = 1\}$. Then $N(\mu)$ is a closed subgroup of
+$\RR$, hence $\{0\}$, a lattice $c\ZZ$ with $c > 0$, or $\RR$; the last case holds if and only
+if $\mu = \delta_0$. For $\omega_0 \ne 0$,
+\[
+  \omega_0 \in N(\mu)
+  \quad\Longleftrightarrow\quad
+  \cos(\omega_0 x) = 1 \ \text{ for } \mu\text{-almost every } x
+  \quad\Longleftrightarrow\quad
+  \mu \text{ is carried by the lattice } \tfrac{2\pi}{|\omega_0|}\ZZ .
+\]
+If $\mu$ is symmetric with $\hat\mu = e^{-\psi}$ for some $\psi \in \NDs$, then
+$N(\mu) = \{\psi = 0\}$: a symmetric exponent vanishes at a nonzero frequency exactly when its
+law is a lattice law. Lattice laws can be infinitely divisible --- the symmetric compound
+Poisson law on $\ZZ$, of exponent $c\,(1 - \cos\omega)$, is one --- so membership of $\NDs$
+does not exclude them.
+\statusT\quad\emph{(Elementary. The last sentence is what makes the node worth stating: it
+records that no analogue of the causal vanishing lemma is available, and hence that the
+exclusion of lattices must come from elsewhere. It comes from covariance,
+\ref{lem:no-lattice}. Machine-checked 2026-09-09, all seven clauses, on Lean core alone. Two
+readings the formal statement had to make and the prose need not: the almost-everywhere
+quantifier in the displayed equivalences is over $\mu$ and not over Lebesgue measure, and
+``carried by the lattice'' is $\mu$ of the complement being zero. The example's law is
+\emph{quantified over} rather than constructed --- any probability measure with the stated
+transform is carried by $\ZZ$ --- which is legitimate because such a measure is unique by
+\ref{prop:fourier-uniqueness}.)}
+\end{lemma}
+
+\begin{proof}\leanok
+Since $\Rea\bigl(1 - e^{-i\omega x}\bigr) = 1 - \cos\omega x \ge 0$, the identity
+$\hat\mu(\omega) = 1$ forces $\int (1 - \cos\omega x)\,\mu(dx) = 0$, hence
+$\cos(\omega x) = 1$ for $\mu$-almost every $x$, hence $e^{-i\omega x} = 1$ almost everywhere
+and $\hat\mu(\omega) = 1$; the three conditions are therefore equivalent. So $N(\mu)$ is
+closed under sums and negation, and closed as a set because $\hat\mu$ is continuous: a closed
+subgroup of $\RR$, hence $\{0\}$, some $c\ZZ$ with $c > 0$, or $\RR$. If $N(\mu) = \RR$ then
+$\hat\mu \equiv 1 = \hat\delta_0$, so $\mu = \delta_0$ by \ref{prop:fourier-uniqueness}; the
+converse is immediate. For $\omega_0 \ne 0$, $\cos(\omega_0 x) = 1$ says
+$x \in \tfrac{2\pi}{|\omega_0|}\ZZ$, so the almost-everywhere clause says exactly that $\mu$
+is carried by that lattice. When $\hat\mu = e^{-\psi}$ with $\psi$ real, $\hat\mu(\omega) = 1$
+if and only if $\psi(\omega) = 0$. For the example, $c\,(1-\cos\omega)$ is of the form
+\ref{eq:levy-khintchine} with $a = 0$ and $\nu = c\,\delta_1$, hence lies in $\NDs$ by
+\ref{prop:fourier-toolbox}(3); its law is carried by $\ZZ$, and it is infinitely divisible
+because $c\,(1-\cos\omega)/n$ is again of that form.
+\end{proof}
+
+% draft: Definition 2.5
+\begin{definition}[self-decomposable; class $L$]\label{def:self-decomposable}
+\lean{SpatialLine.IsSelfDecomposable}\leanok
+\notes{self-decomposability}
+A probability measure $\mu$ on $\RR$ is \emph{self-decomposable} if for every $b > 1$ there is
+a probability measure $\rho_b$ on $\RR$ with
+$\hat\mu(\omega) = \hat\mu(\omega/b)\,\hat\rho_b(\omega)$ for every $\omega$; equivalently, if
+$X \seq cX + R_c$ with $R_c$ independent of $X$, for every $c \in (0,1)$, where $X$ has law
+$\mu$.
+\statusT
+\end{definition}
+
+% draft: Proposition 2.6
+% twin: hcs lem:selfdecomposable-exponents (ledger A18 there). The relation is deliberately
+% NOT a Lean reuse: the causal article consumes its classical statement, and this article
+% does not consume this one -- lem:selfdecomposable-exponents below proves the profile form
+% it needs from the dilation identity instead.
+% CHANGED (2026-09-11, draft sync, R1): the profile is now stated NONNEGATIVE where the class is
+% introduced -- "k : (0,infty) -> [0,infty) nonincreasing" in the sentence and "k >= 0
+% nonincreasing" at eq:sd-profile. Nonnegativity was implied by reading k(x)x^{-1}dx as a \Levy{}
+% measure, and it was stated at lem:profile-integrability, but not at the display every later
+% node refers to as "the form eq:sd-profile"; the Lean carries it as a field (SDProfile.k_nonneg).
+% Nothing is narrowed: a nonincreasing k with a negative value is negative from that point on and
+% gives no \Levy{} measure. Mirrored in the draft's (2.2) and Proposition 2.6 in the same sync.
+\begin{proposition}[symmetric self-decomposable exponents]\label{prop:sd-exponents}
+\uses{def:self-decomposable,prop:fourier-toolbox}
+\lean{Skeleton.sd_exponents}\notready
+\notes{self-decomposability}
+A symmetric infinitely divisible law with pair $(a,\nu)$ is self-decomposable if and only if
+its \Levy{} measure has the form $\nu(dx) = k(x)\,x^{-1}dx$ on $(0,\infty)$ with
+$k : (0,\infty) \to [0,\infty)$ nonincreasing, so that its exponent is
+\begin{equation}\label{eq:sd-profile}
+  \psi(\omega) \;=\; a\,\omega^2
+  + \int_0^\infty \bigl(1 - \cos\omega x\bigr)\,\frac{k(x)}{x}\,dx,
+  \qquad a \ge 0, \quad k \ge 0 \ \text{nonincreasing}.
+\end{equation}
+Self-decomposability imposes no restriction on the Gaussian coefficient $a$.
+\statusA\quad\ledger{A7}\quad\emph{(The classical statement, cited for orientation.
+\textbf{Assignment.} \ledger{A7} carries the whole equivalence. What it does not carry is
+anything this article's development consumes: the profile form is obtained independently in
+\ref{lem:selfdecomposable-exponents}, from the dilation identity and a convex-tail argument,
+and every later node cites that node and not this one. The node is kept because the statement
+is part of the article's text of record and is where a reader meets the class; that it lies on
+no proof path is deliberate, and is the difference from the causal article, which consumes
+its twin.)}
+\end{proposition}
+
+% additive: the integrability criterion the draft records after its Proposition 2.6 and then
+% cites repeatedly as "the criterion". Used by lem:selfdecomposable-exponents, lem:cin-rays,
+% prop:choquet-cone, prop:matern-exponent.
+% twin: hcs prop:admissibility-criterion + lem:criterion-converse
+% (Hemigroup.levyExponentD_ne_top_of_integrableOn,
+%  Hemigroup.SelfDecomposableExponent.integrableOn_of_ne_top)
+\begin{lemma}[the integrability criterion for a profile]\label{lem:profile-integrability}
+\uses{prop:fourier-toolbox}
+\lean{SpatialLine.profile_integrability, SpatialLine.profile_integrability_mem}\leanok
+Let $k : (0,\infty) \to [0,\infty)$ be measurable and put $\nu(dx) := k(x)\,x^{-1}dx$. Then
+\[
+  \int_{(0,\infty)} (1 \wedge x^2)\,\nu(dx) < \infty
+  \qquad\Longleftrightarrow\qquad
+  \int_0^1 x\,k(x)\,dx < \infty \ \ \text{and} \ \
+  \int_1^\infty \frac{k(x)}{x}\,dx < \infty .
+\]
+Consequently, by \ref{prop:fourier-toolbox}(3), the right-hand pair of conditions is necessary
+and sufficient for \ref{eq:sd-profile} to define a member of $\NDs$.
+\statusT\quad\emph{(A change of variables and nothing else. It is stated because it is the
+admissibility test every family in this article is put through, and because its two halves are
+the symmetric forms of the causal criterion: near the origin the integrand is
+$\asymp \omega^2x^2\,k(x)/x$, so $\int_0^1 x\,k$ replaces the causal $\int_0^1 k$, while at
+infinity $1 - \cos \le 2$ gives the same condition as there. Machine-checked 2026-09-09. The
+criterion itself is proved on Lean core alone, and takes $k$ measurable and nonnegative and
+\emph{nothing else} --- in particular not monotone, because
+\ref{lem:cin-rays} and \ref{prop:choquet-cone} apply it to increment densities
+$k(u/t) - k(u/s)$, which are not. The second sentence is split in the Lean into the production
+of the pair, which is again Lean core, and the membership of $\NDs$, which is where
+\ref{prop:fourier-toolbox}(3) --- ledger A3, converse clause --- is spent; that split is what
+makes the trust boundary of the two halves separately visible.)}
+\end{lemma}
+
+\begin{proof}\leanok
+Both terms below are nonnegative, so
+\[
+  \int_{(0,\infty)}(1 \wedge x^2)\,\nu(dx)
+  = \int_0^1 x^2\,k(x)\,\frac{dx}{x} + \int_1^\infty k(x)\,\frac{dx}{x}
+  = \int_0^1 x\,k(x)\,dx + \int_1^\infty \frac{k(x)}{x}\,dx,
+\]
+and the left side is finite exactly when both terms are. The second sentence is
+\ref{prop:fourier-toolbox}(3) applied to the pair $(a,\nu)$.
+\end{proof}
+
+% CHANGED (article mirror 2026-09-14, R157): the remark is split in two, as the paper prints it,
+% and its first half is reworded. "Rate per unit of scale" is the linear-accumulation reading the
+% article exists to drop -- the catalogue of one law is an intensity, and how the catalogue depends
+% on scale is chapter 7's result, not a rate; "diffusive jitter" is out (the word was the author's
+% objection, and "a Gaussian displacement of variance 2a" says what it is); and the Poisson stream
+% is explained in its own sentence rather than named in a subordinate clause.
+\begin{remark}[the displacement dictionary]\label{rem:displacement-dictionary}
+A symmetric kernel is the law of a \emph{random displacement}: $\Phis{s}{t}f$ reports the
+signal at a randomly displaced position $x - X_{s,t}$ with $X_{s,t} \sim \mu_{s,t}$. Its
+transform $\hat\mu_{s,t}(\omega) = \mathbb{E}\cos(\omega X_{s,t})$ is the contrast that a
+sinusoidal probe of wavenumber $\omega$ retains after the random displacement, the stage's
+modulation transfer function (\ref{rem:modulation-transfer}). The exponent
+$\psi = -\log\hat\mu$ adds along the cascade. In \ref{eq:levy-khintchine} the Gaussian
+coefficient $a$ is the \emph{diffusive part}, a Gaussian displacement of variance $2a$, the one
+term the time-causal axis deletes and the only one Gaussian scale space uses. The measure $\nu$
+is a \emph{catalogue of jump displacements}. Displacements of size about $x$ arrive as a
+Poisson stream, that is at independent random moments with a constant rate, and $\nu(dx)$ is
+that rate; the streams of different sizes are independent, and each event of size $x$ costs the
+probe the phase deficit $1 - \cos\omega x$. So a symmetric infinitely divisible displacement is
+a Gaussian part plus an independent sum of jumps of all sizes, and the representation says that
+every such displacement decomposes in this way.
+\end{remark}
+
+\begin{remark}[the profile in log-displacement]\label{rem:displacement-profile-log}
+In the log-displacement coordinate $\theta = \log x$ the density shape of \ref{eq:sd-profile}
+is the profile $\tilde k(\theta) = k(e^\theta)$ per unit log-displacement, dilation acts by
+translation in $\theta$, and self-decomposability is the profile being nonincreasing: zooming
+out may only add displacement intensity. The Gaussian is the profile-free member; the symmetric
+stable exponents $|\omega|^\alpha$ are the exactly scale-free profiles
+$\tilde k = c\,e^{-\alpha\theta}$. The extreme rays of the cone are the Gaussian ray $\omega^2$
+and the unit steps, whose exponents are the $\Cin$ functions of \ref{lem:cin-rays}.
+\end{remark}

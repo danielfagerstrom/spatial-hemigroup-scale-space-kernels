@@ -1,0 +1,130 @@
+% The article. Theorem statements are shared with the blueprint so they cannot drift ---
+% see the framework's LINKAGE.md rule 4: a shared statement carries
+% `% shared with blueprint <label>` and its own \label equals the blueprint label.
+%
+% Structure (decided 2026-09-11, the article session's first day; the blueprint's chapters
+% are the sections, in the same order, so blueprint numbering is not churned):
+%   1  Introduction (written LAST; 1.1 "what is machine-checked" owns the trust base)
+%   2  Preliminaries and notation (blueprint ch. 2; fixes the shared notation table)
+%   3  Axioms (ch. 3)
+%   4  Convolution representation (ch. 4)
+%   5  The cascade: additivity and infinite divisibility (ch. 5)
+%   6  Scale covariance: the similarity form (ch. 6)
+%   7  Self-decomposability and the characterization theorem (ch. 7)
+%   8  The admissible cone (ch. 8)
+%   9  The subordination bridge (ch. 9)
+%   10 The corners (ch. 10)
+%   11 The scale evolution in generator form (ch. 11)
+%   12 Locality (ch. 12)
+%   13 Non-creation and non-enhancement (ch. 13)
+%   14 Implementation (ch. 14)
+%   15 The scale-space jet (ch. 15)
+%
+% Drafting order (2026-09-11): 2, 4-7, 3, then the introduction for the SCOPE 1-7 as the test
+% of whether the article is cut there. The candidate cut is after section 7 -- the
+% characterization theorem, which the title names, fully machine-checked but for one
+% proposition of section 3 -- and the decision is taken at that test, not before. What
+% crosses that cut: prop:no-positivity-no-classification uses prop:matern-exponent and
+% prop:matern-density (ch. 10) as its witness, and one node of ch. 7 uses lem:cin-rays (ch. 8);
+% all three are \leanok and can be pulled forward. Sections 8-15 follow in either case, as
+% later sections of this document or as a second module; the \input lines below are
+% uncommented as each section is drafted.
+%
+% Reference policy (repo CLAUDE.md): the causal article appears in the introduction, in the
+% bridge section, and in at most one "relation to the causal theory" remark per section, never
+% inside a statement or a proof. Pauwels et al. 1995 is the main-story foil. Papers VI and VII
+% are unreleased and are not cited (BACKFILL comments in the draft, ledger row R126).
+%
+% Voice and register: the hub's writing-style-and-ai-use.md, whose rule is hub ADR-0015 --
+% neutral third person, no impersonation target, the restraint budget counted by the blind
+% reviewer. Short computational proofs; hard analysis imported as attributed citations with
+% page anchors read from blueprint/AXIOMS.md, never from memory.
+
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\setlength{\emergencystretch}{1.5em}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={Spatial Scale Space from Hemigroup Axioms: Characterization of the Kernels on the Line},
+  pdfauthor={Daniel Fagerstr\"om},
+}
+
+\graphicspath{{../figures/}}
+
+\input{macros}
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Spatial scale space from hemigroup axioms:\\
+characterization of the kernels on the line}
+\author{Daniel Fagerstr\"om}
+\date{Working draft --- not yet released}
+
+\begin{document}
+\maketitle
+
+% Abstract for the scope §§1-7 (2026-09-11, written with §1); rewritten if the scope grows.
+\begin{abstract}
+We characterize the spatial scale spaces on the line: the families of smoothing operators
+through which an uncommitted observer can measure a signal at every scale, under
+translation and reflection symmetry. The axioms are those of the extended class of Pauwels,
+Van Gool, Fiddelaers and Moons, with one weakened. Their recursivity, a one-parameter
+semigroup in scale, is stated as a two-parameter hemigroup
+$\Phi_{s,t}\Phi_{r,s} = \Phi_{r,t}$, which retains the composition of measurements and drops
+the tacit assumption that an increment depends only on the scale difference, the
+stationarity of the increments in the scale parameter. Two things then change. Without positivity no
+classification of the form proved here exists: the remaining axioms admit an
+infinite-dimensional family containing the Gaussian. With positivity the admissible
+kernels from the origin are exactly the symmetric self-decomposable laws. Each family is
+determined by a Gaussian coefficient and a nonincreasing function that sets the rate of
+displacements at every size. The Gaussian families form the one ray with a Gaussian
+coefficient alone, an extreme ray of the cone rather than the whole of it. Reimposing
+stationarity, in whichever scale parametrization the family has it, selects the
+symmetric stable family, the positive part of the extended class, with the
+bound $\alpha \le 2$ proved from the representation. The class also contains members with
+all moments finite, the variance-gamma family among them, whose kernels are the Mat\'ern
+covariance functions for smoothness above zero. The kernels from the origin are absolutely
+continuous and unimodal. The contribution is the derivation of this class from measurement
+axioms on the line; locality, non-creation of local extrema, recursive implementation and
+higher dimension are outside the paper. The characterization is machine-checked in Lean~4,
+resting on two cited analytic facts, Bochner's theorem and the symmetric \Levy--Khintchine
+representation; the regularity of the kernels rests on two more.
+\end{abstract}
+
+\input{01-introduction}
+\input{02-preliminaries}
+\input{03-axioms}
+\input{04-representation}
+\input{05-cascade}
+\input{06-covariance}
+\input{07-characterization}
+\input{08-conclusions}
+% v0.1 stops at section 7 (the author's decision, 2026-09-12); blueprint chapters 8-15 become
+% two further modules (agreed 2026-09-12, notes/HANDOFF-article.md) and are not input here.
+% The appendix transcribes the two nodes of chapters 8 and 10 that sections 2, 3 and 7 use.
+
+\appendix
+\input{appendix-matern}
+
+\input{ai-statement}   % from the session archive, 2026-09-12 (Paper I's model); its header
+                       % comment records the sources, the caveats, and what must be re-derived
+
+\bibliographystyle{plain}
+\bibliography{references}   % curated subset of the hub's library.bib (`library bib export`)
+
+\end{document}

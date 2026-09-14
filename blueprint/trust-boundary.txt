@@ -1,0 +1,570 @@
+# The trust boundary: the analytic interfaces a headline theorem may depend on.
+#
+# `#print axioms` on this article's proved theorems must reduce to Lean core plus exactly
+# these. CI reads this file via `linkage axioms`, which refuses any name that no AXIOMS.md
+# entry mentions in a `**Lean:**` segment — so the boundary cannot be widened without a
+# reviewed ledger entry behind it.
+#
+# Adding a line here widens the project's trust base and is a review decision, not a fix.
+#
+# =======================================================================================
+# WHAT EACH NAME CARRIES BEYOND ITS PAGES. This is the canonical list; A21, A22, README.md
+# and CLAUDE.md point here rather than repeating it.
+#
+# Until 2026-09-10 this file said, categorically, that "every name on this file carries only
+# what its cited pages carry, with ONE exception, the Karlin pair". The fidelity review's
+# interface pass (F6, finding F6-2) read all eleven names against the page images and found
+# that sentence inaccurate: EIGHT of the eleven carry something beyond their pages, and the
+# Karlin pair's analytic continuation is the deepest of them but not the only one. The
+# categorical sentence is replaced by this per-name list. Nothing below is new work taken on
+# trust -- every step named was already inside a statement -- and no status changed; what
+# changed is that the trust base is now stated at the resolution at which it is true.
+#
+# ONE ITEM HAS SINCE BEEN REMOVED FROM THE LIST BY BEING PROVED (2026-09-11, the author's
+# decision (b) of the fidelity review). variationDiminishing_of_polyaExponent carried, besides
+# the integrable test functions, the choice of representative in the essential sign-change count
+# (row R14). That step is now a machine-checked lemma on Lean core and the axiom is restated at
+# Karlin's ordinary count; see the entry below. The count is still EIGHT of the eleven -- the
+# name keeps its other item -- and this is the first time the list has shortened rather than
+# grown, which is the direction it is meant to move in.
+#
+# A SECOND ITEM HAS GONE THE SAME WAY, AND IT WAS THE DEEPEST ONE (2026-09-12, phase C1c).
+# From 2026-09-10 this block ended with the Karlin pair's symmetry reduction and parameter
+# matching, described as an ANALYTIC CONTINUATION and accepted by the author as this article's
+# one stated formalization debt. Read against Karlin's own pages that description was wrong
+# (row R150): Prop. 1.4 p. 333 puts the Laplace transform of a PF density on an OPEN STRIP
+# CONTAINING THE IMAGINARY AXIS and Thm. 3.2(a) p. 345 is stated at complex s, so s = i*omega
+# lies inside the region where the identity 1/phi = psi already holds, and nothing is continued
+# anywhere. The matching is now MACHINE-CHECKED, on Lean core plus the axiom of its own
+# direction: evenness of psi on a real interval of the strip (from the symmetry of the law),
+# then delta = 0 with vanishing odd power sums (ScaleSpace.polyaE2_even_imp_oddPowerSums), then
+# the reflection invariance of the atomic measure sum_j a_j^2 delta_{a_j} with the halving
+# identity sum_j g(a_j) = 2 sum_j g(a_j^+) (ScaleSpace.tsum_eq_two_mul_tsum_posPart), then the
+# modulus of psi on the imaginary axis (ScaleSpace.norm_polyaE2_mul_I) -- all four in
+# ScaleSpaceCore v0.2.0 -- assembled in SpatialLine.isPolyaExponent_of_variationDiminishing and
+# SpatialLine.variationDiminishingOrd_of_polyaExponent. The integer weights of the displayed
+# exponent no longer come from pairing the parameters index by index: the halving identity gives
+# them directly, with lambda_j = a_j^+. Both axioms are RESTATED AT KARLIN'S LETTER (the author's
+# decision of 2026-09-11, row R151), which drops this article's hsym and hcos from them and
+# leaves the two names below carrying only what is listed against them.
+#
+# THE COUNT IS STILL EIGHT of the eleven, because each Karlin name keeps items of its own. What
+# is gone is the only analytic continuation among them -- and with it this article's one stated
+# formalization debt, which is DISCHARGED rather than accepted.
+#
+# THREE NAMES CARRY NOTHING BEYOND THEIR PAGES:
+#
+#   fourier_toolbox_bochner_symm (A1) -- once the anchor is read as Sato pp. 8-9 rather than
+#     p. 8 (finding F6-6): the symmetric rider is Prop. 2.5(ii), p. 8, with (v), p. 9, and the
+#     axiom's hypotheses are STRONGER than the source's twice over (continuity on all of R
+#     where Sato asks it at the origin; a real phi where the source allows a complex one).
+#   fourier_toolbox_levy_unique (A3, uniqueness) -- Sato Thm. 8.1(ii) p. 38, at equal exponents
+#     rather than equal characteristic functions, which is the same after exp; it concludes
+#     LESS than the source, not pinning the centering term.
+#   bernstein_completely_monotone (A11) -- Schilling Def. 1.3 p. 2 is verbatim the Lean
+#     predicate and Thm. 1.4 p. 3 is both directions; uniqueness is deliberately not asked.
+#
+# THE OTHER EIGHT, each with what it carries:
+#
+#   fourier_toolbox_levy_converse (A3, converse) -- THE FOLDING REDUCTION (fidelity review
+#     R37). The axiom quantifies over SymLevyPair, whose Levy measure is already folded onto
+#     (0,infty), where Sato Thm. 8.1(iii) reads on the punctured line; chapter 2's folding
+#     convention is prose and not a node, so nothing proves it and the reduction sits INSIDE
+#     the statement. Its one load-bearing field, exp_posDef, also reaches two pages outside the
+#     pinned pp. 37-38: Cor. 8.3 p. 38 and Prop. 2.5(i) p. 8 (finding F6-5).
+#
+#   kernel_regularity_law (A8, A9) -- THE SYMMETRIC RIDER (that a symmetric unimodal law has
+#     its mode at the origin, and that the density may be taken even), which neither Sato
+#     Thm. 27.13 nor Yamazato Thm. 1 states; and THE CHOICE OF REPRESENTATIVE, the statement
+#     asserting a NAMED p whose monotonicity holds pointwise on (0,infty) where absolute
+#     continuity gives a density only up to a null set.
+#
+#   moments_tails_criterion (A13) -- THREE TRANSLATION STEPS between Sato Thm. 25.3 p. 159 and
+#     the admitted equivalence. (a) Reading the Levy measure of mu t off the cosine transform,
+#     which is A3's uniqueness clause. (b) THE FOLD WITH ITS FACTOR 2: the unfolded nu_2 has
+#     density k(|x|)/(2|x|), and the 2 cancels exactly between the two sides. (c) DILATION
+#     INVARIANCE: the family is exponent(t omega), so the Levy measure at scale t is the
+#     t-dilate and the tail integral is k(./t); finiteness of the dilated and the undilated
+#     integral are equivalent because k is antitone and real-valued. Step (c) is NOT Sato's own
+#     time-independence sentence, which is about one process at different times.
+#
+#   moments_tails_divergence (A14) -- THE RADIUS LOWER BOUND and THE DILATION. Sato Thm. 26.1
+#     p. 168 is stated at c = inf{a > 0 : supp nu inside {|x| <= a}}; the axiom is read at a
+#     LOWER bound for c, obtained from hmass with k nonnegative and antitone, and then dilated
+#     by t. Both steps narrow the admitted alpha-range to a subset of Sato's, which is the safe
+#     direction, but neither is on the page.
+#
+#   polyaExponent_of_variationDiminishing (A22 into A21, necessity) -- THE ESSENTIAL-VERSUS-
+#     ORDINARY SIGN-CHANGE RECONCILIATION (Karlin counts S^-(f) on bounded Borel f, p. 233;
+#     IsVariationDiminishing counts signChangesAE), and THE PASSAGE FROM Thm. 4.2's a.e. TOTAL
+#     POSITIVITY (p. 243) TO AN HONEST PF DENSITY, with the choice of a representative. Since
+#     the restatement at the letter (2026-09-12) it also carries THE COMPOSITION -- neither
+#     axiom names total positivity, which this development does not define, and the two are
+#     spent only together -- THE INDEX SET PADDED TO N, a finite family of parameters padded
+#     with zeros whose factors contribute log 1 = 0, and THE STRIP READ AS
+#     "exists alpha < 0 < beta", with absolute convergence of the transform on it, where
+#     Prop. 1.4 p. 333 says "an open strip containing the imaginary axis". It NO LONGER carries
+#     the symmetry reduction or the matching (see the block above). The essential sign-change
+#     count and the wider class of test functions enter here as HYPOTHESES, where a wider
+#     quantifier is a narrowing and not a widening.
+#
+#   variationDiminishing_of_polyaExponent (A21 into A22, sufficiency) -- INTEGRABLE TEST
+#     FUNCTIONS, where Karlin Thm. 3.1(i) states the conclusion for bounded Borel f (the
+#     preamble on p. 233) and IsVariationDiminishingOrd follows the node's "every integrable or
+#     bounded g" instead. Since the restatement at the letter (2026-09-12) it also carries THE
+#     COMPOSITION, THE INDEX SET PADDED TO N and THE STRIP READ AS "exists alpha < 0 < beta" with
+#     integrability, exactly as its partner does; and its conclusion asks LESS than the page,
+#     giving a finite measure absolutely continuous against volume where Karlin produces a
+#     density, so neither a representative nor total mass 1 is claimed. It NO LONGER carries the
+#     symmetry reduction or the matching (see the block near the head of this file), and it NO
+#     LONGER carries THE CHOICE OF REPRESENTATIVE
+#     IN THE ESSENTIAL COUNT, which it did between 2026-09-10, when fidelity review R14 declared
+#     it, and 2026-09-11, when the author's decision (b) had it proved: that no representative of
+#     g -- non-measurable ones included -- lowers the right-hand infimum below what Karlin's
+#     inequality controls is SpatialLine.exists_measurable_rep_signChanges_le with
+#     SpatialLine.signChangesAE_eq_iInf_measurable (SpatialLine/MeasurableHull.lean, Lean core),
+#     and the axiom is restated at Karlin's own ORDINARY count. The essential-count form the
+#     development consumes is now the theorem SpatialLine.isVariationDiminishing_of_polyaExponent,
+#     which adds to the axiom only the proved reduction isVariationDiminishing_of_ord. The name
+#     stays on this list for the integrable test functions and for the three items named above.
+#
+#   joint_locality_bounded_solution (A19 b') -- THE SUBSTITUTION phi(z) = z^nu w(sqrt c z),
+#     nu = (1-beta)/2, reducing the covariant equation to the modified Bessel equation (DLMF
+#     (10.25.1), A&S 9.6.1): that is the entry's clause (a), which A19 declares UNADMITTED, and
+#     it is inside this statement because the axiom is stated about the covariant equation and
+#     concludes in terms of besselK with nothing in between written down. Beyond it: the
+#     elimination of the I_nu branch by boundedness, and the passage from the limiting forms
+#     (DLMF (10.30.2)-(10.30.3) and (10.25.3); A&S 9.6.7-9.6.9, with 9.6.6 for K_{-nu} = K_nu)
+#     to a pointwise identity on all of (0,infty), which is ODE uniqueness (finding F6-7). The
+#     formulas themselves were read at the DLMF primary on 2026-09-11 and hold (row R119).
+#
+#   joint_locality_hyperbolic (A19 c) -- THE SAME SUBSTITUTION, to the ordinary Bessel
+#     equation; the transfer of zeros through z^nu <> 0 on (0,infty); THE REDUCTION of a
+#     nontrivial real solution to a real multiple of a cylinder function
+#     C_nu = J_nu cos(pi t) + Y_nu sin(pi t) (the fundamental pair, DLMF 10.2(ii), not stored);
+#     and THE INFINITUDE OF POSITIVE ZEROS OF A GENERAL C_nu, which neither source states by
+#     name. Read at the DLMF primary (row R119): 10.21(i) states the infinitude for J_nu and Y_nu
+#     at real nu and the interlacing of the positive zeros of any two distinct real cylinder
+#     functions of the same order, from which the general case is a one-line deduction; A&S 9.5
+#     p. 370 only presupposes it (finding F6-7). A presupposition became a stated deduction; the
+#     step is still inside the name.
+#
+# NO ANALYTIC CONTINUATION IS LEFT AMONG THEM. Until 2026-09-12 the deepest item on this list,
+# and the only one the author had recorded a decision about, was the Karlin pair's symmetry
+# reduction and parameter matching; it is now machine-checked, and the block near the head of
+# this file records how. Every item that remains is an elementary translation between a source's
+# setting and this one: a folding convention, a factor 2, a dilation, a radius bound, a
+# symmetric rider, the choice of a representative, a class of test functions, the padding of an
+# index set, the reading of a strip. The heaviest of them are the two A19 substitutions, which
+# reduce the covariant equation to a Bessel equation and a nontrivial real solution to a
+# multiple of a cylinder function; neither is an appeal to a theory this development lacks.
+#
+# So the honest statement of this article's trust base is: Lean core, plus the eleven names
+# below, plus the steps this block lists inside eight of them -- and this article has NO stated
+# formalization debt.
+# =======================================================================================
+#
+# Scaffolded 2026-09-07, empty. STILL EMPTY after the blueprint campaign (2026-09-07):
+# no Lean has been written, so there is no declaration name to admit. What follows is the
+# PROPOSAL the campaign settled, recorded here so that the statement-skeleton phase has a
+# target and so that anything that appears on a line below later can be checked against it.
+#
+# The ledger (blueprint/AXIOMS.md) has 22 entries, A1-A22. Not all of them will become Lean
+# axioms: an entry grounds a blueprint [A] node, while a line here names a Lean declaration
+# that `#print axioms` may reach. The expected split, on the evidence of the causal
+# development, is:
+#
+#   EXPECTED ON THIS FILE eventually (the analysis Lean cannot reach):
+#     A3  the symmetric Levy-Khintchine representation with a unique pair -- spent for
+#         UNIQUENESS in the analysis direction and for the CONVERSE in the construction
+#         direction, so it is likely to split into two Lean names, as the causal A17/A18 did;
+#     A1  Bochner, in the construction direction, unless Mathlib's characteristic-function
+#         development already supplies it;
+#     A6  Levy's continuity theorem, for (A7) in the construction direction, likewise;
+#     A8, A9   absolute continuity and unimodality of class L -- no route in Lean;
+#     A10 the origin behaviour of a self-decomposable density -- likewise;
+#     A13, A14 the moment and tail theorems -- likewise;
+#     A15, A16, A17, A18, A19, A20 the corner and locality interfaces -- likewise;
+#     A21, A22 the Polya-frequency interfaces -- likewise.
+#
+#   EXPECTED NOT TO REACH THIS FILE:
+#     A2  Schoenberg -- used only to import kernel-form statements; the development defines
+#         the class by the exponential form and never needs the equivalence;
+#     A4  the closure clause -- stated in the toolbox but never spent, thm:increments-levy
+#         extracting the representation directly;
+#     A5  uniqueness of the Fourier-Stieltjes transform -- Mathlib has the ingredients, and
+#         the causal twin is proved rather than axiomatised there;
+#     A7  the one-dimensional self-decomposability theorem -- CITED AND NOT CONSUMED, the
+#         profile form being proved in lem:selfdecomposable-exponents; this is the one place
+#         the spatial trust base is narrower than the causal one, and it should stay so;
+#     A11, A12 Bernstein's theorem and the exponential clause -- these serve the bridge
+#         chapter, which is not scheduled for formalisation.
+#
+# Nine further facts the draft named as ledger candidates are held [T] or rerouted and have
+# no entry at all; the table in AXIOMS.md says which and why. The two that matter most for
+# the Lean design are the quadratic growth bound (proved in three lines, lem:quadratic-growth)
+# and the nonvanishing of the transforms (proved from (A6)-(A7), lem:nonvanishing), because
+# both were candidates for axioms in the draft and both turn out to be cheap.
+#
+# Adding any name below remains a review decision. Until one appears, `linkage axioms` has
+# nothing to check and `#print axioms` on this article's (as yet nonexistent) theorems must
+# reduce to Lean core alone.
+#
+# ---------------------------------------------------------------------------------------
+# THE PROVING CAMPAIGN (opened 2026-09-09). Two of the proposal's predictions are already
+# settled, both in the direction of a NARROWER base than expected:
+#
+#   A5 (uniqueness of the Fourier-Stieltjes transform) and A6 (Levy's continuity theorem)
+#   are RETIRED, not admitted: prop:fourier-uniqueness and prop:levy-continuity are [T],
+#   proved from Mathlib's Measure.ext_of_charFun and
+#   ProbabilityMeasure.tendsto_of_tendsto_charFun. The proposal expected A6 on this file
+#   "unless Mathlib's characteristic-function development already supplies it"; it does.
+#
+# The name below is A3's converse clause, which the proposal predicted would appear and
+# predicted would be one of two A3 names. It is spent by exactly one declaration,
+# SpatialLine.profile_integrability_mem -- the "consequently" clause of
+# lem:profile-integrability, whose blueprint proof is one sentence citing
+# prop:fourier-toolbox(3). profile_integrability and profile_integrability_pair are stated
+# separately so that their own footprints stay at Lean core.
+
+#
+# WAVE 2 (2026-09-09) adds the second name, and it is A1, which the proposal above predicted
+# "unless Mathlib's characteristic-function development already supplies it". It does not:
+# there is no Bochner theorem for positive definite functions in Mathlib at the pinned version,
+# and no IsPositiveDefinite either. SpatialLine.fourier_toolbox_bochner_symm is spent by exactly
+# one declaration, SpatialLine.increments_levy_infinitely_divisible -- the closing sentence of
+# thm:increments-levy -- whose blueprint proof cites prop:fourier-toolbox(1) and the converse
+# half of (3). The null-array limit itself, SpatialLine.increments_levy, is machine-checked to
+# Lean core and spends neither, which is why the theorem's two declarations are separate and
+# why prop:canonical-gauge is Lean core as well.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 2 (2026-09-09), chapters 5, 7 and 10, AND THE MERGE. Two names added, both predicted,
+# and the merge collected all three in ONE file, Formalization/SpatialLine/Interfaces.lean.
+# The three had been declared in four files -- InterfacesCh2, InterfacesCh5, InterfacesCh7,
+# InterfacesCh10 -- because parallel proving worktrees must not edit the same file, and two of
+# those files held the SAME axiom under the same name. The merged tree did not build until they
+# were collected, and the trust boundary is now readable in a single screen.
+#
+# A1 -- SpatialLine.fourier_toolbox_bochner_symm. The proposal listed A1 as "Bochner, in the
+# construction direction, unless Mathlib's characteristic-function development already supplies
+# it". It does not: Mathlib has no positive-definiteness predicate for functions on a group and
+# no Bochner theorem at the pinned version, so the implication from positive definiteness to a
+# measure has to be cited. NARROWED BY THE MERGE to the FORWARD implication -- the only
+# direction either consumer spends -- with the skeleton's hypotheses otherwise verbatim. The
+# reverse direction is proved beside it as fourier_toolbox_bochner_symm_of_measure, from
+# isPositiveDefinite_fourierCos, and the equivalence the reviewed skeleton states survives as
+# the theorem fourier_toolbox_bochner_symm_iff, which spends the axiom for one leg and nothing
+# for the other. Consumers: SpatialLine.increments_levy_infinitely_divisible (the closing
+# sentence of thm:increments-levy) and SpatialLine.exists_isSymmetric_of_isSymLevyExponent, and
+# through the latter SpatialLine.main_construction. The null-array limit itself,
+# SpatialLine.increments_levy, is machine-checked to Lean core and spends neither, which is why
+# the theorem's two declarations are separate and why prop:canonical-gauge is Lean core as well.
+#
+# A3's SECOND name -- SpatialLine.fourier_toolbox_levy_unique, the UNIQUENESS clause of
+# prop:fourier-toolbox(3). Spent by SpatialLine.eqOn_maternProfile_of_exponent alone, the
+# backward direction of thm:matern(1)<=>(2) and of thm:matern(1)<=>(3), and through it by
+# matern_thorin_atom, matern_kernels and the bundling matern_theorem. A3's own text names
+# thm:matern among the four places uniqueness is spent, so this is the predicted split and not a
+# widening beyond it. Chapter 7 predicted it too, and predicted correctly that its own
+# construction direction would NOT need it: that direction reaches the existence clause of
+# prop:fourier-toolbox(3) through the converse clause plus A1.
+#
+# The forward directions of the corner clauses spend nothing: matern_exponent,
+# matern_transforms, matern_gauge, matern_rational and stable_family_bridge all print Lean core.
+# THE PROPOSAL'S COUNT IS NOW SETTLED at three names: A3 split into two, A1 supplied the third,
+# A5 and A6 were retired, and no fourth name appeared in chapters 2-10.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 3 (2026-09-09), chapter 7. One name added, and it is the first that is NOT a clause of
+# prop:fourier-toolbox.
+#
+# A8 and A9 -- SpatialLine.kernel_regularity_law, the interface proper of
+# prop:kernel-regularity: a nondegenerate symmetric self-decomposable law on the line is
+# absolutely continuous with an even density nonincreasing on (0,infty). A8 is Sato Thm. 27.13
+# p. 181 (absolute continuity) and A9 is Yamazato Thm. 1 p. 523 (unimodality); the symmetric
+# rider that places the mode at the origin is elementary and is ours. The proposal above listed
+# "A8, A9 absolute continuity and unimodality of class L -- no route in Lean" and that is what
+# happened.
+#
+# NARROWED 2026-09-10 (fidelity review, F6-1): the sentence above read "[0,infty)" when the name
+# was admitted, and the Lean statement said AntitoneOn p (Set.Ici 0). That is FALSE -- it forces
+# p x <= p 0 < infinity for every x >= 0, a bounded density, where Sato gives absolute continuity
+# and Yamazato gives convexity left of the mode and concavity right of it, neither pinning a value
+# AT the mode. The Matern member at gamma <= 1/2, which this development itself constructs, has
+# density of order |x|^(2gamma-1). The axiom and its re-export SpatialLine.kernel_regularity now
+# read AntitoneOn p (Set.Ioi 0). Recorded at A8 and A9 and at the node.
+#
+# ONE consumer: SpatialLine.kernel_regularity, the ASSEMBLY of prop:kernel-regularity, which the
+# review's R27 split off from the interface for exactly this reason -- so that the interface's
+# footprint is the ledger and nothing else, and the assembly's is the ledger plus whatever the
+# [T] hypothesis check spends. The hypothesis check turned out to spend NOTHING beyond Lean
+# core: self-decomposability of mu_{0,t} is prop:canonical-gauge plus lem:additivity (the factor
+# law is an increment of the family itself), and nondegeneracy needs only that some frequency is
+# moved. So kernel_regularity prints Lean core plus this one name, and neither
+# lem:selfdecomposable-exponents nor prop:strict-positivity(2) is on its path, although the
+# node's printed proof cited both.
+#
+# NOT added in wave 3, and worth recording: continuity of an admissible exponent. The route
+# through prop:fourier-toolbox(3)'s converse (profile_integrability_mem, which produces an
+# IsSymNegDef and reads its continuity field) would have put A3 into main_uniqueness and
+# strict_positivity_strict, both of which are otherwise Lean core. Dominated convergence against
+# the truncation bound gives it outright (SpatialLine.ExponentContinuity), so it is proved, not
+# spent. The trust base is narrower than the naive route by one axiom at two headline
+# declarations.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 3 (2026-09-09), chapters 10 and 11. ONE name added, and it is A11, which the proposal
+# above listed under "EXPECTED NOT TO REACH THIS FILE" on the ground that Bernstein's theorem
+# and the exponential clause "serve the bridge chapter, which is not scheduled for
+# formalisation". That reading was wrong in one place: A11 also serves prop:thorin-subclass,
+# whose clause (1)<=>(2) IS Bernstein's theorem, and that clause was scheduled and is now
+# proved. The prediction held for A12, which nothing consumes.
+#
+# A11 -- SpatialLine.bernstein_completely_monotone. ADMITTED AS THE EXISTENCE EQUIVALENCE
+# ONLY. Schilling Thm. 1.4 states the equivalence together with UNIQUENESS of the representing
+# measure, and A11's own entry says that uniqueness "is what makes the Thorin measure well
+# defined" in prop:thorin-subclass. It is not spent: the node's uniqueness clause is discharged
+# by SpatialLine.laplace_uniqueness_locally_finite, which this development PROVES
+# (prop:laplace-uniqueness-locally-finite, held [T] because the causal argument transfers
+# verbatim). So the ledger is charged for less than the citation carries, exactly as the merge
+# narrowed A1 to its forward implication. Consumers: SpatialLine.thorin_subclass_representation
+# alone, in both directions.
+#
+# The measure of A11's statement lives on [0,infty) -- U (Set.Iio 0) = 0, NOT IsFolded -- because
+# Bernstein's measure is allowed an atom at the origin. Excluding that atom is the article's own
+# step, marked [T] in the node's annotation, and it is proved from the profile's integrability at
+# infinity through SDProfile.tendsto_k_atTop. The transform identity is stated as finiteness of
+# the lintegral together with the real equality rather than as an ENNReal identity, because
+# ofReal (f x) = laplaceL U x is satisfied by a negative f and the zero measure and the ENNReal
+# form of the EQUIVALENCE is therefore false in its backward direction.
+#
+# Nothing else of wave 3 reaches this file: prop:scale-evolution's conjugation clause and
+# prop:corner-generators (1) and (5) print Lean core.
+
+
+# ---------------------------------------------------------------------------------------
+# WAVE 4 (2026-09-10), chapters 10, 11 and 13. FOUR names added, and they are the last four
+# the proposal above predicted under "EXPECTED ON THIS FILE eventually" ("A13, A14 the moment
+# and tail theorems -- likewise", "A21, A22 the Polya-frequency interfaces -- likewise", i.e. no
+# route in Lean). That is what happened in both places. Mathlib has no infinite-divisibility
+# development at the pinned version, so the passage from the Levy measure to the moments of the
+# law cannot be proved here; and it carries neither total positivity nor Schoenberg's
+# representation, so neither direction of the Polya-frequency equivalence can be either.
+#
+# A13 -- SpatialLine.moments_tails_criterion, prop:moments-tails(1)'s criterion: for n >= 1,
+# E|X_t|^n is finite exactly when the profile's tail integral int_1^infty x^{n-1}k(x)dx is.
+# Sato Thm. 25.3 p. 159, the g-moment theorem for a submultiplicative weight, read at
+# g(x) = |x|^n. ADMITTED AT THE SKELETON'S REVIEWED TYPE VERBATIM -- no narrowing was available,
+# both consumers using the equivalence in both directions (the stable clause is an iff and the
+# Matern clause needs the finite side at every n).
+#
+# The entry is admitted AFTER the blueprint's own [T] translation into the folded profile, which
+# is the step A13 does not carry: the Levy measure of X_t is the t-dilate of k(x)x^{-1}dx folded,
+# so int_{|x|>1}|x|^n nu_2(dx) and int_1^infty x^{n-1}k(x)dx are finite together. That
+# translation is written out in the node's proof and is NOT part of the axiom, which is why the
+# axiom's right-hand side is the profile integral and not the Levy integral.
+#
+# Consumers: SpatialLine.stable_family_moments (prop:stable-family's moment clause, in both
+# directions) and SpatialLine.matern_moments_integrable (prop:matern-exponent(3)'s finiteness
+# clause, in one). Nothing else of chapters 10 and 11 reaches this file:
+# prop:corner-generators(2) and (3) and prop:scale-evolution's Fourier-side identity print
+# Lean core, and so does the whole of chapters 9 and 12, neither of which adds a name.
+#
+# A14 -- SpatialLine.moments_tails_divergence, prop:moments-tails(2)'s divergence branch: if the
+# profile is nonzero at some point at or beyond tau > 0, then E exp(alpha |X_t| log|X_t|) is
+# infinite for every alpha > 1/(tau t). Sato Thm. 26.1 p. 168 clause (ii), read at a LOWER BOUND
+# for Sato's radius c.
+#
+# NARROWED, AND THE NARROWING WAS FORCED, NOT CHOSEN. The skeleton's reviewed
+# moments_tails_bounded asserts the divergence for every tau beyond which k vanishes. That is
+# FALSE twice over: at k == 0, the pure Gaussian, where every tau satisfies the hypothesis and
+# the Gaussian moment is finite at every alpha (Sato treats nu = 0 separately, Remark 26.3); and
+# at any tau strictly larger than the radius, where the claim asserts divergence on a range in
+# which the entry's OWN finiteness clause asserts convergence. Admitting the reviewed type would
+# have admitted a false axiom. The skeleton statement is repaired and prop:moments-tails carries
+# % CHANGED (proof 2026-09-10).
+#
+# The finiteness branch and the tail-ratio statement of Thm. 26.1 are NOT admitted, nothing
+# consuming them. moments_tails_heavy is not admitted either: unbounded support is this axiom
+# read along tau -> infinity, so the heavy branch needs no separate name.
+#
+# Consumer: SpatialLine.moments_tails_completely_monotone alone, at its second clause. That
+# theorem's first clause spends A11 instead, through bernstein_completely_monotone, so the
+# node's last sentence rests on two entries and on nothing else.
+#
+# A21 and A22 -- SpatialLine.polyaExponent_of_variationDiminishing and
+# SpatialLine.variationDiminishing_of_polyaExponent, the two directions of
+# prop:polya-frequency(1), stated about a SINGLE law rather than about a family. Karlin's
+# theorems are theorems about one kernel; the family form is the article's packaging, so the
+# single-law form is the one closer to the citation, and the family is put back by the assembly
+# SpatialLine.polya_frequency, which is [T].
+#
+# ONE THING TO FLAG, and it is the first of its kind on this file: these two axioms carry a step
+# the blueprint marks [T]. prop:polya-frequency's printed proof performs the symmetry reduction
+# and the matching -- delta = 0, the a_i in +/- pairs, gamma = a, lambda_i = 1/theta_i -- between
+# A21's reciprocal Laplace transform and this article's exponent. In prose that passage is an
+# analytic continuation of Psi(sigma) = phihat(i sigma) off the imaginary axis; in Lean it would
+# need the two-sided Laplace transform as an entire function and an identity theorem, neither of
+# which exists in this development or in Mathlib. So the axioms are stated in the article's own
+# vocabulary (fourierCos, IsPolyaExponent) with the matching inside them. Recorded at A21 and A22
+# in AXIOMS.md and in the node's own annotation; it is the item a fidelity review should look at
+# first in this chapter.
+#
+# THE SENTENCE THAT FOLLOWED -- "Every other name on this file carries only what its pages
+# carry" -- IS WITHDRAWN (fidelity review 2026-09-10, finding F6-2). It was written when this
+# was the first name of its kind to be noticed, and it is not accurate: eight of the eleven
+# carry a step beyond their pages, and the per-name list at the head of this file says which.
+# What survives of the sentence is that the Karlin pair's step is the DEEPEST -- the only one
+# that is an analytic continuation rather than an elementary translation, and the only one the
+# author has recorded a decision about.
+#
+# THE HYPOTHESIS RANGES ARE THE PAGES'. Karlin Ch. 5 Thm. 4.2 (p. 243) is stated for a DENSITY
+# ("Let k(u) be a density function on (-inf,inf); i.e. k(u) is nonnegative and has total integral
+# 1"), so the necessity axiom carries hac : mu << volume, and the assembly has to supply it --
+# which it does from ledger A8, kernel_regularity_law, whose own hypothesis check is a change of
+# scale (SpatialLine.isSelfDecomposable_of_fourierCos). Karlin Ch. 7 Thm. 3.2(a) (p. 345) carries
+# the condition gamma + sum a_i^2 > 0, which p. 346 says is "essential in order that f be a bona
+# fide density function", so the sufficiency axiom carries hnd and the degenerate ray -- where
+# the law is the point mass and the operator is the identity -- is PROVED beside it
+# (isVariationDiminishing_dirac_zero) rather than cited.
+#
+# One extension beyond the letter, named rather than left silent: Karlin states the
+# variation-diminishing conclusion for bounded Borel f, while IsVariationDiminishingOrd follows
+# the node ("every integrable or bounded g") and admits integrable f too. It touches only
+# variationDiminishing_of_polyaExponent; in the other direction the wider quantifier is a
+# hypothesis, where wider is narrower. Since 2026-09-11 it is the ONLY extension that leg
+# carries on its own.
+#
+# A SECOND EXTENSION WAS DECLARED AND HAS BEEN DISCHARGED (fidelity review R14; the author's
+# decision (b), 2026-09-11). signChangesAE is an infimum over EVERY a.e. representative,
+# non-measurable ones included, where Karlin counts S^-(f) on a bounded Borel f. The necessity
+# leg was always safe -- hac makes mu * g continuous, the two counts agree there, and on the
+# right the essential count is at most the ordinary one. The sufficiency leg needed one thing
+# more, and that thing is now proved, not believed: given a measurable g and any h equal to it
+# almost everywhere, delete g on a measurable null superset N of the set where the two differ.
+# The result 1_{N^c} g is measurable, is again a representative of g, has |h'| <= |g| pointwise
+# (so it inherits integrability or boundedness), and equals h wherever it is nonzero -- so every
+# alternation of it is an alternation of h at the same points, and S^-(h') <= S^-(h). Hence the
+# infimum is attained along measurable representatives, and Karlin's ordinary-count conclusion
+# implies the essential-count one. The axiom now concludes IsVariationDiminishingOrd, Karlin's
+# letter; SpatialLine.isVariationDiminishing_of_polyaExponent carries it the rest of the way.
+# No status changed and no #print axioms line changed.
+#
+# Consumers: SpatialLine.polya_frequency for both. The sufficiency leg is consumed by
+# SpatialLine.isVariationDiminishing_of_polyaExponent alone, and through it by
+# SpatialLine.polya_frequency, SpatialLine.scale_monotone_converse,
+# SpatialLine.exists_smoothing_law and SpatialLine.isVariationDiminishing_gaussianKernel.
+#
+# AND ONE NAME WAS NOT NEEDED WHERE THE LEDGER EXPECTED IT. A11's clause (b) -- a completely
+# monotone function vanishing at an interior point of the ray vanishes identically -- was
+# prop:bridge-strictness's grounding, and chapter 9 proved that node ENTIRE on Lean core:
+# def:causal-admissible hands the representing measure to the proof, so what clause (2) needs
+# is the strict positivity of b_0 + int_0^infty e^{-sigma u}k_I(u)du under the data, not
+# Bernstein's theorem. prop:bridge-strictness is [T] and A11's clause (b) is retired; the entry
+# stays on the file for its existence equivalence alone, with thorin_subclass_representation
+# its one consumer as before.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 5 (2026-09-10), chapter 11. NO name added, and the two clauses it closed are worth a
+# line each for where the boundary was NOT crossed.
+#
+# prop:scale-evolution's multiplier clause (A_1 = -B(D)) prints Lean core. The Fubini it turns
+# on -- exchanging the Choquet integral with the transform integral -- was the reason the clause
+# was re-priced L, and what closes it is an estimate of this development and not an interface:
+# the L1 translation estimate ||T_h g - g||_1 <= |h| ||g'||_1
+# (SpatialLine/GeneratorL1.lean), applied twice through the factorisation
+# Delta_v = (1/2)(T_v - I)(I - T_{-v}). Mathlib carries no such estimate in this form, but it is
+# the fundamental theorem of calculus plus Tonelli, so it is proved and not spent.
+#
+# prop:corner-generators(4), the Thorin corner, spends A3's uniqueness clause and nothing else,
+# through SpatialLine.laplaceL_eq_of_thorin. That is chapter 10's representation
+# k(x) = int e^{-theta x} U(d theta), which is the uses edge to prop:thorin-subclass the node's
+# printed proof already declares; the corner's own argument -- the Choquet measure as the image
+# of U (x) Exp under (theta, u) |-> u/theta, its tails by one Tonelli, the exchange by the
+# ordinary product Fubini -- prints Lean core wherever it is separated out
+# (SpatialLine.thorinJump_tail, integral_expLaw_secondDifference, integral_thorinJump).
+# fourier_toolbox_levy_unique therefore gains two consumers, seventeen in all, and remains the
+# widest-spent name of the eleven.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 5 (2026-09-10), chapter 12. TWO names added, both clauses of A19, and they are the
+# entry's RESTATED form (question Q13): the consequence the proof consumes, not the solution
+# basis of A19(a). Formalising the basis would need I_nu, which -- unlike K_nu, whose DLMF
+# (10.32.9) integral is definitional for every real order -- has no single integral
+# representation valid for every real nu, and the proof discards that branch in one line by
+# boundedness. What is admitted is the uniqueness of the bounded normalised solution, which is
+# clause (b)'s asymptotics; demoting clause (a) to [T], which the ledger records as a candidate,
+# would therefore NOT discharge either name.
+#
+# A19(b') -- SpatialLine.joint_locality_bounded_solution: for c > 0 and nu = (1-beta)/2, a C^2
+# solution of phi'' + (beta/z)phi' - c phi = 0 that is bounded on [0,infty) with value 1 at the
+# origin exists only for nu > 0 and is then the normalised 2^{1-nu}Gamma(nu)^{-1}(sqrt c z)^nu
+# K_nu(sqrt c z).
+#
+# A19(c) -- SpatialLine.joint_locality_hyperbolic: for c < 0 every nontrivial C^2 solution has
+# arbitrarily large positive zeros. The exclusion drawn from it -- an admissible transform is
+# strictly positive, so no admissible family arises -- is the article's, [T], and is in the
+# node's proof.
+#
+# THE C^2 QUALIFIER IS ON BOTH, and it is load-bearing (review R22): A19 speaks of classical
+# solutions, and without the hypothesis the statements would range over iteratedDeriv's junk
+# value and be wider than the citation. The article supplies it rather than assuming it:
+# SpatialLine.joint_locality_ode CONCLUDES the regularity of phi, from the locality hypothesis
+# and not from admissibility, which is why the ODE node was proved before either axiom was
+# admitted.
+#
+# EDGE CASES CHECKED BEFORE ADMISSION. At nu <= 0 the first name asserts nothing: its conclusion
+# 0 < (1-beta)/2 IS the entry's "there are none when nu <= 0", carried as a conclusion rather
+# than excluded by a hypothesis. The constant solution phi == 1 is bounded and normalised and
+# does not solve the equation for any c > 0 (it gives -c = 0), so it is no counterexample to the
+# uniqueness clause; at c = 0 it is the solution, and that case is PROVED
+# (SpatialLine.joint_locality_degenerate) rather than cited.
+#
+# Consumer of both: SpatialLine.joint_locality_forward, the forward direction of
+# thm:joint-locality, in the cases c > 0 and c < 0 respectively.
+#
+# A20 IS NOT ADMITTED, and the reason is the campaign's rule rather than an oversight. The
+# forward direction does not reach the half-plane Dirichlet problem at all; the backward
+# direction would consume its EXISTENCE clause -- the regularity and the equation of the
+# Student-t scale space -- and is not proved, being blocked on prop:student-t(2), which is itself
+# an unadmitted [A]. Its UNIQUENESS clause, the part of A20 whose boundedness qualifier the
+# ledger records a caveat about, is consumed by NEITHER direction of the node.
+
+# ---------------------------------------------------------------------------------------
+# WAVE 6 (2026-09-10), chapter 10. NO name added, and the two clauses it closed are worth a
+# line for where the boundary was NOT crossed and for one narrowing that is now visible.
+#
+# prop:thorin-subclass(4) and (5) -- SpatialLine.thorin_bridge and
+# SpatialLine.thorin_strictness -- spend A11 and A3's uniqueness clause, and nothing else. A11
+# is now spent at BOTH its directions and by three declarations rather than one:
+# thorin_subclass_representation uses both, thorin_bridge only the EASY one (a Laplace transform
+# is completely monotone, the mpr of the admitted iff), thorin_strictness only the FORWARD one (a
+# completely monotone function is a Laplace transform, in a contradiction). The easy direction is
+# elementary and would be provable here, but proving it would buy nothing: the name is on the
+# boundary for the forward direction regardless, and splitting the iff into two axioms to charge
+# the ledger for less would leave the same footprint on every consumer.
+#
+# NOTHING NEW WAS NEEDED FOR erfc, which this development defines by its integral and Mathlib
+# does not carry at all. Its four facts -- integrability of e^{-v^2}, continuity, strict
+# positivity, and the Gaussian bound erfc y <= 2e^{-y^2} for y >= 1 -- print Lean core. The bound
+# in particular is a monotone comparison against e^{-yv} and not the asymptotic of the printed
+# proof, which would have been Watson's lemma and had no route here.
+
+# The eleven names of the trust boundary, in the order they were admitted. Wave 3 added the
+# fourth and fifth, the first that are not clauses of prop:fourier-toolbox; wave 4 added the
+# next four -- A13 and A14 from chapters 10 and 11, A21 and A22 from chapter 13; wave 5 added
+# the last two, both clauses of A19, from chapter 12, and nothing from chapters 3, 7, 8,
+# 9, 10, 11 or 13.
+
+SpatialLine.fourier_toolbox_levy_converse
+SpatialLine.fourier_toolbox_bochner_symm
+SpatialLine.fourier_toolbox_levy_unique
+SpatialLine.kernel_regularity_law
+SpatialLine.bernstein_completely_monotone
+SpatialLine.moments_tails_criterion
+SpatialLine.moments_tails_divergence
+SpatialLine.polyaExponent_of_variationDiminishing
+SpatialLine.variationDiminishing_of_polyaExponent
+SpatialLine.joint_locality_bounded_solution
+SpatialLine.joint_locality_hyperbolic

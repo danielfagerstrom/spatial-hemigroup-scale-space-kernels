@@ -1,0 +1,37 @@
+name = "SpatialHemigroup"
+version = "0.1.0"
+keywords = ["math", "scale-space"]
+# Both libraries are default targets so that CI compiles the skeleton too: a skeleton statement
+# that is malformed or names a missing declaration must fail the build (Paper I's lesson,
+# 2026-08-11). The sorry guard scans `Formalization/SpatialLine` only.
+defaultTargets = ["SpatialLine", "Skeleton"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+weak.linter.mathlibStandardSet = true
+maxSynthPendingDepth = 3
+
+# The shared core, pinned to a tag; bumped together with the other articles.
+[[require]]
+name = "ScaleSpaceCore"
+git = "https://github.com/danielfagerstrom/scale-space-lean"
+rev = "v0.2.0"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.31.0"
+
+# The proved library: sorry-free by CI guard.
+[[lean_lib]]
+name = "SpatialLine"
+globs = ["SpatialLine.*"]
+
+# Stated-but-unproved targets: the Lean type of a blueprint node, with `sorry` for the proof.
+# Separate from `SpatialLine` on purpose (see Paper I's lakefile for the rationale); a
+# declaration MOVES into SpatialLine/ when it is proved, and nothing here is ever cited by the
+# library.
+[[lean_lib]]
+name = "Skeleton"
+globs = ["Skeleton.*"]

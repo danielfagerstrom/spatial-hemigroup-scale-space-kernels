@@ -1,0 +1,194 @@
+% Appendix A --- the Cin rays and the Matérn exponent. Added 2026-09-12 to resolve the forward
+% references of v0.1 (§§1-7) into blueprint chapters 8 and 10, on the author's go: two nodes are
+% transcribed verbatim, both [T] and \leanok on Lean core.
+%   - lem:cin-rays (chapter 8): §2's dictionary remark names its Cin functions, and the proof of
+%     lem:selfdecomposable-exponents in §7 uses its clause (2), the quantile measure attached to a
+%     nonincreasing profile, and its clause (1), the growth of Cin at infinity; rem:cin-constant is
+%     copied with it.
+%   - prop:matern-exponent (chapter 10): §3's Matérn member rests on its clause (1) for
+%     admissibility and on its clause (3) for the variance and the finiteness of every moment.
+%     The remark at the end of its proof pointed at the moment criterion of chapter 10's
+%     prop:moments-tails, which is not transcribed; the remark cites the criterion's source instead.
+% NOT transcribed: prop:matern-density (chapter 10, [A] on A15 and A16, notready), whose statement
+% references prop:moments-tails and whose transcription would bring four more cited facts into
+% this paper for one sentence of §3. The density identification of the Matérn member stays a cited
+% closed form in §3 (A15's anchors), and the recommended end state --- narrowing prop:two-members
+% by that sentence, in the blueprint --- is recorded in notes/HANDOFF-article.md for the
+% formalization session, which owns blueprint/ and Formalization/.
+
+\section{The \texorpdfstring{$\Cin$}{Cin} rays and the Mat\'ern exponent}\label{sec:appendix}
+
+Two computations that the body of the paper uses are collected here: the exponents of the
+unit-step profiles, which the proof of Lemma~\ref{lem:selfdecomposable-exponents} uses through
+the tail measure they attach to a nonincreasing profile, and the exponent of the Mat\'ern
+member of \S\ref{sec:axioms}. Both belong to material outside this paper (the geometry of
+the admissible cone and the families at its corners) and are stated here in the form the
+body uses and in no more generality. Both are machine-checked and rest on Lean core alone.
+
+% shared with blueprint lem:cin-rays
+\begin{lemma}[the $\Cin$ rays and the superposition]\label{lem:cin-rays}
+Write $\Cin(z) := \int_0^z (1 - \cos v)\,v^{-1}dv$ for $z \ge 0$, extended evenly to $\RR$.
+\begin{enumerate}
+\item \emph{(The rays.)} For $\tau > 0$ the profile $k = \mathbf 1_{(0,\tau)}$ is admissible,
+with Gaussian coefficient $0$, and its exponent is $\omega \mapsto \Cin(\tau\omega)$. The
+function $\Cin$ is even and nondecreasing on $[0,\infty)$, with $\Cin(z) \le z^2/4$ and
+$\Cin(z) = \tfrac14 z^2 + O(z^4)$ as $z \to 0$; and there is a finite constant $C$ with
+$\Cin(z) = \log z + C + O(1/z)$ as $z \to \infty$.
+\item \emph{(The superposition.)} Every admissible $F$, with Gaussian coefficient $a$ and
+profile $k$, satisfies
+\begin{equation}\label{eq:cone-superposition}
+  F(\omega) = a\,\omega^2 + \int_{(0,\infty)} \Cin(\tau\omega)\,\varpi(d\tau),
+  \qquad \omega \in \RR,
+\end{equation}
+where $\varpi$ is any positive measure on $(0,\infty)$ with $\varpi((x,\infty)) = k(x)$ for
+almost every $x > 0$; such a $\varpi$ exists.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(1) Evenness of $\Cin$ needs no stipulation: the integrand $v \mapsto (1 - \cos v)/v$ is odd,
+so the integral from $0$ is even, and $\Cin(-z) = \Cin(z)$. Monotonicity on $[0,\infty)$ is the
+positivity of that integrand there. From $1 - \cos v \le v^2/2$ we get
+$\Cin(z) \le \int_0^z v/2\,dv = z^2/4$ for $z \ge 0$, and for $z < 0$ by evenness, so the bound
+holds on $\RR$. For the expansion at the origin, $|\cos v - (1 - v^2/2)| \le \tfrac{5}{96}v^4$
+for $|v| \le 1$ gives $|(1-\cos v)/v - v/2| \le \tfrac{5}{96}v^3$ on $(0,1]$, and integrating
+over $[0,z]$,
+\[
+  \Bigl|\Cin(z) - \tfrac14 z^2\Bigr| \ \le\ \tfrac{5}{96}\,z^4,
+  \qquad |z| \le 1,
+\]
+which is the asserted $\Cin(z) = \tfrac14z^2 + O(z^4)$. For the expansion at infinity, split at
+$v = 1$:
+\[
+  \Cin(z) = \Cin(1) + \log z - \int_1^z \frac{\cos v}{v}\,dv , \qquad z \ge 1,
+\]
+using $(1-\cos v)/v = v^{-1} - v^{-1}\cos v$ on $[1,z]$; and integrating by parts against the
+primitive $\sin v/v$,
+$\int_1^z v^{-1}\cos v\,dv = \sin z/z - \sin 1 + \int_1^z v^{-2}\sin v\,dv$. The last integrand
+is dominated by $v^{-2}$, so $\int_1^\infty v^{-2}\sin v\,dv$ converges absolutely and, with
+\[
+  C := \Cin(1) + \sin 1 - \int_1^\infty \frac{\sin v}{v^2}\,dv ,
+\]
+one gets $\Cin(z) - \log z - C = -\sin z/z + \int_z^\infty v^{-2}\sin v\,dv$, whence
+$|\Cin(z) - \log z - C| \le 2/z$ for $z \ge 1$. That is the expansion, with an explicit
+constant in the error.
+
+For the ray, $k = \mathbf 1_{(0,\tau)}$ is nonnegative and nonincreasing on $(0,\infty)$ and
+satisfies both integrability conditions of Lemma~\ref{lem:profile-integrability} at once,
+being bounded by $1$ and supported in $(0,\tau)$: $\int_0^1 x\,k(x)\,dx \le \tfrac12$ and
+$\int_1^\infty k(x)\,x^{-1}dx \le \tau$. So $(0,k)$ is a pair of the form \ref{eq:sd-profile},
+and its exponent is
+$\int_0^\tau (1-\cos\omega x)\,x^{-1}dx = \Cin(\tau\omega)$ by the substitution $v = \omega x$,
+valid for every real $\omega$ because both sides vanish at $\omega = 0$ and $\Cin$ is even.
+
+(2) A positive measure $\varpi$ on $(0,\infty)$ with $\varpi((x,\infty)) = k(x)$ for almost
+every $x > 0$ is the image of Lebesgue measure on $(0,\infty)$ under the generalised inverse
+$y \mapsto \sup\{u > 0 : k(u) > y\}$, restricted to $(0,\infty)$ to discard the atom the
+transform leaves at the origin when $k$ is bounded. Only two properties of $k$ are used: it is
+nonincreasing, and it tends to $0$ at infinity --- and the second is forced rather than
+assumed, since $k$ nonincreasing and bounded below by a positive constant would make
+$\int_1^\infty k(x)\,x^{-1}dx$ diverge like the harmonic integral. What comes out is the
+sandwich $k(x{+}) \le \varpi((x,\infty)) \le k(x)$, whose two sides agree off the countably
+many discontinuities of $k$; that is why the tail identity is asserted almost everywhere and
+not everywhere, and a right-continuous version of $k$ is neither available nor needed.
+
+Given such a $\varpi$, \ref{eq:cone-superposition} is the layer-cake exchange
+\[
+  \int_{(0,\infty)} \Cin(\tau\omega)\,\varpi(d\tau)
+  = \int_0^\infty \frac{1 - \cos\omega x}{x}\,\varpi((x,\infty))\,dx
+  = \int_0^\infty (1 - \cos\omega x)\,k(x)\,\frac{dx}{x},
+\]
+in which $\Cin(\tau\omega)$ is read as $\int_0^\tau (1-\cos\omega x)x^{-1}dx$ and the exchange
+is Tonelli, for which $\varpi$ is $\sigma$-finite: the tail measure of an unbounded profile
+puts infinite mass near the origin, but its restriction to $[\varepsilon,\infty)$ is finite
+for every $\varepsilon > 0$. Adding $a\,\omega^2$ gives
+\ref{eq:cone-superposition}.
+\end{proof}
+
+% blueprint rem:cin-constant, copied
+\begin{remark}[the constant]\label{rem:cin-constant}
+The constant of Lemma~\ref{lem:cin-rays}(1) is Euler's constant: $\Cin(z) = \gamma_E + \log z -
+\mathrm{Ci}(z)$ with $\mathrm{Ci}$ the cosine integral and $\mathrm{Ci}(z) = O(1/z)$
+(\sscite{dlmf2026}, \S6.2). The identification is not used anywhere in this paper, which is
+why Lemma~\ref{lem:cin-rays} asserts only that the constant is finite.
+\end{remark}
+
+\ref{eq:cone-superposition} writes every admissible exponent as a superposition of the
+Gaussian ray and the unit-step exponents. That the unit-step exponents are extreme rays of
+the cone does not follow from the superposition and is outside this paper; only the two
+clauses above are used in it.
+
+In clause (3) of the next proposition $B$ denotes standard Brownian motion, taken
+independent of the random time $T$; the letter is the statement's, and it is not the symbol
+$B = \omega F'$ of Lemma~\ref{lem:selfdecomposable-exponents}.
+
+% shared with blueprint prop:matern-exponent
+\begin{proposition}[the \Matern{} family: exponent, transforms, moments]\label{prop:matern-exponent}
+For $\gamma > 0$:
+\begin{enumerate}
+\item \emph{(Exponent.)} $F(\omega) = \gamma\log(1 + \omega^2)$ is admissible, with Gaussian
+coefficient $a = 0$ and folded profile $k(x) = 2\gamma e^{-x}$; the profile at range $\theta$ is
+$k(x) = 2\gamma e^{-x/\theta}$, with exponent $\gamma\log(1 + \theta^2\omega^2)$.
+\item \emph{(Transforms.)} $e^{-F(t\omega)} = (1 + t^2\omega^2)^{-\gamma}$, and the increments
+have transfer functions $\bigl((1 + s^2\omega^2)/(1 + t^2\omega^2)\bigr)^{\gamma}$, rational in
+$\omega$ for integer $\gamma$.
+\item \emph{(Moments.)} Every moment is finite: $X_t \seq B_T$ with $T$ Gamma-distributed of
+shape $\gamma$ and scale $2t^2$, so
+$\mathbb{E}X_t^{2n} = (2n-1)!!\,(2t^2)^n\,\Gamma(\gamma+n)/\Gamma(\gamma)$, and in particular
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+\end{enumerate}
+\end{proposition}
+
+Finiteness of every moment follows from the even moments by $|x|^n \le 1 + x^{2n}$, and the
+Gaussian mixture is constructed rather than cited.
+
+\begin{proof}
+(1) Fix $\theta > 0$ and write $p = 1/\theta$. The integrand
+$(1 - \cos\omega x)\,e^{-px}x^{-1}$ is nonnegative on $(0,\infty)$ and, since
+$1 - \cos u \le u^2/2$, is bounded there by $\tfrac12\omega^2\,x\,e^{-px}$, so it is integrable
+for every $\omega$; its derivative in $\omega$ is $\sin(\omega x)\,e^{-px}$, whose modulus is at
+most $e^{-px}$ \emph{uniformly in} $\omega$. Differentiation under the integral sign is
+therefore legitimate at every $\omega$ with one and the same dominating function, and gives
+\[
+  \frac{d}{d\omega}\int_0^\infty (1 - \cos\omega x)\,e^{-px}\,\frac{dx}{x}
+   = \int_0^\infty \sin(\omega x)\,e^{-px}\,dx = \frac{\omega}{p^2+\omega^2},
+\]
+which is also the derivative of $\tfrac12\log(1 + \omega^2/p^2)$. The two functions of $\omega$
+therefore differ by a constant, and both vanish at $\omega = 0$, so
+\[
+  \int_0^\infty (1 - \cos\omega x)\,e^{-x/\theta}\,\frac{dx}{x}
+   = \tfrac12\log\bigl(1 + \theta^2\omega^2\bigr).
+\]
+Hence $F(\omega) = \gamma\log(1+\theta^2\omega^2)$ is of the form \ref{eq:sd-profile} with
+$a = 0$ and $k(x) = 2\gamma e^{-x/\theta}$, which is nonnegative and nonincreasing on
+$(0,\infty)$. Its two integrability conditions are the two dominating functions above read on
+the two halves of the range: $\int_0^1 x\,k(x)\,dx \le 2\gamma$ and
+$\int_1^\infty k(x)\,x^{-1}dx \le 2\gamma\int_1^\infty e^{-x/\theta}dx < \infty$. Exhibiting the
+pair $(0, 2\gamma e^{-\cdot/\theta})$ is what admissibility asks for, so the argument stops
+there; the range $\theta$ is carried by the computation and needs no separate dilation step.
+
+(2) is (1) read through the similarity form of Theorem~\ref{thm:main-characterization}: the
+increment transfer function is the ratio of the endpoint transforms, the denominators being
+nonvanishing.
+
+(3) Let $\Gamma_{\gamma,2t^2}$ be the Gamma law of shape $\gamma$ and scale $2t^2$, that is the
+law on $(0,\infty)$ with density $u^{\gamma-1}e^{-u/2t^2}/(\Gamma(\gamma)(2t^2)^{\gamma})$. Its
+Laplace transform is $\int_0^\infty e^{-\sigma u}\,\Gamma_{\gamma,2t^2}(du) =
+(1 + 2t^2\sigma)^{-\gamma}$ for $\sigma \ge 0$, one Gamma integral; so the Gaussian mixture
+$\int_0^\infty g_u\,\Gamma_{\gamma,2t^2}(du)$ --- the law of $B_T$ with $T$ so distributed ---
+has cosine transform $(1 + 2t^2\cdot\omega^2/2)^{-\gamma} = (1 + t^2\omega^2)^{-\gamma}$, which
+by (2) is the transform of the kernel at scale $t$. Both are symmetric probability measures, so
+Proposition~\ref{prop:fourier-uniqueness} identifies them and $X_t \seq B_T$. Conditioning on
+$T$, $\mathbb{E}X_t^{2n} = \mathbb{E}[T^n]\,\mathbb{E}[B_1^{2n}] = (2n-1)!!\;\mathbb{E}T^n$
+with $\mathbb{E}[B_v^{2n}] = (2n-1)!!\,v^n$ and
+$\mathbb{E}T^n = (2t^2)^n\Gamma(\gamma+n)/\Gamma(\gamma)$; the two are the same Gamma integral
+read at half-integer and at integer argument. Every moment is then finite, since
+$|x|^n \le 1 + x^{2n}$, and $n = 1$ with $\Gamma(\gamma+1) = \gamma\Gamma(\gamma)$ gives
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+
+\emph{Remark.} Finiteness of every moment also follows from the moment criterion for
+infinitely divisible laws --- $\mathbb{E}|X|^n < \infty$ exactly when the \Levy{} measure
+integrates $|x|^n$ off a neighbourhood of the origin (\sscite{sato1999levy}, Thm.~25.3,
+p.~159) --- the profile decaying exponentially. That route is machine-checked too, uses
+that cited fact, and is independent of this one; it does not reach the general even moment.
+\end{proof}
