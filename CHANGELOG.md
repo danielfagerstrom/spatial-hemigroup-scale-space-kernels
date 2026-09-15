@@ -34,5 +34,9 @@ development repository's `scripts/export-release.py` — the Lean modules the st
 process account, both external review rounds verbatim and the response plan. The export builds
 from scratch and its guard reproduces the `#print axioms` block printed in section 1.1.
 
-Release commit: *to be filled at tagging*. Version DOI: *to be recorded at the Zenodo deposit*.
+Release commit: tag `v0.1` (2026-09-15), first placed at `3596d4b` and moved the same morning to
+the commit that freezes the date line of the PDF (the first build still said "working draft"); the
+export in `spatial-hemigroup-scale-space-kernels` carries tag `v0.1` on the matching commit.
+Zenodo DOI of the deposit: 10.5281/zenodo.22761632 (the deposit made from the first build; a
+second version with the dated PDF is the author's call, under the same concept DOI).
 The development log of everything before this release follows.

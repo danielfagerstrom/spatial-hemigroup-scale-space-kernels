@@ -1,7 +1,7 @@
 # Spatial scale space from hemigroup axioms: characterization of the kernels on the line — release v0.1
 
 This repository is the verification artifact of the article of the same name (the PDF is at the
-root). It is an export of the development repository at revision `3596d4b`, restricted to what
+root). It is an export of the development repository at revision `3f89ab6`, restricted to what
 the article's statements rest on; the development repository also holds the material of two
 further modules and stays private until they are released.
 
