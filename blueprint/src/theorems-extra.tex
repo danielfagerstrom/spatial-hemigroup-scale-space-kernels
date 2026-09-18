@@ -1,0 +1,29 @@
+% !TEX root = print.tex
+% This article's additional theorem-like environments.
+%
+% Framework-owned theorems.tex defines definition/lemma/proposition/theorem on one
+% counter mastered by `definition` and reset per chapter. Three more are needed here,
+% and all three ride the SAME counter, so the numbering is one sequence per chapter.
+%
+% Why they are not in macros.tex: both drivers (print.tex, web.tex) \input macros
+% *before* theorems, so `definition` does not exist yet at that point. This file is
+% \input from the top of content.tex instead, after theorems.tex has run. The
+% arrangement is copied from the causal article, whose reasons apply verbatim.
+%
+%   corollary -- omitted by theorems.tex although `linkage` counts it a statement
+%                environment (config.py DEFAULT_STATEMENT_ENVS) and plastexdepgraph
+%                graphs it by default. A `corollary` here IS a blueprint node and needs
+%                \label and \statusT/\statusA like any other.
+%
+%   remark    -- NOT statement environments: no \label discipline, no status tag, not in
+%   example      the dependency graph. They carry the draft's Remarks so the blueprint
+%                stays the full text of record. A remark whose content is load-bearing
+%                must be promoted to a definition/proposition instead -- see Chapter 2,
+%                where the draft's Remark 2.4 becomes \ref{lem:lattice-zero}.
+%
+% Adding a *statement* kind beyond corollary would also mean listing it in web.tex's
+% `thms=` option, or the graph would silently ignore its \uses/\leanok annotations.
+
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{example}[definition]{Example}

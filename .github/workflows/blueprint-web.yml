@@ -1,0 +1,126 @@
+name: Blueprint (web)
+
+# Builds the blueprint's hypertext view — the one that renders the dependency graph, which
+# statement rests on which, and whether each is a proved target [T] or a cited analytic
+# interface [A] — and publishes it beside this release's PDF on the research site.
+#
+# This repository is a FROZEN verification artifact: it is the export of release v0.1 and its
+# sources do not change. So the trigger is manual. There is nothing here that a push should
+# rebuild, and the release channel it publishes into is immutable by design (hub ADR-0016 §2)
+# — this workflow adds the blueprint/ subtree that the v0.1 channel was published without,
+# and syncs nothing else.
+#
+# Two build dependencies fail SILENTLY rather than loudly, and both are hidden on a desktop
+# that has MiKTeX and Graphviz installed. They are the reason this file is not three lines:
+#
+#   graphviz   — plastexdepgraph pulls in pygraphviz, which is a BINDING against the Graphviz
+#                C library, not an implementation. Without the system package it still
+#                installs from a wheel and the build still succeeds; it just emits a graph
+#                with no nodes. Hence the apt step and the node count in the validation.
+#   kpsewhich  — plasTeX resolves every \input through it. Its fallback is an exact filename
+#                match against a directory listing, which cannot resolve any path containing
+#                a separator, so without it blueprint/src/parts/* is silently dropped and the
+#                site renders complete but empty. texlive-base carries it AND the search path;
+#                texlive-binaries alone installs the binary with no texmf.cnf, which is worse
+#                than absent (every lookup raises instead of falling back).
+#
+# Nothing here is typeset — all mathematics goes to MathJax — so no TeX formats are needed
+# and --imager=none says so rather than relying on a probe for pdf2svg/dvisvgm.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Sync the built blueprint to the research site's release channel"
+        type: boolean
+        default: true
+  push:
+    paths:
+      - "blueprint/src/**"
+      - ".github/workflows/blueprint-web.yml"
+
+permissions:
+  contents: read
+
+env:
+  # Where this release is served from: research.danielfagerstrom.com/papers/<SLUG>/<CHANNEL>/
+  SLUG: hemigroup-spatial-kernels-line
+  CHANNEL: v0.1
+  # Pinned in lockstep with what the development repository's authors run locally, so CI and
+  # the desk render the same bytes.
+  PLASTEX_REQUIREMENTS: "plastex==3.1 plastexdepgraph==0.0.5 plastexshowmore==0.0.2 leanblueprint==0.0.20"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Graphviz and kpsewhich
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends graphviz graphviz-dev texlive-base
+          kpsewhich --version | head -1
+
+      - name: Install plasTeX and the blueprint plugins
+        run: pip install ${{ env.PLASTEX_REQUIREMENTS }}
+
+      - name: Build the web blueprint
+        working-directory: blueprint/src
+        run: |
+          # Fail here, with a sentence, rather than in plasTeX's traceback: an installed but
+          # unconfigured kpsewhich turns every lookup into a bare FileNotFoundError.
+          if ! kpsewhich web.tex >/dev/null 2>&1; then
+            echo "::error::kpsewhich cannot resolve web.tex from $PWD — installed but with no search path. Is texlive-base present (not just texlive-binaries)?"
+            exit 1
+          fi
+          plastex -c plastex.cfg --imager=none --vector-imager=none web.tex
+
+      - name: Validate the build
+        run: |
+          out=blueprint/web
+          for f in "$out/index.html" "$out/dep_graph_document.html"; do
+            [ -s "$f" ] || { echo "::error::$f is missing or empty — plasTeX produced no web build"; exit 1; }
+          done
+          grep -q 'digraph' "$out/dep_graph_document.html" || {
+            echo "::error::no DOT digraph — plastexdepgraph produced no graph"; exit 1; }
+          nodes=$(grep -oE 'shape=(ellipse|box)' "$out/dep_graph_document.html" | wc -l)
+          if [ "$nodes" -eq 0 ]; then
+            echo "::error::the dependency graph has no nodes — Graphviz missing, or \\input silently dropped"
+            sed -n 's/.*\(digraph[^<]*\).*/\1/p' "$out/dep_graph_document.html" | head -c 2000
+            exit 1
+          fi
+          [ -s "$out/js/graphvizlib.wasm" ] || {
+            echo "::error::graphvizlib.wasm missing — the graph would not render in the browser"; exit 1; }
+          # The six chapters this export carries. Fewer means \input was dropped despite a
+          # graph having been produced.
+          chapters=$(grep -ohE '(Definition|Lemma|Proposition|Theorem|Corollary) [0-9]+\.[0-9]+' "$out"/*.html | cut -d' ' -f2 | cut -d. -f1 | sort -u | tr '\n' ' ')
+          echo "web blueprint OK: $nodes graph nodes, statements in chapters: $chapters"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: blueprint-web
+          path: blueprint/web
+          if-no-files-found: error
+
+      - name: Publish to the release channel
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$ACCOUNT" ]; then
+            echo "::notice::R2 secrets not configured — the build is in the artifact, nothing published."
+            exit 0
+          fi
+          # No --delete: this syncs ONE subtree of an immutable release channel and must not
+          # touch the paper and landing page already published beside it.
+          aws s3 sync blueprint/web/ "s3://research-content/${SLUG}/${CHANNEL}/blueprint/" \
+            --endpoint-url "https://${ACCOUNT}.r2.cloudflarestorage.com" --no-progress
+          echo "published to /papers/${SLUG}/${CHANNEL}/blueprint/"
